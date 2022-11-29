@@ -8,7 +8,7 @@ import math
 import datetime
 import plotly.graph_objects as go
 
-days = 365
+days = 600
 amplitude = 60
 displacement = 0
 noise = 0.4
@@ -42,22 +42,22 @@ def sin_data_generate(N,A,S,R):
     return [x,y]
 
 test_df = pd.DataFrame()
-test_type = ['liquid based', 'conventional','another type']
+test_type = ['liquid based', 'conventional','another type', 'fourth type', 'just another']
 adequacy_list = [{'satisfactory': 'Yes'},{'satisfactory': 'No', 'processed': 'Not processed'},{'satisfactory': 'No', 'processed': 'processed'}]
-results_list = ['negative', 'ASC-US', 'ASC-H', 'LSIL', 'MSIL', 'SCC', 'AC']
+results_list = ['negative', 'ASC-US', 'ASC-H', 'LSIL', 'MSIL', 'SCC', 'AC', 'JJJ', 'KKK', 'LLL']
+genotype_list = ['16','18']
 for type in test_type:
     test_data = sin_data_generate(days, random.randint(1, 5), random.randint(0,20), noise)
     final = datetime.datetime.now()
     initial = final - datetime.timedelta(days=days-1)
-    # print(initial, final)
-    
+    # print(initial, final)    
     daterange = pd.date_range(initial, final, freq='D')
 
     test_df['day'] = daterange
     test_df[type] = test_data[1]
-    test_df['adequacy'] = random.choices(adequacy_list, k=len(test_df))
-    test_df['result'] = random.choices(results_list, k=len(test_df))
-
+    test_df['adequacy ' + type] = random.choices(adequacy_list, k=len(test_df))
+    test_df['result ' + type] = random.choices(results_list, k=len(test_df))
+    test_df['mvp'] = random.choices(genotype_list, k=len(test_df))
 # print(test_df['result'].head(4))
 # First Graph definition
 # fig1 = px.line(test_df, x="day", y="number", color=test_type, symbol=test_type, title='Types', markers=True)
@@ -77,11 +77,6 @@ tree_parents = ["", "Satisfactory", "Satisfactory", "No", "No"]
 fig2 = px.treemap()
 fig2.update_layout(margin = dict(t=100, l=50, r=50, b=100))
 
-# fig1.update_layout(
-#     plot_bgcolor = colors["background"],
-#     paper_bgcolor = colors["background"],
-#     font_color = colors["text"]
-# )
 
 
 app.layout = html.Div(children=[
@@ -219,6 +214,11 @@ def filter_df_by_dates(start_date, end_date):
         fig.add_trace(go.Scatter(x=filter_df['day'], y=filter_df[test],
                             mode='lines+markers',
                             name=test))
+    
+
+    fig.update_layout(legend_title_text = "Type")
+    fig.update_yaxes(title_text='number')
+
     return fig
 
 @app.callback(
@@ -248,13 +248,13 @@ def update_tree_map(selected_type, start_date, end_date):
     filtered_df = test_df[(test_df['day']>start_date) & (test_df['day']<end_date)]
     count_df = pd.DataFrame()
     count_df['value'] = filtered_df[str(selected_type)]
-    count_df['adequacy'] = filtered_df['adequacy']
+    count_df['adequacy ' + selected_type] = filtered_df['adequacy ' + selected_type]
     count = filtered_df[str(selected_type)].count()
-    satisfactory_df = count_df[count_df['adequacy'] == {'satisfactory': 'Yes'}]
+    satisfactory_df = count_df[count_df['adequacy ' + selected_type] == {'satisfactory': 'Yes'}]
     satisfactory = satisfactory_df['value'].count()
-    not_processed_df = count_df[count_df['adequacy'] == {'satisfactory': 'No', 'processed': 'Not processed'} ]
+    not_processed_df = count_df[count_df['adequacy ' + selected_type] == {'satisfactory': 'No', 'processed': 'processed'}]
     not_processed = not_processed_df['value'].count()
-    remainder_df = count_df[count_df['adequacy'] == {'satisfactory': 'No', 'processed': 'processed'} ]
+    remainder_df = count_df[count_df['adequacy ' + selected_type] == {'satisfactory': 'No', 'processed': 'Not processed'}]
     remainder = remainder_df['value'].count()
     not_satisfactory = not_processed + remainder
     tree_values = [count, 
@@ -290,25 +290,23 @@ def update_result_graph(click_data, type, start_date, end_date):
     if click_data:
         clicked_data = click_data.get("points")
         label = clicked_data[0]["label"]
-        print(f'label: {label}')
-        print(f'type: {type}')
         match label:
             case 'Yes':
-                filtered_result_df = filtered_result_df[filtered_result_df['adequacy'].isin([{'satisfactory': 'Yes'}])]
+                filtered_result_df = filtered_result_df[filtered_result_df['adequacy ' + type].isin([{'satisfactory': 'Yes'}])]
                 message = 'Yes'
                 processed = 'Yes'
             case 'No':
-                filtered_result_df = filtered_result_df[filtered_result_df['adequacy'].isin([{'satisfactory': 'No', 'processed': 'Not processed'},{'satisfactory': 'No', 'processed': 'processed'}])]
+                filtered_result_df = filtered_result_df[filtered_result_df['adequacy ' + type].isin([{'satisfactory': 'No', 'processed': 'Not processed'},{'satisfactory': 'No', 'processed': 'processed'}])]
                 message = 'No'
                 processed = 'No'
             case 'Processed':
-                filtered_result_df = filtered_result_df[filtered_result_df['adequacy'].isin([{'satisfactory': 'No', 'processed': 'processed'}])]
+                filtered_result_df = filtered_result_df[filtered_result_df['adequacy ' + type].isin([{'satisfactory': 'No', 'processed': 'processed'}])]
                 message = 'No'
                 processed = 'Yes'
             case 'Not Processed':
                 message = 'No'
                 processed = 'No'
-                filtered_result_df = filtered_result_df[filtered_result_df['adequacy'].isin([{'satisfactory': 'No', 'processed': 'Not processed'}])]
+                filtered_result_df = filtered_result_df[filtered_result_df['adequacy ' + type].isin([{'satisfactory': 'No', 'processed': 'Not processed'}])]
             case 'Satisfactory':
                 message = 'All'
                 processed = ''
@@ -316,8 +314,11 @@ def update_result_graph(click_data, type, start_date, end_date):
     fig3 = go.Figure()
     # print(filtered_result_df.head())    
     for result in results_list:
-        data = filtered_result_df[filtered_result_df['result'] == result]
-        fig3.add_trace(go.Scatter(x=filtered_result_df["day"], y= data[type], mode="markers+lines", name=result,  ))
+        data = filtered_result_df[filtered_result_df['result ' + type] == result]
+        fig3.add_trace(go.Scatter(x=filtered_result_df["day"], y= data[type], mode="markers+lines", name=result))
+  
+    fig3.update_layout(legend_title_text = "Result")
+    fig3.update_yaxes(title_text=type)
     # fig3 = px.line(filtered_result_df, x=filtered_result_df["day"], y=filtered_result_df[type], color=filtered_result_df["result"], symbol=filtered_result_df["result"])
     return f'Type: {type}, Adequacy: {message}, Processed: {processed}', fig3
 
@@ -335,22 +336,24 @@ def update_mpv_graph(click_data, result, type, start_date, end_date):
     if click_data:
         clicked_data = click_data.get("points")
         label = clicked_data[0]["label"]
-        print(f'label: {label}')
-        print(f'type: {type}')
         match label:
             case 'Yes':
-                filtered_df = filtered_df[filtered_df['adequacy'].isin([{'satisfactory': 'Yes'}])]
+                filtered_df = filtered_df[filtered_df['adequacy ' + type].isin([{'satisfactory': 'Yes'}])]
             case 'No':
-                filtered_df = filtered_df[filtered_df['adequacy'].isin([{'satisfactory': 'No', 'processed': 'Not processed'},{'satisfactory': 'No', 'processed': 'processed'}])]
+                filtered_df = filtered_df[filtered_df['adequacy ' + type].isin([{'satisfactory': 'No', 'processed': 'Not processed'},{'satisfactory': 'No', 'processed': 'processed'}])]
             case 'Processed':
-                filtered_df = filtered_df[filtered_df['adequacy'].isin([{'satisfactory': 'No', 'processed': 'processed'}])]
+                filtered_df = filtered_df[filtered_df['adequacy ' + type].isin([{'satisfactory': 'No', 'processed': 'processed'}])]
             case 'Not Processed':
-                filtered_df = filtered_df[filtered_df['adequacy'].isin([{'satisfactory': 'No', 'processed': 'Not processed'}])]
+                filtered_df = filtered_df[filtered_df['adequacy ' + type].isin([{'satisfactory': 'No', 'processed': 'Not processed'}])]
 
-    filtered_df = filtered_df[filtered_df['result'] == result]
-    print(filtered_df)
+    filtered_df = filtered_df[filtered_df['result ' + type] == result]
     fig4 = go.Figure()
-    fig4.add_trace(go.Scatter(x=filtered_df['day'], y=filtered_df[type], mode='markers+lines', name=type))
+    for genotype in genotype_list:
+        data = filtered_df[filtered_df['mvp'] == genotype]
+        fig4.add_trace(go.Scatter(x=filtered_df['day'], y=data[type], mode='markers+lines', name=genotype))
+    fig4.update_layout(legend_title_text = "Genotype")
+    fig4.update_yaxes(title_text='number')
+
     return f'{result}', fig4
 
 
