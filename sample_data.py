@@ -34,6 +34,14 @@ adequacy_list = [{'satisfactory': 'Yes'},{'satisfactory': 'No', 'processed': 'No
 results_list = ['negative', 'ASC-US', 'ASC-H', 'LSIL', 'MSIL', 'SCC', 'AC', 'JJJ', 'KKK', 'LLL']
 genotype_list = ['16','18']
 
+
+#tree map data
+# # Second Graph definition
+tree_values = [100, 40, 60, 30, 30]
+tree_labels = ["Satisfactory","Yes", "No", "Processed", "Not Processed"]
+tree_parents = ["", "Satisfactory", "Satisfactory", "No", "No"]
+
+
 #Data Generator
 def sin_data_generate(N,A,S,R):
     """To generate sinusoidal data."""
@@ -48,29 +56,48 @@ def sin_data_generate(N,A,S,R):
 
 initial_df = pd.DataFrame()
 test_df = pd.DataFrame(columns=['day', 'type', 'adequacy', 'result', 'mvp', 'cytology', 'hystology'])
-
 choices = ['true positive', 'false positive', 'false negative', 'true negative']
 
-for type in test_type:
-    test_data = sin_data_generate(days, random.randint(5, 20), random.randint(20,50), noise)
-    final = datetime.now()
-    initial = final - timedelta(days=days-1)
-    daterange = pd.date_range(initial, final, freq='D')
-    initial_df['day'] = daterange
-    initial_df[type] = test_data[1].astype(int)
+def get_test_quality(cytology, hystology):
+    """Get quality test based on cytology and hystology results."""
+    if cytology == 'positive' and hystology == 'positive':
+        test_quality = 'true positive'
+    if cytology == 'positive' and hystology == 'negative':
+        test_quality = 'false positive'
+    if cytology == 'negative' and hystology == 'positive':
+        test_quality = 'false negative'
+    if cytology == 'negative' and hystology == 'negative':
+        test_quality = 'true negative'
+    return test_quality
 
-for type in test_type:
-    type_list_samples = initial_df[type].values
-    for index, number in enumerate(type_list_samples):
-        for sample in range(number):
-            day = initial_df['day'].iloc[index]
-            adequacy = random.choices(adequacy_list)[0]
-            result = random.choices(results_list, weights=[0.2, 0.05, 0.05, 0.1, 0.1, 0.1, 0.1,0.1,0.1, 0.1])[0]
-            mvp = random.choices(genotype_list)[0]
-            cytology = random.choices(['positive', 'negative'], weights=[0.8, 0.2])[0]
-            hystology = random.choices(['positive', 'negative'], weights=[0.8, 0.2])[0]
-            new_row = {'day': day,'type': type, 'adequacy': adequacy, 'result': result, 'mvp': mvp, 'cytology': cytology, 'hystology': hystology}
-            new_df = pd.DataFrame([new_row])
-            test_df = pd.concat([test_df, new_df], axis=0, ignore_index=True)
-            new_df.reset_index()
-    print(test_df.tail(5))
+
+
+def generate_sample_data():
+    """Create Sample data."""
+    for type in test_type:
+        test_data = sin_data_generate(days, random.randint(5, 20), random.randint(20,50), noise)
+        final = datetime.now()
+        initial = final - timedelta(days=days-1)
+        daterange = pd.date_range(initial, final, freq='D')
+        initial_df['day'] = daterange
+        initial_df[type] = test_data[1].astype(int)
+
+    for type in test_type:
+        type_list_samples = initial_df[type].values
+        for index, number in enumerate(type_list_samples):
+            for sample in range(number):
+                day = initial_df['day'].iloc[index]
+                adequacy = random.choices(adequacy_list)[0]
+                result = random.choices(results_list, weights=[0.2, 0.05, 0.05, 0.1, 0.1, 0.1, 0.1,0.1,0.1, 0.1])[0]
+                mvp = random.choices(genotype_list)[0]
+                cytology = random.choices(['positive', 'negative'], weights=[0.8, 0.2])[0]
+                hystology = random.choices(['positive', 'negative'], weights=[0.8, 0.2])[0]
+                test_quality = get_test_quality(cytology, hystology)
+                new_row = {'day': day,'type': type, 'adequacy': adequacy, 'result': result, 'mvp': mvp, 'cytology': cytology, 'hystology': hystology, 'test_quality': test_quality }
+                new_df = pd.DataFrame([new_row])
+                test_df = pd.concat([test_df, new_df], axis=0, ignore_index=True)
+                new_df.reset_index()
+        print(test_df.tail(5))
+
+    initial_df.to_csv('test_type_count.csv')
+    test_df.to_csv('test_dataframe.csv')
