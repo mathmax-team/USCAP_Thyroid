@@ -1,0 +1,90 @@
+{
+    "files.encoding": "utf8",
+    "files.trimTrailingWhitespace": true,
+    "files.exclude": {
+        "**/venv": true,
+        "**/__pycache__": true,
+        "**/.mypy_cache": true,
+        "**/.pytest_cache": true,
+        "**/node_modules": true,
+        "**/dist": true,
+    },
+    "[python]": {
+        "editor.formatOnPaste": false,
+        "editor.formatOnSaveMode": "file",
+        "editor.renderWhitespace": "trailing",
+        "editor.insertSpaces": true,
+    },
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": [
+        "--line-length",
+        "100",
+    ],
+    "editor.detectIndentation": true,
+    "editor.tabSize": 4,
+    "python.linting.enabled": true,
+    "python.linting.lintOnSave": true,
+    "python.linting.pycodestyleEnabled": true,
+    "python.linting.pycodestyleArgs": [
+        "--line-length",
+        "100",
+    ],
+    "python.linting.pydocstyleEnabled": true,
+    "python.linting.banditEnabled": true,
+    "python.linting.mypyEnabled": true,
+    "git.autofetch": true,
+    "git.mergeEditor": true,
+    "eslint.format.enable": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true,
+    },
+    "[javascript, vue]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "eslint.workingDirectories": [
+        "./fe",
+    ],
+    "eslint.lintTask.enable": false,
+    "eslint.run": "onType",
+    "eslint.options": {
+        "overrideConfig": {
+            "env": {
+                "browser": true,
+            },
+            "extends": [
+                "eslint:recommended",
+                "plugin:vue/vue3-recommended"
+            ],
+            "plugins": [
+                "vue"
+            ],
+            "rules": {
+                "indent": [
+                    "error",
+                    "tab"
+                ],
+                "quotes": [
+                    "error",
+                    "single"
+                ],
+                "semi": [
+                    "error",
+                    "always"
+                ],
+                "spaced-comment": [
+                    "error",
+                    "always"
+                ],
+                "curly": 2,
+                "no-mixed-spaces-and-tabs": 2,
+                "no-trailing-spaces": "error",
+            },
+        },
+    },
+    "python.testing.pytestArgs": [
+        "."
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}

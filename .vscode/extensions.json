@@ -1,0 +1,18 @@
+{
+    "recommendations": [
+        "visualstudioexptteam.vscodeintellicode",
+        "visualstudioexptteam.intellicode-api-usage-examples",
+        "mhutchie.git-graph",
+        "srmeyers.git-prefix",
+        "eamodio.gitlens-insiders",
+        "github.remotehub",
+        "ms-python.vscode-pylance",
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "mechatroner.rainbow-csv",
+        "dbaeumer.vscode-eslint",
+        "octref.vetur",
+        "vuetifyjs.vuetify-vscode",
+        "sdras.vue-vscode-snippets",
+    ]
+}
