@@ -3,7 +3,7 @@ from dash import Dash, html, dcc, Output, Input
 import flask
 import plotly.express as px
 import pandas as pd
-from sample_data import last_week_date, last_year_date, last_month_date,test_type, results_list, genotype_list, initial_df, test_df
+from sample_data import last_week_date, last_year_date, last_month_date,test_type, results_list, genotype_list
 from datetime import date
 from be.controllers.types_graph import types_graph
 from be.controllers.filter_dataframe import filter_dataframe
@@ -16,6 +16,8 @@ external_stylesheets = ['/assets/styles.css']
 f_app = flask.Flask(__name__)
 app = Dash(__name__, server=f_app, external_stylesheets=external_stylesheets)
 
+test_df = pd.read_csv('test_dataframe.csv')
+initial_df = pd.read_csv('test_type_count.csv')
 
 app.layout = html.Div(children=[
     html.Nav(children=[
@@ -94,7 +96,7 @@ app.layout = html.Div(children=[
             html.H3('Adequacy: ', style={'fontWeigth': 'bold'}),
             # html.Div(id='adequacy-selected'),
             dcc.Dropdown(results_list,
-            value='negative',
+            value=results_list[0],
             id = 'selected-result'
             ),
             dcc.Graph(id='results-graph', figure={},
@@ -113,7 +115,7 @@ app.layout = html.Div(children=[
 
         #Fourth GRAPH
         html.Div(children=[
-            html.H2('MVp', style={'textAlign': 'center'}),
+            html.H2('MVP', style={'textAlign': 'center'}),
             html.H3('Result selected: ', style={'fontWeigth': 'bold'}),
                         dcc.RadioItems(genotype_list,
             value=genotype_list[0],
@@ -140,7 +142,7 @@ app.layout = html.Div(children=[
         #Fifth GRAPH
         html.Div(children=[
             html.H2('QC', style={'textAlign': 'center'}),
-            html.H3('MVp selected: ', style={'fontWeigth': 'bold'}),
+            html.H3('MVP selected: ', style={'fontWeigth': 'bold'}),
             html.Div(id='genotype-selected'),
             dcc.Graph(id='qc-graph', figure={},
                 config={
@@ -185,7 +187,7 @@ def update_time_range(input_range):
     Output(component_id='tree-map', component_property='figure'),
     Output(component_id='results-graph', component_property='figure'),
     Output(component_id='mvp-graph', component_property='figure'),
-    # Output(component_id='qc-graph', component_property='figure'),
+    Output(component_id='qc-graph', component_property='figure'),
 
     Input(component_id = 'type-dropdown', component_property='value'),
     Input(component_id='tree-map', component_property='clickData'),
@@ -203,11 +205,11 @@ def update_graphs(type, click_data, result, genotype, start_date, end_date):
     tree_graph = tree_data[0]
     # message =  tree_data[1]
     # processed = tree_data[2]
-    filtered_df = tree_data[3]
-    results_data = result_graph(filtered_df, type, result)
+    result_df = tree_data[3]
+    results_data = result_graph(result_df, type, result)
     results_graph = results_data[0]
-    mvp_data = mvp_graph(results_data[1], type, result)
+    mvp_data = mvp_graph(results_data[1], type, result, genotype)
     mvps_graph = mvp_data[0]
-    # qc = qc_graph(mvp_data[1], type, genotype)
+    qc = qc_graph(result_df, type, result, genotype)
 
-    return f'{type}',f'{result}', f'{genotype}', types, tree_graph, results_graph, mvps_graph#, qc
+    return f'{type}',f'{result}', f'{genotype}', types, tree_graph, results_graph, mvps_graph, qc
