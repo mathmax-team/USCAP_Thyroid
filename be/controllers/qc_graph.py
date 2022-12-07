@@ -1,19 +1,40 @@
 """Creates and returns qc graph."""
 from sample_data import choices
 import plotly.graph_objects as go
+import pandas as pd
 
-def qc_graph(df, type, genotype):
+def qc_graph(df, type, result, genotype):
     """Create a scatter graph on filtered data frame."""
-    graph = go.Figure()
-    df = df[df['mvp'] == genotype]
     count = 0
-    positive = df[df['cytology'] == 'positive']
+    graph = go.Figure()
+    # df = df[df['mvp'] == genotype]
+    data = df.loc[df['type'] == type]
+    data = data.loc[data['result'] == result]
+    data = data.loc[data['mvp'] == int(genotype)]
+
+    positive = data[data['cytology'] == 'positive']
+
+    positive_day_group = positive.groupby('day')
+    graph_df = pd.DataFrame()
+    graph_df['count'] = positive_day_group['cytology'].count()
+    graph_df = graph_df.reset_index()
+
+
+
     print(positive)
-    graph.add_trace(go.Scatter(x=positive['day'], y=positive[type], marker_symbol= count, mode='markers+lines', name='positive_cytology', showlegend=True))
+    graph.add_trace(go.Scatter(x=graph_df['day'], y=graph_df['count'], marker_symbol= count, mode='markers+lines', name='positive_cytology', showlegend=True))
+
     for qc_result in choices:
         count += 1
-        data = df[df['test_quality'] == qc_result]
-        graph.add_trace(go.Scatter(x=data['day'], y=data[type], marker_symbol= count, mode='markers+lines', name=qc_result, showlegend=True, fill='tonexty'))
-        graph.update_layout(legend_title_text = "Combinations")
-        graph.update_yaxes(title_text='number')
+        test_data = data[data['test_quality'] == qc_result]
+        if not test_data.empty:
+            day_group = test_data.groupby('day')
+            dataframe = pd.DataFrame()
+            dataframe['count'] = day_group['cytology'].count()
+            dataframe = dataframe.reset_index()
+
+
+            graph.add_trace(go.Scatter(x=dataframe['day'], y=dataframe['count'], marker_symbol= count, mode='markers+lines', name=qc_result, showlegend=True, fill='tonexty'))
+            graph.update_layout(legend_title_text = "Combinations")
+            graph.update_yaxes(title_text='number')
     return graph
