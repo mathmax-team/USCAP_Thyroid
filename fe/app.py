@@ -158,9 +158,6 @@ app.layout = html.Div(children=[
         html.Div('6', style={'padding':'10px', 'border':'solid 1px black'}),
     ], style={'display': 'grid', 'gridTemplateColumns': 'repeat(3, 1fr)', 'gridTemplateRows':'repeat(2, 1fr)','gridAutoFlow': 'column'}),
 ], style={'display': 'grid', 'margin': '20px'})
-# if __name__ == '__main__':
-#     app.run_server(debug=True)
-
 @app.callback(
     Output(component_id= 'date-range', component_property='start_date'),
     Output(component_id= 'date-range', component_property='end_date'),
@@ -213,3 +210,6 @@ def update_graphs(type, click_data, result, genotype, start_date, end_date):
     qc = qc_graph(result_df, type, result, genotype)
 
     return f'{type}',f'{result}', f'{genotype}', types, tree_graph, results_graph, mvps_graph, qc
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
