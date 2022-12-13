@@ -1,0 +1,49 @@
+:root {
+ --pink: #ef476f;
+--orange: #f99909;
+--green: #06d6a0;
+--blue: #118ab2;
+--midnight: #073b4c;
+--rich-black: #0d1b2aff;
+--oxford-blue: #1b263bff;
+--shadow-blue: #778da9ff;
+--platinum: rgb(200, 202, 189);
+--yellow:rgb(243, 249, 69);
+  }
+
+
+body {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
+}
+h3, h4, h5, h6 {
+    color: var(--green);
+    font-weight: 'bold';
+}
+
+
+h2 {
+    color: var(--green);font-size: "25";
+}
+h1 {color:var(--platinum);font-size:"30";}
+
+label{
+    margin: 20px;
+    color: var(--pink);
+    font-size: "40";
+    font-weight: 'bold';
+}
+div {
+    background-color: white;
+    border:'solid 3px black';
+
+  }
+
+#grad{background-image:linear-gradient(var(--green), var(--midnight));
+    }
+
+
+#default-time-ranges {
+    font-size:"4"
+}
+
+
