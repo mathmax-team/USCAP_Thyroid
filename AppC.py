@@ -24,11 +24,11 @@ initial_df = pd.read_csv('test_type_count.csv')
 app.layout = html.Div(children=[
     html.Div(children=[
         html.H1('CYTOPATHOLOGY MONITOR')], style={'display': 'table','vertical-align':'middle','textAlign': 'center','height':'15px','border': 'solid 5px gray','font-size':"20px"}
-       ),
+       ,id="grad"),
     html.Div(children=[
         # Default time Ranges
-        html.Label('Time period:'),
-        dcc.Dropdown(['last week', 'last month', 'last year'], 'last month',style={'width': '40%','color':'orange'} ,id="default-time-ranges"),
+        html.Label('Time period:',style={'font-size':"20px",'font-weight':"bold"}),
+        dcc.Dropdown(['last week', 'last month', 'last year'], 'last month',style={'width': '40%','color':'orange',"font-size":"20px"} ,id="default-time-ranges"),
         dcc.DatePickerRange(
             id = 'date-range',
             start_date_placeholder_text = last_month_date,
@@ -95,7 +95,7 @@ app.layout = html.Div(children=[
         html.Div(children=[
             #html.H2('Results', style={'textAlign': 'center'}),
             html.H3('Adequacy: ', style={'fontWeigth': 'bold'}),
-            html.Div(id='adequacy-selected'),
+            #html.Div(id='adequacy-selected'),
             dcc.Dropdown(results_list,
             value=results_list[0],
             id = 'selected-result'
@@ -178,7 +178,7 @@ def update_time_range(input_range):
 
 @app.callback(
     Output(component_id='type-selected', component_property='children'),
-    Output(component_id='adequacy-selected', component_property='children'),
+    #Output(component_id='adequacy-selected', component_property='children'),
     Output(component_id='result-selected', component_property='children'),
     Output(component_id='genotype-selected', component_property='children'),
     Output(component_id='types-graph', component_property='figure'),
