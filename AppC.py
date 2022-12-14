@@ -23,20 +23,20 @@ initial_df = pd.read_csv('test_type_count.csv')
 #,'backgroundColor':"black"
 app.layout = html.Div(children=[
     html.Div(children=[
-        html.H1('CYTOPATHOLOGY MONITOR')], style={'display': 'table','vertical-align':'middle','textAlign': 'center','height':'15px','border': 'solid 5px gray','font-size':"20px"}
+        html.H1('CYTOPATHOLOGY MONITOR',style={"margin-top":"10px"}),html.Img(src="assets/medicine.svg", style={'height': '50px','margin-bottom': '10px','margin-left':'20px'})], style={"display":"table",'textAlign': 'center','height':'30mm','font-size':"20px",'justifyContent': 'center','justifyContent': 'center'}
        ,id="grad"),
     html.Div(children=[
         # Default time Ranges
         html.Label('Time period:',style={'font-size':"20px",'font-weight':"bold"}),
-        dcc.Dropdown(['last week', 'last month', 'last year'], 'last month',style={'width': '40%','color':'orange',"font-size":"20px"} ,id="default-time-ranges"),
+        dcc.Dropdown(['last week', 'last month', 'last year'], 'last month',style={'width': '40%','color':'white',"font-size":"20px"} ,id="default-time-ranges"),
         dcc.DatePickerRange(
             id = 'date-range',
             start_date_placeholder_text = last_month_date,
             end_date = date.today(),
             max_date_allowed = date.today()
-        ),
+        )
 
-    ], style={'display':'flex','justifyContent': 'center', 'alignItems': 'center', 'width': '100%',"hegiht":"10px"}),
+    ], style={'display':'flex','align-items': 'flex-start' ,'justifyContent': 'center','justifyContent': 'left', 'alignItems': 'center','width': '80%',"height":"15mm"}),
     html.Hr(),
 
     html.Div(children=[
@@ -69,12 +69,11 @@ app.layout = html.Div(children=[
             # id = 'type-radio'
             # ),
         ], style={'padding':'10px', 'border':None, 'display':'felx', 'flexDirection': 'column', 'justifyContent':'center'}),
-
         #Second GRAPH
         html.Div(children=[
             #html.H2('Adequacy', style={'textAlign': 'center'}),
-            html.H3('Type selected: ', style={'fontWeigth': 'bold'}),
-            html.Div(id='type-selected',style={'margin': '0px'}),
+            html.H3('Type selected: ', style={'fontWeigth': 'bold','textAlign':'center','font-size':"30px"},id='type-selected'),
+            #html.Div(id='type-selected',style={'margin': '0px'}),
             dcc.Graph(
                 id='tree-map',
                 figure={},
@@ -99,7 +98,7 @@ app.layout = html.Div(children=[
             dcc.Dropdown(results_list,
             value=results_list[0],
             id = 'selected-result'
-            ),
+            ,style={'color':'white',"font-size":"20px"}),
             dcc.Graph(id='results-graph', figure={},
                   config={
                       'staticPlot': True,     # True, False
@@ -158,7 +157,7 @@ app.layout = html.Div(children=[
         ], style={'padding':'10px'}),
         html.Div('6', style={'padding':'0px', 'border':None}),
     ], style={'display': 'grid', 'gridTemplateColumns': 'repeat(2, 1fr)', 'gridTemplateRows':'repeat(3, 1fr)','gridAutoFlow': 'row'}),
-], style={'display': 'grid', 'margin': '0px'})
+], style={'display': 'grid'})
 @app.callback(
     Output(component_id= 'date-range', component_property='start_date'),
     Output(component_id= 'date-range', component_property='end_date'),
