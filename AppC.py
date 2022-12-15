@@ -29,7 +29,7 @@ app.layout = html.Div(children=[
         # Default time Ranges
         html.Label('Time period:',style={'font-size':"20px",'font-weight':"bold"}),
         dcc.Dropdown(['last week', 'last month', 'last year'], 'last month',style={'width': '40%','color':'white',"font-size":"20px"} ,id="default-time-ranges"),
-d        # dcc.DatePickerRange(
+       # dcc.DatePickerRange(
         #     id = 'date-range',
         #     start_date_placeholder_text = last_month_date,
         #     end_date = date.today(),
@@ -180,6 +180,7 @@ d        # dcc.DatePickerRange(
 #     return start_date, end_date
 
 
+
 @app.callback(
     Output(component_id='type-selected', component_property='children'),
     #Output(component_id='adequacy-selected', component_property='children'),
@@ -225,8 +226,8 @@ def update_graphs(type, click_data, result, genotype, input_range):
     qc = qc_graph(result_df, type, result, genotype)
 
     return f'{type}',f'{result}', f'{genotype}', types, tree_graph, results_graph, mvps_graph, qc
-#initial_df["day"][5]>last_month_date
-print("this is type" ,type(initial_df["day"][0]))
-print(initial_df.dtypes)
+# #initial_df["day"][5]>last_month_date
+# print("this is type" ,type(initial_df["day"][0]))
+# print(initial_df.dtypes)
 if __name__ == '__main__':
     app.run_server(debug=True)
