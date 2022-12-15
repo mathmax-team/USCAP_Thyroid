@@ -29,7 +29,7 @@ app.layout = html.Div(children=[
         # Default time Ranges
         html.Label('Time period:',style={'font-size':"20px",'font-weight':"bold"}),
         dcc.Dropdown(['last week', 'last month', 'last year'], 'last month',style={'width': '40%','color':'white',"font-size":"20px"} ,id="default-time-ranges"),
-        # dcc.DatePickerRange(
+d        # dcc.DatePickerRange(
         #     id = 'date-range',
         #     start_date_placeholder_text = last_month_date,
         #     end_date = date.today(),
