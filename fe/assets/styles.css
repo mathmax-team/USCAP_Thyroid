@@ -2,8 +2,9 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 h1, h3, h4, h5, h6 {
-    color: hotpink
+    color: hotpink;background-color: rgb(16, 236, 16);
 }
+H1 {color: blue; background-color: green;}
 
 h2 {
     color: burlywood;
@@ -11,5 +12,8 @@ h2 {
 
 label{
     margin: 10px;
-    color: black;
+    color: rgb(11, 213, 244);
 }
+div {
+    background-color: lightblue;
+  }

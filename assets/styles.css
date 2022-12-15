@@ -8,7 +8,7 @@
 --oxford-blue: #1b263bff;
 --shadow-blue: #778da9ff;
 --platinum: rgb(200, 202, 189);
---yellow:rgb(243, 249, 69);
+--yellow:rgb(230, 230, 182);
   }
 
 
@@ -16,35 +16,40 @@ body {
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
 }
 h3, h4, h5, h6 {
-    color: var(--green);
+    color: whitesmoke;
     font-weight: 'bold';
     font-size:'80px';
 }
 
 
 h2 {
-    color: var(--green);font-size: "35";
+    color: whitesmoke;font-size: "35";
 }
-h1 {color:var(--platinum);font-size:"30";}
+h1 {color:whitesmoke;font-size:"30";}
 
 label{
     margin: 20px;
-    color: var(--pink);
+    color: whitesmoke;
 
 }
 div {
-    background-color:var(--midnight);
+    background-color: rgb(92, 92, 86);
     border:'solid 3px black';
 
   }
 
-#grad{background-image:linear-gradient(var(--green), var(--midnight));
+#grad{background-image:linear-gradient(var(--green), rgb(92, 92, 86));
     }
 
 
 #default-time-ranges {
-    font-size:"4"
+    font-size:"4px"
 }
 
+/* .DateRangePickerInput{
+    background-color:"red";
+    color:pink;
+    height:"40mm";
+} */
 
-
+*{margin:0;padding:0;} body {margin: 0;} header {margin: 0; top:0;}

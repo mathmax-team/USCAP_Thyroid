@@ -29,14 +29,32 @@ app.layout = html.Div(children=[
         # Default time Ranges
         html.Label('Time period:',style={'font-size':"20px",'font-weight':"bold"}),
         dcc.Dropdown(['last week', 'last month', 'last year'], 'last month',style={'width': '40%','color':'white',"font-size":"20px"} ,id="default-time-ranges"),
-        dcc.DatePickerRange(
-            id = 'date-range',
-            start_date_placeholder_text = last_month_date,
-            end_date = date.today(),
-            max_date_allowed = date.today()
-        )
-
-    ], style={'display':'flex','align-items': 'flex-start' ,'justifyContent': 'center','justifyContent': 'left', 'alignItems': 'center','width': '80%',"height":"15mm"}),
+        # dcc.DatePickerRange(
+        #     id = 'date-range',
+        #     start_date_placeholder_text = last_month_date,
+        #     end_date = date.today(),
+        #     max_date_allowed = date.today(),
+        #     day_size=40
+        # ),
+    html.H3('Type elalskjdf selected: ', style={'fontWeigth': 'bold','textAlign':'center','font-size':"30px"},id='type-selected'),
+            #html.Div(id='type-selected',style={'margin': '0px'}),
+            dcc.Graph(
+                id='tree-map',
+                figure={},
+                clickData={},
+                config={
+                    'staticPlot': True,     # True, False
+                    'scrollZoom': True,      # True, False
+                    'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
+                    'showTips': True,       # True, False
+                    'displayModeBar': 'hover',  # True, False, 'hover'
+                    'watermark': False,
+                    # 'modeBarButtonsToRemove': ['pan2d','select2d'],
+                    }
+            #,style={"height":"40px"}
+            )
+            #'align-items': 'flex-start'
+    ], style={"display":'flex','justifyContent': 'center', 'alignItems': 'center','width': '100%'}),
     html.Hr(),
 
     html.Div(children=[
@@ -70,25 +88,10 @@ app.layout = html.Div(children=[
             # ),
         ], style={'padding':'10px', 'border':None, 'display':'felx', 'flexDirection': 'column', 'justifyContent':'center'}),
         #Second GRAPH
-        html.Div(children=[
-            #html.H2('Adequacy', style={'textAlign': 'center'}),
-            html.H3('Type selected: ', style={'fontWeigth': 'bold','textAlign':'center','font-size':"30px"},id='type-selected'),
-            #html.Div(id='type-selected',style={'margin': '0px'}),
-            dcc.Graph(
-                id='tree-map',
-                figure={},
-                clickData={},
-                config={
-                    'staticPlot': True,     # True, False
-                    'scrollZoom': True,      # True, False
-                    'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
-                    'showTips': True,       # True, False
-                    'displayModeBar': 'hover',  # True, False, 'hover'
-                    'watermark': False,
-                    # 'modeBarButtonsToRemove': ['pan2d','select2d'],
-                    },
-            ),
-        ], style={'padding':'10px', 'border':None}),
+        # html.Div(children=[
+        #     html.H2('Adequacy', style={'textAlign': 'center'}),
+
+        # ], style={'padding':'10px', 'border':None}),
 
         #Third GRAPH
         html.Div(children=[
@@ -158,21 +161,23 @@ app.layout = html.Div(children=[
         html.Div('6', style={'padding':'0px', 'border':None}),
     ], style={'display': 'grid', 'gridTemplateColumns': 'repeat(2, 1fr)', 'gridTemplateRows':'repeat(3, 1fr)','gridAutoFlow': 'row'}),
 ], style={'display': 'grid'})
-@app.callback(
-    Output(component_id= 'date-range', component_property='start_date'),
-    Output(component_id= 'date-range', component_property='end_date'),
-    Input(component_id='default-time-ranges', component_property='value')
-)
-def update_time_range(input_range):
-    """Control time range selection."""
-    if input_range == 'last week':
-        start_date = last_week_date
-    elif input_range == 'last month':
-        start_date =last_month_date
-    elif input_range == 'last year':
-        start_date = last_year_date
-    end_date = date.today()
-    return start_date, end_date
+
+
+# @app.callback(
+#     Output(component_id= 'date-range', component_property='start_date'),
+#     Output(component_id= 'date-range', component_property='end_date'),
+#     Input(component_id='default-time-ranges', component_property='value')
+# )
+# def update_time_range(input_range):
+#     """Control time range selection."""
+#     if input_range == 'last week':
+#         start_date = last_week_date
+#     elif input_range == 'last month':
+#         start_date =last_month_date
+#     elif input_range == 'last year':
+#         start_date = last_year_date
+#     end_date = date.today()
+#     return start_date, end_date
 
 
 @app.callback(
@@ -190,14 +195,24 @@ def update_time_range(input_range):
     Input(component_id='tree-map', component_property='clickData'),
     Input(component_id='selected-result', component_property='value'),
     Input(component_id='genotype-radio', component_property='value'),
-    Input(component_id='date-range', component_property='start_date'),
-    Input(component_id='date-range', component_property='end_date')
+    # Input(component_id='default-time-range', component_property='start_date'),
+    Input(component_id='default-time-ranges', component_property='value')
 )
-def update_graphs(type, click_data, result, genotype, start_date, end_date):
+def update_graphs(type, click_data, result, genotype, input_range):
+
     """Return all graphs based on interactive filters."""
-    filtered_df = filter_dataframe(initial_df, start_date, end_date)
+    # if input_range == 'last week':
+    #     start_date = last_week_date
+    # elif input_range == 'last month':
+    #     start_date =last_month_date
+    # elif input_range == 'last year':
+    #     start_date = last_year_date
+    start_date="camilo"#last_month_date
+    end_date = date.today()
+
+    filtered_df = initial_df#filter_dataframe(initial_df,date.today(),date.today())
     types = types_graph(filtered_df, type)
-    test_dataframe = filter_dataframe(test_df, start_date, end_date)
+    test_dataframe = test_df#filter_dataframe(test_df, start_date, end_date)
     tree_data = tree_map_graph(test_dataframe, type, click_data)
     tree_graph = tree_data[0]
     # message =  tree_data[1]
@@ -210,6 +225,8 @@ def update_graphs(type, click_data, result, genotype, start_date, end_date):
     qc = qc_graph(result_df, type, result, genotype)
 
     return f'{type}',f'{result}', f'{genotype}', types, tree_graph, results_graph, mvps_graph, qc
-
+#initial_df["day"][5]>last_month_date
+print("this is type" ,type(initial_df["day"][0]))
+print(initial_df.dtypes)
 if __name__ == '__main__':
     app.run_server(debug=True)
