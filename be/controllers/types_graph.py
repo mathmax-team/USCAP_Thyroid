@@ -21,6 +21,17 @@ def types_graph(df, type):
     graph.update_layout(legend_title_text = "Type")
     graph.update_yaxes(title_text='number')
     graph.update_xaxes(title_text='day')
+    graph.update_layout(margin=go.layout.Margin(
+        l=0, #left margin
+        r=0, #right margin
+        b=0, #bottom margin
+        t=0, #top margin
+
+    ),
+    paper_bgcolor="#f5f3f4",
+    plot_bgcolor="#f5f3f4",
+    height=300,
+    width=650)
     # graph.update_layout(plot_bgcolor='white')
     # graph.update_layout(colorway=['red'])
     # graph.update_layout(paper_bgcolor='black')

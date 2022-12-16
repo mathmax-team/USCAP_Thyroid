@@ -24,4 +24,18 @@ def mvp_graph(df, type, result, genotype):
             count += 1
     graph.update_layout(legend_title_text = "Genotype")
     graph.update_yaxes(title_text='number')
+    graph.update_layout(margin=go.layout.Margin(
+        l=0, #left margin
+        r=0, #right margin
+        b=0, #bottom margin
+        t=0, #top margin
+
+    ),
+    #paper_bgcolor="#293241",
+    paper_bgcolor="#f5f3f4",
+    plot_bgcolor="#f5f3f4",
+    height=300,
+    width=650
+
+    )
     return [graph, graph_df]

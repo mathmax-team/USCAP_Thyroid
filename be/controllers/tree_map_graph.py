@@ -4,8 +4,8 @@ import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 
-fig = px.treemap()
-fig.update_layout(margin = dict(t=100, l=50, r=50, b=100))
+fig = px.treemap( width=400, height=200)
+fig.update_layout(margin = dict(t=0, l=0, r=0, b=0))
 
 
 def tree_map_graph(df, type, click_data):
@@ -30,15 +30,15 @@ def tree_map_graph(df, type, click_data):
                     remainder]
 
     # treemap figure
-    adequacy_graph = px.treemap()
-    adequacy_graph.update_layout(margin = dict(t=100, l=50, r=50, b=100))
+    adequacy_graph = px.treemap(width=200,height=50)
+    adequacy_graph.update_layout(margin = dict(t=0, l=0, r=0, b=0))
     adequacy_graph.add_trace(go.Treemap(
         branchvalues = "total",
         labels = tree_labels,
         parents = tree_parents,
         values = tree_values,
         textinfo = "label+value",
-        marker_colorscale = 'Reds'
+        marker_colorscale = ["pink","orange","yellow"]
     ),row = 1, col = 1)
 
     message = ''

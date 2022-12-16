@@ -21,7 +21,7 @@ def qc_graph(df, type, result, genotype):
 
 
 
-    print(positive)
+    #print(positive)
     graph.add_trace(go.Scatter(x=graph_df['day'], y=graph_df['count'], marker_symbol= count, mode='markers+lines', name='positive_cytology', showlegend=True))
 
     for qc_result in choices:
@@ -37,4 +37,20 @@ def qc_graph(df, type, result, genotype):
             graph.add_trace(go.Scatter(x=dataframe['day'], y=dataframe['count'], marker_symbol= count, mode='markers+lines', name=qc_result, showlegend=True, fill='tonexty'))
             graph.update_layout(legend_title_text = "Combinations")
             graph.update_yaxes(title_text='number')
+            graph.update_layout(margin=go.layout.Margin(
+        l=0, #left margin
+        r=0, #right margin
+        b=0, #bottom margin
+        t=0, #top margin
+
+    ),
+    #paper_bgcolor="#293241",
+    paper_bgcolor="#f5f3f4",
+    plot_bgcolor="#f5f3f4",
+    height=300,
+    width=650
+
+    )
+
+
     return graph

@@ -9,6 +9,7 @@
 --shadow-blue: #778da9ff;
 --platinum: rgb(200, 202, 189);
 --yellow:rgb(230, 230, 182);
+--metal: #293241;
   }
 
 
@@ -32,19 +33,22 @@ label{
     color: whitesmoke;
 
 }
-div {
-    background-color: rgb(92, 92, 86);
+/* #default-time-ranges{
+    background-color: var(--metal); */
+/* } */
+#grid {
+    background-color:var(--metal);
     border:'solid 3px black';
-
   }
 
-#grad{background-image:linear-gradient(var(--green), rgb(92, 92, 86));
+
+#grad{background-image:linear-gradient(var(--green),var(--metal));
     }
 
 
-#default-time-ranges {
+/* #default-time-ranges {
     font-size:"4px"
-}
+} */
 
 /* .DateRangePickerInput{
     background-color:"red";
