@@ -39,10 +39,10 @@ app.layout = html.Div(children=[
                     html.Div(children=[
                         html.Label('Time period:',style={'font-size':"20px",'font-weight':"bold","display":"flex"}),
                         dcc.Dropdown(['last week', 'last month', 'last year'], 'last month',
-                            style={'width': '200px','color':'black',"font-size":"20px","display":"flex","align-items": "center","justifyContent":"right"} ,id="default-time-ranges"),
+                            style={'width': '200px','color':'black',"font-size":"20px","display":"flex","align-items": "center","justifyContent":"right","height":"1.2cm"} ,id="default-time-ranges"),
 
 
-                            ], style={"margin-left":"40mm","display":'table','justify-items': 'center', 'align-items': 'center','width': '40%'}
+                            ], style={"margin-left":"20mm","display":'table','justify-items': 'center', 'align-items': 'right','width': '100px'}
                     ),
                     ###DatePicker
                     dcc.DatePickerRange(
@@ -50,8 +50,8 @@ app.layout = html.Div(children=[
                             start_date_placeholder_text = last_month_date,
                             end_date = date.today(),
                             max_date_allowed = date.today(),
-                            day_size=40,
-                        style={"width":"10cm"}),
+                            day_size=30,
+                        style={"width":"10cm","height":"20cm","margin-top":"50px","margin-left":"20px"}),
                     ##Title and Treegraph
                     html.Div(children=[
                         html.H3('Type : ', style={'fontWeigth': 'bold','textAlign':'center','font-size':"20px"},id='type-selected'),
@@ -75,12 +75,13 @@ app.layout = html.Div(children=[
                                     className="vertical")
 
                     ],
-                    style={"display":"flex","height":"30mm",'justify-items': 'center', 'align-items': 'center'},
+                    style={"display":"flex","height":"30mm"},
                     id="grad"
                     ),
+                html.Hr(),
                 html.Div(children=[
 
-                    #html.Hr(),
+                    #
 
 
                         #First GRAPH
@@ -142,7 +143,7 @@ app.layout = html.Div(children=[
                                         },),
 
 
-                        ], style={'padding':'10px', 'border':None}),
+                        ], style={'padding':'10px'}),
 
 
                         #Fourth GRAPH
