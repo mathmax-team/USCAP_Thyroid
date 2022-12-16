@@ -27,21 +27,24 @@ initial_df["day"]=pd.to_datetime(initial_df["day"])
 #,'backgroundColor':"black"
 app.layout = html.Div(children=[
                 html.Div(children=[
+                    ###Name and Logo
                     html.Div(children=[
-                        html.H1('CYTOPATHOLOGY MONITOR',style={"margin-top":"10px","font-size":20}),
-                        html.Img(src="assets/medicine.svg", style={'height': '40px','margin-bottom': '10px','margin-left':'20px'})
+                        html.Img(src="assets/medicine.svg",style={'height': '60px','margin-bottom': '10px'}),
+                        html.H1('CYTOPATHOLOGY MONITOR',style={"margin-top":"10px","textAlign":"center"})
                         ],
-                        style={"display":"table"}
+                        style={"margin-left":"20px","align-items":"center"},
+                        className="horizontal"
                     ),
+                    ##Time and default ranges
                     html.Div(children=[
-                    # Default time Ranges
                         html.Label('Time period:',style={'font-size':"20px",'font-weight':"bold","display":"flex"}),
                         dcc.Dropdown(['last week', 'last month', 'last year'], 'last month',
-                            style={'width': '200px','color':'black',"font-size":"20px","display":"flex","align-items": "right","justifyContent":"right"} ,id="default-time-ranges"),
+                            style={'width': '200px','color':'black',"font-size":"20px","display":"flex","align-items": "center","justifyContent":"right"} ,id="default-time-ranges"),
 
 
-                            ], style={"margin-left":"20mm","display":'table','justifyContent': 'center', 'align-items': 'center','width': '40%'}
+                            ], style={"margin-left":"40mm","display":'table','justify-items': 'center', 'align-items': 'center','width': '40%'}
                     ),
+                    ###DatePicker
                     dcc.DatePickerRange(
                             id = 'date-range',
                             start_date_placeholder_text = last_month_date,
@@ -49,6 +52,7 @@ app.layout = html.Div(children=[
                             max_date_allowed = date.today(),
                             day_size=40,
                         style={"width":"10cm"}),
+                    ##Title and Treegraph
                     html.Div(children=[
                         html.H3('Type : ', style={'fontWeigth': 'bold','textAlign':'center','font-size':"20px"},id='type-selected'),
                         dcc.Graph(
@@ -67,10 +71,11 @@ app.layout = html.Div(children=[
                                 style={"height":"100px","width":"100px"}
                                     )
                                     ],
-                                    style={"display":"table"})
+                                    style={},
+                                    className="vertical")
 
                     ],
-                    style={"height":"40px","display":"flex","textAlign": "center","height":"30mm","font-size":"20px","justifyContent":"center"},
+                    style={"display":"flex","height":"30mm",'justify-items': 'center', 'align-items': 'center'},
                     id="grad"
                     ),
                 html.Div(children=[
