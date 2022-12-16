@@ -29,14 +29,14 @@ app.layout = html.Div(children=[
                 html.Div(children=[
                     html.Div(children=[
                         html.H1('CYTOPATHOLOGY MONITOR',style={"margin-top":"10px"}),
-                        html.Img(src="assets/medicine.svg", style={'height': '30px','margin-bottom': '10px','margin-left':'20px'})],
+                        html.Img(src="assets/medicine.svg", style={'height': '40px','margin-bottom': '10px','margin-left':'20px'})],
                         style={"display":"table"}
                     ),
                     html.Div(children=[
                     # Default time Ranges
-                        html.Label('Time period:',style={'font-size':"20px",'font-weight':"bold"}),
+                        html.Label('Time period:',style={'font-size':"20px",'font-weight':"bold","display":"flex"}),
                         dcc.Dropdown(['last week', 'last month', 'last year'], 'last month',
-                            style={'width': '50%','color':'white',"font-size":"20px","justifyContent":"right"} ,id="default-time-ranges"),
+                            style={'width': '200px','color':'black',"font-size":"20px","display":"flex","align-items": "right","justifyContent":"right"} ,id="default-time-ranges"),
                     # dcc.DatePickerRange(
                         #     id = 'date-range',
                         #     start_date_placeholder_text = last_month_date,
@@ -62,10 +62,10 @@ app.layout = html.Div(children=[
                         #     #,style={"height":"40px"}
                         #         )
                             #'align-items': 'flex-start'
-                            ], style={"display":'table','justifyContent': 'center', 'alignItems': 'center','width': '40%',"height":"40px"}
+                            ], style={"margin-left":"20mm","display":'table','justifyContent': 'center', 'align-items': 'center','width': '40%',"height":"6cm"}
                     ),
                     ],
-                    style={"display":"flex",'textAlign': 'center','height':'40mm','font-size':"20px",'justifyContent': 'center','justifyContent': 'center'},
+                    style={"display":"flex",'textAlign': 'center','height':'100mm','font-size':"20px",'justifyContent': 'left'},
                     id="grad"
                     ),
                 html.Div(children=[
