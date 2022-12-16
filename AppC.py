@@ -62,10 +62,47 @@ app.layout = html.Div(children=[
                         #     #,style={"height":"40px"}
                         #         )
                             #'align-items': 'flex-start'
+                        #html.H3('Type elalskjdf selected: ', style={'fontWeigth': 'bold','textAlign':'center','font-size':"30px"},id='type-selected'),
+                            #html.Div(id='type-selected',style={'margin': '0px'}),
+                        # dcc.Graph(
+                        #     id='tree-map',
+                        #     figure={},
+                        #     clickData={},
+                        #     config={
+                        #     'staticPlot': False,     # True, False
+                        #     'scrollZoom': True,      # True, False
+                        #     'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
+                        #     'showTips': True,       # True, False
+                        #     'displayModeBar': None,  # True, False, 'hover'
+                        #     'watermark': False,
+                        #     # 'modeBarButtonsToRemove': ['pan2d','select2d'],
+                        #     }
+                        #     #,style={"height":"40px"}
+                        #         )
                             ], style={"margin-left":"20mm","display":'table','justifyContent': 'center', 'align-items': 'center','width': '40%',"height":"6cm"}
                     ),
+                    html.Div(children=[
+                        html.H3('Type : ', style={'fontWeigth': 'bold','textAlign':'center','font-size':"20px"},id='type-selected'),
+                        dcc.Graph(
+                                id='tree-map',
+                                figure={},
+                                clickData={},
+                                config={
+                                'staticPlot': False,     # True, False
+                                'scrollZoom': True,      # True, False
+                                'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
+                                'showTips': True,       # True, False
+                                'displayModeBar': None,  # True, False, 'hover'
+                                'watermark': False,
+                                # 'modeBarButtonsToRemove': ['pan2d','select2d'],
+                                },
+                                style={"height":"100px","width":"100px"}
+                                    )
+                                    ],
+                                    style={"display":"table"})
+
                     ],
-                    style={"display":"flex",'textAlign': 'center','height':'100mm','font-size':"20px",'justifyContent': 'left'},
+                    style={"display":"flex",'textAlign': 'center','height':'40mm','font-size':"20px",'justifyContent': 'left'},
                     id="grad"
                     ),
                 html.Div(children=[
@@ -156,7 +193,7 @@ app.layout = html.Div(children=[
                         #Fifth GRAPH
                         html.Div(children=[
                             #html.H2('QC', style={'textAlign': 'center'}),
-                            html.H3('MVP selected: '+"fdsa", style={'fontWeigth': 'bold'}),
+                            html.H3('MVP selected:', style={'fontWeigth': 'bold'}),
                             html.Div(id='genotype-selected'),
                             dcc.Graph(id='qc-graph', figure={},
                                 config={
