@@ -324,33 +324,53 @@ def update_time_range(input_range):
 
 #     Input(component_id='default-time-ranges', component_property='value')
 # )
-def update_graphs(type, click_data, result, genotype, input_range):
+#####################################################
+@app.callback(
+    #Output(component_id='type-selected', component_property='children'),
+    #Output(component_id='adequacy-selected', component_property='children'),
+    # Output(component_id='result-selected', component_property='children'),
+    # Output(component_id='genotype-selected', component_property='children'),
+
+    Output(component_id='types-graph', component_property='figure'),
+    #Output(component_id='tree-map', component_property='figure'),
+    # Output(component_id='results-graph', component_property='figure'),
+    # Output(component_id='mvp-graph', component_property='figure'),
+    # Output(component_id='qc-graph', component_property='figure'),
+    Input(component_id = 'dropletter', component_property='label'),
+    Input(component_id='type', component_property='label'),
+    # Input(component_id='selected-result', component_property='value'),
+    # Input(component_id='genotype-radio', component_property='value'),
+
+    #Input(component_id='default-time-range', component_property='start_date'),
+
+   # Input(component_id='default-time-ranges', component_property='value')
+)
+def update_graphs(input_range,tipo):
 
     """Return all graphs based on interactive filters."""
-    if input_range == 'last week':
+    if input_range == 'Last week':
         start_date = last_week_date
-    elif input_range == 'last month':
+    elif input_range == 'Last month':
         start_date =last_month_date
-    elif input_range == 'last year':
+    elif input_range == 'Last year':
         start_date = last_year_date
-
     end_date = date.today()
 
     filtered_df = filter_dataframe(initial_df,pd.to_datetime(start_date),pd.to_datetime(end_date))
-    types = types_graph(filtered_df, type)
-    test_dataframe = filter_dataframe(test_df,pd.to_datetime(start_date), pd.to_datetime(end_date))
-    tree_data = tree_map_graph(test_dataframe, type, click_data)
-    tree_graph = tree_data[0]
-    # message =  tree_data[1]
-    # processed = tree_data[2]
-    result_df = tree_data[3]
-    results_data = result_graph(result_df, type, result)
-    results_graph = results_data[0]
-    mvp_data = mvp_graph(results_data[1], type, result, genotype)
-    mvps_graph = mvp_data[0]
-    qc = qc_graph(result_df, type, result, genotype)
+    types = types_graph(filtered_df, tipo)
+    # test_dataframe = filter_dataframe(test_df,pd.to_datetime(start_date), pd.to_datetime(end_date))
+    # tree_data = tree_map_graph(test_dataframe, type, click_data)
+    # tree_graph = tree_data[0]
+    # # message =  tree_data[1]
+    # # processed = tree_data[2]
+    # result_df = tree_data[3]
+    # results_data = result_graph(result_df, type, result)
+    # results_graph = results_data[0]
+    # mvp_data = mvp_graph(results_data[1], type, result, genotype)
+    # mvps_graph = mvp_data[0]
+    # qc = qc_graph(result_df, type, result, genotype)
 #f'{type}'
-    return f'{result}', f'{genotype}', types, tree_graph, results_graph, mvps_graph, qc
+    return  types
 
 
 #######################################################
