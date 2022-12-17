@@ -1,94 +1,92 @@
 # 1. Import Dash
 import dash
 import dash_bootstrap_components as dbc
-from dash import html, dcc
+from dash import html, dcc, Output, Input
 
-# 2. Create a Dash app instance
-app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
-dropdown = dbc.DropdownMenu(color="warning",
-    label="Pick a date",
-    children=[
-        dbc.DropdownMenuItem("Ayer"),
-        dbc.DropdownMenuItem("Hoy"),
-        dbc.DropdownMenuItem("Mañana"),
-    ],
-)
-# 3. Add the example to the app's layout
-# First we copy the snippet from the docs
-badge = dbc.Button(
-    [
-        "Notifications",
-        dbc.Badge("4", color="light", text_color="primary", className="ms-3"),
-    ],
-    color="success",
+items=['Last week', 'Last month', 'Last year']
+atems=list(map(lambda z: dbc.DropdownMenuItem(z,id=z),items))
 
-)
-row_content = [
-    dbc.Col(dcc.DatePickerRange(
+INP=list(map(lambda z: Input(z,"n_clicks"),items))
+
+dropletter=dbc.DropdownMenu(atems,
+            label="Time period",
+            className="mb-3",
+            id= 'iddropdownmenu'  #create an id for the dropdown menu to be used in the graph callback to modify the label
+        ,color="warning"
+        )
+
+
+page_header=[dbc.Row(html.Div(style={"height":"10px"})),dbc.Row([
+                    dbc.Col(
+                    [dbc.Row(html.Img(src="assets/medicine.svg",style={'height': '60px'})),
+                        dbc.Row(html.H4('CYTOPATHOLOGY MONITOR'),style={"textAlign":"center"})
+                        ],
+                    width="3",
+                    align="end"),
+
+                    ##Time and default ranges
+                    dbc.Col(
+                        #html.Label('Time period:',style={'font-size':"20px",'font-weight':"bold","display":"flex"}),
+                        dropletter),
+                    ###DatePicker
+                    dbc.Col(
+                    dcc.DatePickerRange(
                             id = 'date-range',
                             #start_date_placeholder_text = last_month_date,
                             #end_date = date.today(),
                             #max_date_allowed = date.today(),
                             #day_size=30,
-                        style={"width":"8cm"}),width=4),
-    dbc.Col(html.Div("Cytopathology Monitor",style={"font-size":"30px","color":"yellow"}), width=2),
-    dbc.Col(
-        [dbc.Row(html.Img(src="assets/medicine.svg",style={'height': '100px', "margin-top":"10px","margin-left":"30px"}),)],
-        align="center"),
-    dbc.Col(html.Div("Two of two columns",style={"margin-left":"50px"}),width=3),
-    dbc.Col(dropdown,width=2)
+                        #style={"width":"10cm","height":"20cm","margin-top":"50px","margin-left":"20px"}
+                    ),width=4),
+                    ##Title and Treegraph
+                    dbc.Col([
+                        #dbc.Row(html.H3('Type : ', style={'fontWeigth': 'bold','textAlign':'center','font-size':"20px"},id='type-selected')),
+                        dbc.Row(dcc.Graph(
+                                id='tree-map',
+                                figure={},
+                                clickData={},
+                                config={
+                                'staticPlot': False,     # True, False
+                                'scrollZoom': True,      # True, False
+                                'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
+                                'showTips': True,       # True, False
+                                'displayModeBar': None,  # True, False, 'hover'
+                                'watermark': False,
+                                # 'modeBarButtonsToRemove': ['pan2d','select2d'],
+                                },
+                                style={"height":"50px","width":"300px"}
+                                    ),
+                                    )
+                                    ]
+                                    )
 
-]
+                    ],
+                    #style={"display":"flex","height":"30mm"},
+                    id="grad",
+                    #align="center",
+                    justify="end",
+                    className="pad-row"
+                    )
+                    ]
 
-row = html.Div(
+# 2. Create a Dash app instance
+app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+app.layout=dbc.Container(page_header,fluid="True")
+
+@app.callback(
     [
-        dbc.Row(
-            row_content,
-            justify="start",
-        ),
-
-    ]
+     Output("iddropdownmenu", "label")
+     ],
+    INP
 )
+def make_graph(*args):
+    ctx = dash.callback_context
 
+    if not ctx.triggered:
+        button_id = "Time period"
+    else:
+        button_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
-rownew = html.Div(
-    [
-        dbc.Row(dbc.Col(html.Div("A single, half-width column"), width=6)),
-        dbc.Row(dbc.Col(html.Div("An automatically sized column"), width="auto")
-        ),
-        dbc.Row(
-            [
-                dbc.Col(dropdown, width=3),
-                dbc.Col(html.Div("One of three columns"),width={"size": 2, "offset": 1}),
-                dbc.Col(html.Div("One of three columns"), width=2),
-            ]
-        ),
-    ]
-)
-breadcrumb = dbc.Breadcrumb(
-    items=[
-        {"label": "Docs", "href": "/docs", "external_link": True},
-        {
-            "label": "Components",
-            "href": "/docs/components",
-            "external_link": True,
-        },
-        {"label": "Breadcrumb", "active": True},
-    ],
-)
-camilo=dbc.Col(html.Div("Camilo"))
-# Then we incorporate the snippet into our layout.
-# This example keeps it simple and just wraps it in a Container
-
-app.layout = dbc.Container(row)
-    #html.Div(
-        #dbc.Row([dbc.Row(html.Div("camilo")),dbc.Row(html.Div("camilo",style={"color":"pink","font-size":"25px"}))]))#dbc.Container(dbc.Col(children=[dbc.Row(children=[camilo,badge,badge,badge]),badge,breadcrumb,dropdown,row,rownew]), fluid=True)
-#)
-# 5. Start the Dash server
+    return [button_id]
 if __name__ == "__main__":
     app.run_server(debug=True)
-
-
-
-
-
