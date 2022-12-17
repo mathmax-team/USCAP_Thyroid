@@ -1,5 +1,6 @@
 """Dash App for visualization of tables and graphics."""
 from dash import Dash, html, dcc, Output, Input
+import dash_bootstrap_components as dbc
 import flask
 import plotly.express as px
 import pandas as pd
@@ -25,7 +26,15 @@ initial_df["day"]=pd.to_datetime(initial_df["day"])
 
 # html.Img(src="fe/assets/micro.png" alt="logo")
 #,'backgroundColor':"black"
-app.layout = html.Div(children=[
+dropdown = dbc.DropdownMenu(color="warning",
+    label="Pick a date",
+    children=[
+        dbc.DropdownMenuItem("Ayer"),
+        dbc.DropdownMenuItem("Hoy"),
+        dbc.DropdownMenuItem("Mañana"),
+    ],
+)
+app.layout = html.Div(children=[dropdown,
                 html.Div(children=[
                     ###Name and Logo
                     html.Div(children=[
