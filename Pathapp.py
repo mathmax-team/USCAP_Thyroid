@@ -84,7 +84,7 @@ page_header=[
                 'watermark': False,
                 # 'modeBarButtonsToRemove': ['pan2d','select2d'],
                         },
-                    style={"height":"100px","width":"300px"}
+                    style={"height":"150px","width":"300px"}
                                 ),
                     )
                                 ],
@@ -332,24 +332,26 @@ def update_time_range(input_range):
     # Output(component_id='genotype-selected', component_property='children'),
 
     Output(component_id='types-graph', component_property='figure'),
-    #Output(component_id='tree-map', component_property='figure'),
-    # Output(component_id='results-graph', component_property='figure'),
-    # Output(component_id='mvp-graph', component_property='figure'),
-    # Output(component_id='qc-graph', component_property='figure'),
+    Output(component_id='tree-map', component_property='figure'),
+    Output(component_id='results-graph', component_property='figure'),
+    Output(component_id='mvp-graph', component_property='figure'),
+    Output(component_id='qc-graph', component_property='figure'),
+
     Input(component_id = 'dropletter', component_property='label'),
     Input(component_id='type', component_property='label'),
-    # Input(component_id='selected-result', component_property='value'),
-    # Input(component_id='genotype-radio', component_property='value'),
+    Input(component_id='tree-map', component_property='clickData'),
+    Input(component_id='weird', component_property='label'),
+    Input(component_id='genotype', component_property='label'),
 
     #Input(component_id='default-time-range', component_property='start_date'),
 
    # Input(component_id='default-time-ranges', component_property='value')
 )
-def update_graphs(input_range,tipo):
+def update_graphs(input_range,tipo,click_data,weird_label,genotype_label):
 
     """Return all graphs based on interactive filters."""
     if input_range == 'Last week':
-        start_date = last_week_date
+        start_date = last_year_date
     elif input_range == 'Last month':
         start_date =last_month_date
     elif input_range == 'Last year':
@@ -358,19 +360,19 @@ def update_graphs(input_range,tipo):
 
     filtered_df = filter_dataframe(initial_df,pd.to_datetime(start_date),pd.to_datetime(end_date))
     types = types_graph(filtered_df, tipo)
-    # test_dataframe = filter_dataframe(test_df,pd.to_datetime(start_date), pd.to_datetime(end_date))
-    # tree_data = tree_map_graph(test_dataframe, type, click_data)
-    # tree_graph = tree_data[0]
+    test_dataframe = filter_dataframe(test_df,pd.to_datetime(start_date), pd.to_datetime(end_date))
+    tree_data = tree_map_graph(test_dataframe, tipo, click_data)
+    tree_graph = tree_data[0]
     # # message =  tree_data[1]
     # # processed = tree_data[2]
-    # result_df = tree_data[3]
-    # results_data = result_graph(result_df, type, result)
-    # results_graph = results_data[0]
-    # mvp_data = mvp_graph(results_data[1], type, result, genotype)
-    # mvps_graph = mvp_data[0]
-    # qc = qc_graph(result_df, type, result, genotype)
+    result_df = tree_data[3]
+    results_data = result_graph(result_df, tipo, weird_label)
+    results_graph = results_data[0]
+    mvp_data = mvp_graph(results_data[1], tipo, weird_label, genotype_label)
+    mvps_graph = mvp_data[0]
+    qc = qc_graph(result_df, tipo, weird_label, genotype_label)
 #f'{type}'
-    return  types
+    return  types,tree_graph,results_graph,mvps_graph,qc
 
 
 #######################################################
