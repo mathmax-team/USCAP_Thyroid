@@ -4,10 +4,21 @@ import dash_bootstrap_components as dbc
 from dash import html, dcc, Output, Input
 from sample_data import last_week_date, last_year_date, last_month_date,test_type, results_list, genotype_list
 from datetime import date
+from be.controllers.types_graph import types_graph
+from be.controllers.filter_dataframe import filter_dataframe
+from be.controllers.tree_map_graph import tree_map_graph
+from be.controllers.results_graph import result_graph
+from be.controllers.mvp_graph import mvp_graph
+from be.controllers.qc_graph import qc_graph
 
 
 ################## MAKE DROPDOWN FROM LIST
 def make_drop(lista,id):
+    color="success"
+    size="sm"
+    if lista[0]=="Last week":
+        color="warning"
+        size="lg"
     items=lista
     atems=list(map(lambda z: dbc.DropdownMenuItem(z,id=z),items))
     inputs=list(map(lambda z: Input(z,"n_clicks"),items))
@@ -16,8 +27,8 @@ def make_drop(lista,id):
             label=lista[0],
             className="mb-3",
             id= id  #create an id for the dropdown menu to be used in the graph callback to modify the label
-        ,color="success",
-        size="sm"
+        ,color=color,
+        size=size
         )
     return {"drop":menu,"inputs":inputs,"list":lista}
 
@@ -270,8 +281,71 @@ def update_default_period(*args):
 
     return [button_id]
 
+##################################
+@app.callback(
+    Output(component_id= 'date-range', component_property='start_date'),
+    Output(component_id= 'date-range', component_property='end_date'),
+    Input(component_id='dropletter', component_property='label')
+)
+def update_time_range(input_range):
+    """Control time range selection."""
+    if input_range == 'Last week':
+        start_date = last_week_date
+    elif input_range == 'Last month':
+        start_date =last_month_date
+    elif input_range == 'Last year':
+        start_date = last_year_date
+    end_date = date.today()
+    return start_date, end_date
+
+#####################################################
+@app.callback(
+    #Output(component_id='type-selected', component_property='children'),
+    #Output(component_id='adequacy-selected', component_property='children'),
+    Output(component_id='result-selected', component_property='children'),
+    Output(component_id='genotype-selected', component_property='children'),
+    Output(component_id='types-graph', component_property='figure'),
+    Output(component_id='tree-map', component_property='figure'),
+    Output(component_id='results-graph', component_property='figure'),
+    Output(component_id='mvp-graph', component_property='figure'),
+    Output(component_id='qc-graph', component_property='figure'),
+
+    Input(component_id = 'type-dropdown', component_property='value'),
+    Input(component_id='tree-map', component_property='clickData'),
+    Input(component_id='selected-result', component_property='value'),
+    Input(component_id='genotype-radio', component_property='value'),
+    # Input(component_id='default-time-range', component_property='start_date'),
+    Input(component_id='default-time-ranges', component_property='value')
+)
+def update_graphs(type, click_data, result, genotype, input_range):
+
+    """Return all graphs based on interactive filters."""
+    if input_range == 'last week':
+        start_date = last_week_date
+    elif input_range == 'last month':
+        start_date =last_month_date
+    elif input_range == 'last year':
+        start_date = last_year_date
+
+    end_date = date.today()
+
+    filtered_df = filter_dataframe(initial_df,pd.to_datetime(start_date),pd.to_datetime(end_date))
+    types = types_graph(filtered_df, type)
+    test_dataframe = filter_dataframe(test_df,pd.to_datetime(start_date), pd.to_datetime(end_date))
+    tree_data = tree_map_graph(test_dataframe, type, click_data)
+    tree_graph = tree_data[0]
+    # message =  tree_data[1]
+    # processed = tree_data[2]
+    result_df = tree_data[3]
+    results_data = result_graph(result_df, type, result)
+    results_graph = results_data[0]
+    mvp_data = mvp_graph(results_data[1], type, result, genotype)
+    mvps_graph = mvp_data[0]
+    qc = qc_graph(result_df, type, result, genotype)
+#f'{type}'
+    return f'{result}', f'{genotype}', types, tree_graph, results_graph, mvps_graph, qc
 
 
-
+#######################################################
 if __name__ == "__main__":
     app.run_server(debug=True)
