@@ -295,7 +295,7 @@ def update_default_period(*args):
 def update_time_range(input_range):
     """Control time range selection."""
     if input_range == 'Last week':
-        start_date = last_week_date
+        start_date = last_month_date
     elif input_range == 'Last month':
         start_date =last_month_date
     elif input_range == 'Last year':
@@ -337,7 +337,9 @@ def update_time_range(input_range):
     Output(component_id='mvp-graph', component_property='figure'),
     Output(component_id='qc-graph', component_property='figure'),
 
-    Input(component_id = 'dropletter', component_property='label'),
+    Input(component_id= 'date-range', component_property='start_date'),
+    Input(component_id= 'date-range', component_property='end_date'),
+    #Input(component_id = 'dropletter', component_property='label'),
     Input(component_id='type', component_property='label'),
     Input(component_id='tree-map', component_property='clickData'),
     Input(component_id='weird', component_property='label'),
@@ -347,16 +349,16 @@ def update_time_range(input_range):
 
    # Input(component_id='default-time-ranges', component_property='value')
 )
-def update_graphs(input_range,tipo,click_data,weird_label,genotype_label):
+def update_graphs(start_date,end_date,tipo,click_data,weird_label,genotype_label):
 
-    """Return all graphs based on interactive filters."""
-    if input_range == 'Last week':
-        start_date = last_year_date
-    elif input_range == 'Last month':
-        start_date =last_month_date
-    elif input_range == 'Last year':
-        start_date = last_year_date
-    end_date = date.today()
+    # """Return all graphs based on interactive filters."""
+    # if input_range == 'Last week':
+    #     start_date = last_year_date
+    # elif input_range == 'Last month':
+    #     start_date =last_month_date
+    # elif input_range == 'Last year':
+    #     start_date = last_year_date
+    # end_date = date.today()
 
     filtered_df = filter_dataframe(initial_df,pd.to_datetime(start_date),pd.to_datetime(end_date))
     types = types_graph(filtered_df, tipo)
