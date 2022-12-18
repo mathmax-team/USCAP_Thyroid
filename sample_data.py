@@ -101,4 +101,4 @@ def generate_sample_data():
 
     initial_df.to_csv('test_type_count_Camilo.csv')
     test_df.to_csv('test_dataframe_Camilo.csv')
-generate_sample_data()
+#generate_sample_data()
