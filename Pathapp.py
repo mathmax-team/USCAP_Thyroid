@@ -12,9 +12,9 @@ from be.controllers.mvp_graph import mvp_graph
 from be.controllers.qc_graph import qc_graph
 import pandas as pd
 ##################  DATA #####################
-test_df = pd.read_csv('test_dataframe.csv')
+test_df = pd.read_csv('test_dataframe_Camilo.csv')
 test_df["day"]=pd.to_datetime(test_df["day"])
-initial_df = pd.read_csv('test_type_count.csv')
+initial_df = pd.read_csv('test_type_count_Camilo.csv')
 initial_df["day"]=pd.to_datetime(initial_df["day"])
 
 ################## MAKE DROPDOWN FROM LIST
@@ -295,7 +295,7 @@ def update_default_period(*args):
 def update_time_range(input_range):
     """Control time range selection."""
     if input_range == 'Last week':
-        start_date = last_month_date
+        start_date = last_week_date
     elif input_range == 'Last month':
         start_date =last_month_date
     elif input_range == 'Last year':
