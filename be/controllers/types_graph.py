@@ -31,7 +31,8 @@ def types_graph(df, type):
     paper_bgcolor="#f5f3f4",
     plot_bgcolor="#f5f3f4",
     height=300,
-    width=650)
+    #width=650
+    )
     # graph.update_layout(plot_bgcolor='white')
     # graph.update_layout(colorway=['red'])
     # graph.update_layout(paper_bgcolor='black')

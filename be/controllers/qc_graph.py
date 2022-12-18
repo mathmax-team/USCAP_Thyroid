@@ -48,7 +48,7 @@ def qc_graph(df, type, result, genotype):
     paper_bgcolor="#f5f3f4",
     plot_bgcolor="#f5f3f4",
     height=300,
-    width=650
+    #width=700
 
     )
 
