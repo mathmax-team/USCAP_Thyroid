@@ -15,7 +15,7 @@ def tree_map_graph(df, type, click_data):
     count_df = df[df['type'] == type]
     # count_df['adequacy'] = df['adequacy']
     count = len(count_df.index)
-    print(f'columns: {count_df["adequacy"]}')
+    #print(f'columns: {count_df["adequacy"]}')
     # satisfactory_df = count_df.apply(lambda row: row[count_df['adequacy'].isin([{'satisfactory': 'Yes'}])])
     satisfactory_df = count_df[count_df['adequacy'] == str(adequacy_list[0])]
     satisfactory = len(satisfactory_df.index)

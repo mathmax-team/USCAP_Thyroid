@@ -36,6 +36,5 @@ def mvp_graph(df, type, result, genotype):
     plot_bgcolor="#f5f3f4",
     height=300,
     width=650
-
     )
-    return [graph, graph_df]
+    return [graph]

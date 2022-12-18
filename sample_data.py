@@ -99,5 +99,6 @@ def generate_sample_data():
                 new_df.reset_index()
         print(test_df.tail(5))
 
-    initial_df.to_csv('test_type_count.csv')
-    test_df.to_csv('test_dataframe.csv')
+    initial_df.to_csv('test_type_count_Camilo.csv')
+    test_df.to_csv('test_dataframe_Camilo.csv')
+generate_sample_data()

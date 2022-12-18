@@ -34,7 +34,7 @@ def qc_graph(df, type, result, genotype):
             dataframe = dataframe.reset_index()
 
 
-            graph.add_trace(go.Scatter(x=dataframe['day'], y=dataframe['count'], marker_symbol= count, mode='markers+lines', name=qc_result, showlegend=True, fill='tonexty'))
+            graph.add_trace(go.Scatter(x=dataframe['day'], y=dataframe['count'], marker_symbol= count, mode='markers+lines', name=qc_result, showlegend=True, fill=None))
             graph.update_layout(legend_title_text = "Combinations")
             graph.update_yaxes(title_text='number')
             graph.update_layout(margin=go.layout.Margin(
