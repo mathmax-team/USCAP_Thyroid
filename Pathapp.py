@@ -12,9 +12,9 @@ from be.controllers.mvp_graph import mvp_graph
 from be.controllers.qc_graph import qc_graph
 import pandas as pd
 ##################  DATA #####################
-test_df = pd.read_csv('test_dataframe_Camilo.csv')
+test_df = pd.read_csv('test_dataframe_C.csv')
 test_df["day"]=pd.to_datetime(test_df["day"])
-initial_df = pd.read_csv('test_type_count_Camilo.csv')
+initial_df = pd.read_csv('test_type_count_C.csv')
 initial_df["day"]=pd.to_datetime(initial_df["day"])
 
 ################## MAKE DROPDOWN FROM LIST
