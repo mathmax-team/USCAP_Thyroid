@@ -10,7 +10,7 @@ def qc_graph(df, type, result, genotype):
     # df = df[df['mvp'] == genotype]
     data = df.loc[df['type'] == type]
     data = data.loc[data['result'] == result]
-    data = data.loc[data['mvp'] == int(genotype)]
+    data = data.loc[data['mvp'] == genotype]
 
     positive = data[data['cytology'] == 'positive']
 
@@ -22,7 +22,8 @@ def qc_graph(df, type, result, genotype):
 
 
     #print(positive)
-    graph.add_trace(go.Scatter(x=graph_df['day'], y=graph_df['count'], marker_symbol= count, mode='markers+lines', name='positive_cytology', showlegend=True))
+    graph.add_trace(go.Scatter(x=graph_df['day'], y=graph_df['count'],
+    marker_symbol= count, mode='markers+lines', name='positive_cytology', showlegend=True))
 
     for qc_result in choices:
         count += 1
@@ -36,7 +37,7 @@ def qc_graph(df, type, result, genotype):
 
             graph.add_trace(go.Scatter(x=dataframe['day'], y=dataframe['count'], marker_symbol= count, mode='markers+lines', name=qc_result, showlegend=True, fill=None))
             graph.update_layout(legend_title_text = "Combinations")
-            graph.update_yaxes(title_text='number')
+            graph.update_yaxes(title_text='Daily tests')
             graph.update_layout(margin=go.layout.Margin(
         l=0, #left margin
         r=0, #right margin

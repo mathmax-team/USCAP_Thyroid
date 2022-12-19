@@ -19,8 +19,8 @@ def types_graph(df, type):
         ))
         count += 1
     graph.update_layout(legend_title_text = "Type")
-    graph.update_yaxes(title_text='number')
-    graph.update_xaxes(title_text='day')
+    graph.update_yaxes(title_text='Daily tests')
+    graph.update_xaxes(title_text='Day')
     graph.update_layout(margin=go.layout.Margin(
         l=0, #left margin
         r=0, #right margin

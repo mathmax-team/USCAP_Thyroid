@@ -27,13 +27,20 @@ colors = {
     'background': '#111111',
     'text': '#7FDBFF'
 }
-
-# Initial Lists
-test_type = ['liquid based', 'conventional','another type', 'fourth type', 'just another']
+#genotype_list = ['16','18']
+#Initial Lists
+#test_type = ['liquid based', 'conventional','another type', 'fourth type', 'just another']
 adequacy_list = [{'satisfactory': 'Yes'},{'satisfactory': 'No', 'processed': 'Not processed'},{'satisfactory': 'No', 'processed': 'processed'}]
-results_list = ['negative', 'ASC-US', 'ASC-H', 'LSIL', 'MSIL', 'SCC', 'AC', 'JJJ', 'KKK', 'LLL']
-genotype_list = ['16','18']
+#results_list = ['negative', 'ASC-US', 'ASC-H', 'LSIL', 'MSIL', 'SCC', 'AC', 'JJJ', 'KKK', 'LLL']
+choices = ['True positive', 'False positive', 'False negative', 'True negative']
+value_sign=["positive","negative"]
 
+###################
+genotype_list=["Genotype A","Genotype B","Genotype C"]
+test_type = ['Urine', 'Spinal Fluid','Blood', 'Pleural Fluid','Pericardial Fluid']
+#adequacy_list = [{'Satisfactory': 'Yes'},{'Satisfactory': 'No', 'Processed': 'Not Processed'},{'Satisfactory': 'No', 'Processed': 'Processed'}]
+results_list = ['Negative', 'ASC-US', 'ASC-H', 'LSIL', 'MSIL', 'SCC', 'AC', 'JJJ', 'KKK', 'LLL']
+# choices = ['True positive', 'False positive', 'False negative', 'True negative']
 
 #tree map data
 # # Second Graph definition
@@ -56,7 +63,7 @@ def sin_data_generate(N,A,S,R):
 
 initial_df = pd.DataFrame()
 test_df = pd.DataFrame(columns=['day', 'type', 'adequacy', 'result', 'mvp', 'cytology', 'hystology'])
-choices = ['true positive', 'false positive', 'false negative', 'true negative']
+
 
 def get_test_quality(cytology, hystology):
     """Get quality test based on cytology and hystology results."""

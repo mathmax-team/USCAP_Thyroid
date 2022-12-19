@@ -2,7 +2,7 @@
 import dash
 import dash_bootstrap_components as dbc
 from dash import html, dcc, Output, Input
-from sample_data import last_week_date, last_year_date, last_month_date,test_type, results_list, genotype_list
+from sample_data import choices,last_week_date, last_year_date, last_month_date,test_type, results_list, genotype_list
 from datetime import date
 from be.controllers.types_graph import types_graph
 from be.controllers.filter_dataframe import filter_dataframe
@@ -45,7 +45,7 @@ dropletter=make_drop(['Last week', 'Last month', 'Last year'],"dropletter")
 type=make_drop(test_type,"type")
 weird=make_drop(results_list,"weird")
 genotype=make_drop(genotype_list,"genotype")
-mvp=make_drop(["A","B"],"mvp")
+mvp=make_drop(choices,"mvp")
 
 ###################### PAGE HEADER    #######################
 
@@ -115,17 +115,13 @@ Imgrid=html.Div(children=[
                                     },
                             style={"height":"300px"}
                             ),
+                            style={"padding":"0px"},
                             )
                         ],
                         style={'padding':'5px'}
-                        )),
+                        )
+                        ),
                         #Second GRAPH
-                        # html.Div(children=[
-                        #     html.H2('Adequacy', style={'textAlign': 'center'}),
-
-                        # ], style={'padding':'10px', 'border':None}),
-
-                        #Third GRAPH
                         html.Div(
                             dbc.Col([
                                 dbc.Row(weird["drop"],style={"textAlign":"center"}),
@@ -141,12 +137,14 @@ Imgrid=html.Div(children=[
                                         # 'modeBarButtonsToRemove': ['pan2d','select2d'],
                                             },
                                         style={"height":"300px"}
-                                        )
+                                        ),
+                                style={"padding":"0px"}
                                 )
                         ],
                         ),
                         style={'padding':'5px'}
                         ),
+                        #THIRD GRAPH
                         html.Div(dbc.Col(
                             [
                             dbc.Row(genotype["drop"],style={"textAlign":"center"}),
@@ -163,19 +161,15 @@ Imgrid=html.Div(children=[
                                             },
                                         style={"height":"300px"}
                                         ),
+                            style={"padding":"0px"}
                             )
-                            # dcc.Dropdown(genotype_list,
-                            # value=genotype_list[0],
-                            # id = 'selected-genotype'
-                            # ),
                         ],
-                        style={'padding':'5px', 'border':None}
+                        style={'padding':'5px'}
                         ),
                         ),
-
-                        #Fifth GRAPH
+                        #FOURTH GRAPH
                         html.Div(dbc.Col([
-                            dbc.Row(mvp["drop"],style={"textAlign":"center"}),
+                            dbc.Row(mvp["drop"],style={"textAlign":"center"},),#
                             dbc.Row(
                                 dcc.Graph(id='qc-graph', figure={},
                                 config={
@@ -187,11 +181,13 @@ Imgrid=html.Div(children=[
                                     'watermark': False,
                                     # 'modeBarButtonsToRemove': ['pan2d','select2d'],
                                     },
-                                    style={"height":"300px"}
+                                    style={"height":"300px"},
                                     ),
+                                    style={"padding":"0px"}
                             )
                         ],
-                        style={'padding':'5px'}),
+                        style={'padding':'5px'},
+                        ),
                         )
                         ],
                         #html.Div('6', style={'padding':'0px', 'border':None}),
