@@ -3,7 +3,7 @@ from sample_data import choices
 import plotly.graph_objects as go
 import pandas as pd
 
-def qc_graph(df, type, result, genotype):
+def qc_graph(df, type, result, genotype,confusion_value):
     """Create a scatter graph on filtered data frame."""
     count = 0
     graph = go.Figure()
@@ -22,8 +22,8 @@ def qc_graph(df, type, result, genotype):
 
 
     #print(positive)
-    graph.add_trace(go.Scatter(x=graph_df['day'], y=graph_df['count'],
-    marker_symbol= count, mode='markers+lines', name='positive_cytology', showlegend=True))
+    # graph.add_trace(go.Scatter(x=graph_df['day'], y=graph_df['count'],
+    # marker_symbol= count, mode='markers+lines', name='positive_cytology', showlegend=True))
 
     for qc_result in choices:
         count += 1
@@ -33,10 +33,13 @@ def qc_graph(df, type, result, genotype):
             dataframe = pd.DataFrame()
             dataframe['count'] = day_group['cytology'].count()
             dataframe = dataframe.reset_index()
+            visibility="legendonly"
+            if confusion_value==qc_result:
+                visibility=True
 
 
-            graph.add_trace(go.Scatter(x=dataframe['day'], y=dataframe['count'], marker_symbol= count, mode='markers+lines', name=qc_result, showlegend=True, fill=None))
-            graph.update_layout(legend_title_text = "Combinations")
+            graph.add_trace(go.Scatter(x=dataframe['day'], y=dataframe['count'], marker_symbol= count, mode='markers+lines', name=qc_result, showlegend=True, fill=None,visible=visibility))
+            graph.update_layout(legend_title_text = "Confusion matrix values")
             graph.update_yaxes(title_text='Daily tests')
             graph.update_layout(margin=go.layout.Margin(
         l=0, #left margin

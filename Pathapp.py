@@ -340,12 +340,13 @@ def update_time_range(input_range):
     Input(component_id='tree-map', component_property='clickData'),
     Input(component_id='weird', component_property='label'),
     Input(component_id='genotype', component_property='label'),
+    Input(component_id='mvp', component_property='label'),
 
     #Input(component_id='default-time-range', component_property='start_date'),
 
    # Input(component_id='default-time-ranges', component_property='value')
 )
-def update_graphs(start_date,end_date,tipo,click_data,weird_label,genotype_label):
+def update_graphs(start_date,end_date,tipo,click_data,weird_label,genotype_label,mvp_label):
 
     # """Return all graphs based on interactive filters."""
     # if input_range == 'Last week':
@@ -368,7 +369,10 @@ def update_graphs(start_date,end_date,tipo,click_data,weird_label,genotype_label
     results_graph = results_data[0]
     mvp_data = mvp_graph(results_data[1], tipo, weird_label, genotype_label)
     mvps_graph = mvp_data[0]
-    qc = qc_graph(result_df, tipo, weird_label, genotype_label)
+    confusion_value=mvp_label
+    qc = qc_graph(result_df, tipo, weird_label, genotype_label,confusion_value)
+    #qc = mvp_graph(result_df, tipo, weird_label, genotype_label)
+
 #f'{type}'
     return  types,tree_graph,results_graph,mvps_graph,qc
 
