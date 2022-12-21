@@ -11,11 +11,17 @@ from be.controllers.results_graph import result_graph
 from be.controllers.mvp_graph import mvp_graph
 from be.controllers.qc_graph import qc_graph
 from be.controllers.scatter_plot import scatter_graph
+from be.controllers.adequacy_bar_graph import make_adequacy_graph
 #from be.controllers.
 import pandas as pd
 ##################  DATA #####################
 data_df=pd.read_csv("lab_data.csv")
 data_df["day"]=pd.to_datetime(data_df["day"])
+
+Data={"All types":data_df}
+for tipo in ["Conventional","Liquid based"]:
+    Data[tipo]=data_df[data_df["type"]==tipo]
+
 test_df = pd.read_csv('test_dataframe_T.csv')
 test_df["day"]=pd.to_datetime(test_df["day"])
 initial_df = pd.read_csv('test_type_count_T.csv')
@@ -47,7 +53,7 @@ def make_drop(lista,id):
 
 dropletter=make_drop(['Last week', 'Last month', 'Last year'],"dropletter")
 type=make_drop(test_type,"type")
-weird=make_drop(results_list[1:],"weird")###### it starts at 1 to rule out the "All results" option
+weird=make_drop(results_list,"weird")###### it starts at 1 to rule out the "All results" option
 genotype=make_drop(genotype_list,"genotype")
 mvp=make_drop(choices,"mvp")
 
@@ -88,7 +94,7 @@ page_header=[
                 'watermark': False,
                 # 'modeBarButtonsToRemove': ['pan2d','select2d'],
                         },
-                    style={"height":"150px","width":"300px"}
+                    #style={"height":"150px","width":"300px"}
                                 ),
                     )
                                 ],
@@ -361,11 +367,17 @@ def update_graphs(start_date,end_date,tipo,click_data,weird_label,genotype_label
     #     start_date = last_year_date
     # end_date = date.today()
     ####Filter by dates
-    filtered_df = filter_dataframe(data_df,pd.to_datetime(start_date),pd.to_datetime(end_date))
+    #temp_df=Data[tipo]
+    filter_date_df = filter_dataframe(data_df,pd.to_datetime(start_date),pd.to_datetime(end_date))
+
     #### create graph by test type
-    types_df=make_property_df(filtered_df,"type")
+    types_df=make_property_df(filter_date_df,"type")
     types_graph= scatter_graph(types_df, tipo)
     ### create graph by result type
+    filtered_df=filter_date_df
+    if tipo in ["Liquid based","Conventional"]:
+        filtered_df=filter_date_df[filter_date_df["type"]==tipo]
+    ##############################
     results_df=make_property_df(filtered_df,"result")
     res_graph= scatter_graph(results_df, weird_label)
     ######create graph by genotype
@@ -374,7 +386,12 @@ def update_graphs(start_date,end_date,tipo,click_data,weird_label,genotype_label
     ############ Create graph of specificity (to do)
 
 
+
     ############### Create graph by adequacy (to do)
+    adequate=filtered_df["adequacy"].value_counts()[0]
+    inadequate_processed=filtered_df["adequacy"].value_counts()[1]
+    inadequate_not_processed=filtered_df["adequacy"].value_counts()[2]
+    adequacy_graph=make_adequacy_graph(adequate,inadequate_processed,inadequate_not_processed)
 
     ############### The rest is obsolete
     # test_dataframe = filter_dataframe(test_df,pd.to_datetime(start_date), pd.to_datetime(end_date))
@@ -393,7 +410,7 @@ def update_graphs(start_date,end_date,tipo,click_data,weird_label,genotype_label
     #qc = mvp_graph(result_df, tipo, weird_label, genotype_label)
 
 #f'{type}'
-    return  types_graph,res_graph,res_graph,gen_graph,gen_graph
+    return  types_graph,adequacy_graph,res_graph,gen_graph,gen_graph
 
 
 #######################################################

@@ -31,7 +31,9 @@ colors = {
 #genotype_list = ['16','18']
 #Initial Lists
 #test_type = ['liquid based', 'conventional','another type', 'fourth type', 'just another']
-adequacy_list = [{'satisfactory': 'Yes'},{'satisfactory': 'No', 'processed': 'Not processed'},{'satisfactory': 'No', 'processed': 'processed'}]
+#adequacy_list = [{'satisfactory': 'Yes'},{'satisfactory': 'No', 'processed': 'Not processed'},{'satisfactory': 'No', 'processed': 'processed'}]
+
+adequacy_list=["Sat","Insat_P","Insat_NP"]##### This referes to Satisfactory/Instatisfactory and Processed Not processed
 #results_list = ['negative', 'ASC-US', 'ASC-H', 'LSIL', 'MSIL', 'SCC', 'AC', 'JJJ', 'KKK', 'LLL']
 choices = ['True positive', 'False positive', 'False negative', 'True negative']
 value_sign=["Positive","Negative"]
