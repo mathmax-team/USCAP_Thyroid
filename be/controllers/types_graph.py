@@ -18,7 +18,7 @@ def types_graph(df, type):
         line_shape= "spline", showlegend=True, line_smoothing=1, marker_symbol=count, visible=visibility, fill='tonexty'
         ))
         count += 1
-    graph.update_layout(legend_title_text = "Type")
+    graph.update_layout(legend_title_text = "Test by type")
     graph.update_yaxes(title_text='Daily tests')
     graph.update_xaxes(title_text='Day')
     graph.update_layout(margin=go.layout.Margin(

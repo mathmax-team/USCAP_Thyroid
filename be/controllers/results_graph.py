@@ -3,13 +3,16 @@ from sample_data import results_list, test_type
 import plotly.graph_objects as go
 import pandas as pd
 
-def result_graph(df, type, result):
+def result_graph(df,result):
     """Create a scatter graph based on filtered data frame."""
     graph = go.Figure()
     count = 0
     for item in results_list:
         count += 1
-        temp_df = df.loc[df['result'] == item]
+        if item=="All results":
+            temp_df=df
+        else:
+            temp_df = df.loc[df['result'] == item]
         if not temp_df.empty:
             day_group = temp_df.groupby('day')
             graph_df = pd.DataFrame()
@@ -19,7 +22,7 @@ def result_graph(df, type, result):
                 visibility = True
             else:
                 visibility = 'legendonly'
-            graph.add_trace(go.Scatter(x=graph_df['day'], y= graph_df['count'], mode="markers+lines", name=item, marker_symbol= count, showlegend=True, visible=visibility))
+            graph.add_trace(go.Scatter(x=graph_df['day'], y= graph_df['count'], mode="markers+lines", name=item, marker_symbol= count, showlegend=True, visible=visibility,fill="tonexty"))
     data = df.loc[df['result'] == result]
     graph.update_layout(margin=go.layout.Margin(
         l=0, #left margin

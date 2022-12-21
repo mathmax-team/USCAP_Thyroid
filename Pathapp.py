@@ -2,19 +2,23 @@
 import dash
 import dash_bootstrap_components as dbc
 from dash import html, dcc, Output, Input
-from sample_data import choices,last_week_date, last_year_date, last_month_date,test_type, results_list, genotype_list
+from sample_data import week_day,choices,last_week_date, last_year_date, last_month_date,test_type, results_list, genotype_list
 from datetime import date
 from be.controllers.types_graph import types_graph
-from be.controllers.filter_dataframe import filter_dataframe
+from be.controllers.filtering_tools import filter_dataframe,make_property_df,new_row_by_column
 from be.controllers.tree_map_graph import tree_map_graph
 from be.controllers.results_graph import result_graph
 from be.controllers.mvp_graph import mvp_graph
 from be.controllers.qc_graph import qc_graph
+from be.controllers.scatter_plot import scatter_graph
+#from be.controllers.
 import pandas as pd
 ##################  DATA #####################
-test_df = pd.read_csv('test_dataframe_C.csv')
+data_df=pd.read_csv("lab_data.csv")
+data_df["day"]=pd.to_datetime(data_df["day"])
+test_df = pd.read_csv('test_dataframe_T.csv')
 test_df["day"]=pd.to_datetime(test_df["day"])
-initial_df = pd.read_csv('test_type_count_C.csv')
+initial_df = pd.read_csv('test_type_count_T.csv')
 initial_df["day"]=pd.to_datetime(initial_df["day"])
 
 ################## MAKE DROPDOWN FROM LIST
@@ -43,7 +47,7 @@ def make_drop(lista,id):
 
 dropletter=make_drop(['Last week', 'Last month', 'Last year'],"dropletter")
 type=make_drop(test_type,"type")
-weird=make_drop(results_list,"weird")
+weird=make_drop(results_list[1:],"weird")###### it starts at 1 to rule out the "All results" option
 genotype=make_drop(genotype_list,"genotype")
 mvp=make_drop(choices,"mvp")
 
@@ -356,25 +360,40 @@ def update_graphs(start_date,end_date,tipo,click_data,weird_label,genotype_label
     # elif input_range == 'Last year':
     #     start_date = last_year_date
     # end_date = date.today()
+    ####Filter by dates
+    filtered_df = filter_dataframe(data_df,pd.to_datetime(start_date),pd.to_datetime(end_date))
+    #### create graph by test type
+    types_df=make_property_df(filtered_df,"type")
+    types_graph= scatter_graph(types_df, tipo)
+    ### create graph by result type
+    results_df=make_property_df(filtered_df,"result")
+    res_graph= scatter_graph(results_df, weird_label)
+    ######create graph by genotype
+    gen_df=make_property_df(filtered_df,"genotype")
+    gen_graph= scatter_graph(gen_df, genotype_label)
+    ############ Create graph of specificity (to do)
 
-    filtered_df = filter_dataframe(initial_df,pd.to_datetime(start_date),pd.to_datetime(end_date))
-    types = types_graph(filtered_df, tipo)
-    test_dataframe = filter_dataframe(test_df,pd.to_datetime(start_date), pd.to_datetime(end_date))
-    tree_data = tree_map_graph(test_dataframe, tipo, click_data)
-    tree_graph = tree_data[0]
-    # # message =  tree_data[1]
-    # # processed = tree_data[2]
-    result_df = tree_data[3]
-    results_data = result_graph(result_df, tipo, weird_label)
-    results_graph = results_data[0]
-    mvp_data = mvp_graph(results_data[1], tipo, weird_label, genotype_label)
-    mvps_graph = mvp_data[0]
-    confusion_value=mvp_label
-    qc = qc_graph(result_df, tipo, weird_label, genotype_label,confusion_value)
+
+    ############### Create graph by adequacy (to do)
+
+    ############### The rest is obsolete
+    # test_dataframe = filter_dataframe(test_df,pd.to_datetime(start_date), pd.to_datetime(end_date))
+    # tree_data = tree_map_graph(test_dataframe, tipo, click_data)
+    # tree_graph = tree_data[0]
+    # # # message =  tree_data[1]
+    # # # processed = tree_data[2]
+    # result_df = tree_data[3]
+    # results_data = result_graph(result_df,
+    # weird_label)
+    # results_graph = results_data[0]
+    # mvp_data = mvp_graph(results_data[1], tipo, weird_label, genotype_label)
+    # mvps_graph = mvp_data[0]
+    # confusion_value=mvp_label
+    # qc = qc_graph(result_df, tipo, weird_label, genotype_label,confusion_value)
     #qc = mvp_graph(result_df, tipo, weird_label, genotype_label)
 
 #f'{type}'
-    return  types,tree_graph,results_graph,mvps_graph,qc
+    return  types_graph,res_graph,res_graph,gen_graph,gen_graph
 
 
 #######################################################

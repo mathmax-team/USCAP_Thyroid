@@ -22,6 +22,7 @@ if month == 1:
 last_month_date = date(year, month -1, day)
 last_week_date = date.today() - timedelta(days = 7)
 last_year_date = date.today() - timedelta(days = 365)
+next_year_date=date.today() +timedelta(days = 100)
 
 colors = {
     'background': '#111111',
@@ -33,13 +34,16 @@ colors = {
 adequacy_list = [{'satisfactory': 'Yes'},{'satisfactory': 'No', 'processed': 'Not processed'},{'satisfactory': 'No', 'processed': 'processed'}]
 #results_list = ['negative', 'ASC-US', 'ASC-H', 'LSIL', 'MSIL', 'SCC', 'AC', 'JJJ', 'KKK', 'LLL']
 choices = ['True positive', 'False positive', 'False negative', 'True negative']
-value_sign=["positive","negative"]
+value_sign=["Positive","Negative"]
 
 ###################
-genotype_list=["Genotype A","Genotype B","Genotype C"]
-test_type = ['Urine', 'Spinal Fluid','Blood', 'Pleural Fluid','Pericardial Fluid']
+#genotype_list=["Genotype A","Genotype B","Genotype C"]
+genotype_list=["HPV genotype 16","HPV genotype 31","HPV genotype 18","HPV genotype 31","HPV genotype 35"]
+#test_type = ['Urine', 'Spinal Fluid','Blood', 'Pleural Fluid','Pericardial Fluid']
+test_type=["All types","Liquid based","Conventional"]
 #adequacy_list = [{'Satisfactory': 'Yes'},{'Satisfactory': 'No', 'Processed': 'Not Processed'},{'Satisfactory': 'No', 'Processed': 'Processed'}]
-results_list = ['Negative', 'ASC-US', 'ASC-H', 'LSIL', 'MSIL', 'SCC', 'AC', 'JJJ', 'KKK', 'LLL']
+#results_list = ['Negative', 'ASC-US', 'ASC-H', 'LSIL', 'MSIL', 'SCC', 'AC', 'JJJ', 'KKK', 'LLL']
+results_list = ["All results",'Negative', 'ASC-US', 'ASC-H', 'LSIL', 'SCC']
 # choices = ['True positive', 'False positive', 'False negative', 'True negative']
 
 #tree map data
@@ -48,6 +52,10 @@ tree_values = [100, 40, 60, 30, 30]
 tree_labels = ["Satisfactory","Yes", "No", "Processed", "Not Processed"]
 tree_parents = ["", "Satisfactory", "Satisfactory", "No", "No"]
 
+##############  DAYS OF THE WEEK
+def week_day(n):
+    days_of_the_week=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
+    return days_of_the_week[n%7]
 
 #Data Generator
 def sin_data_generate(N,A,S,R):

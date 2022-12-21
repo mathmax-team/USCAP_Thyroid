@@ -11,8 +11,11 @@ fig.update_layout(margin = dict(t=0, l=0, r=0, b=0))
 
 def tree_map_graph(df, type, click_data):
     """Create a tree map based on filtered data frame."""
-    count_df = pd.DataFrame()
-    count_df = df[df['type'] == type]
+    if type=="All test types":
+        count_df=df
+    else:
+        count_df = pd.DataFrame()
+        count_df = df[df['type'] == type]
     # count_df['adequacy'] = df['adequacy']
     count = len(count_df.index)
     #print(f'columns: {count_df["adequacy"]}')

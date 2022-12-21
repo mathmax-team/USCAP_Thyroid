@@ -39,7 +39,7 @@ def qc_graph(df, type, result, genotype,confusion_value):
 
 
             graph.add_trace(go.Scatter(x=dataframe['day'], y=dataframe['count'], marker_symbol= count, mode='markers+lines', name=qc_result, showlegend=True, fill=None,visible=visibility))
-            graph.update_layout(legend_title_text = "Confusion matrix values")
+            graph.update_layout(legend_title_text = "Confusion values")
             graph.update_yaxes(title_text='Daily tests')
             graph.update_layout(margin=go.layout.Margin(
         l=0, #left margin
