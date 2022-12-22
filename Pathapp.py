@@ -2,7 +2,7 @@
 import dash
 import dash_bootstrap_components as dbc
 from dash import html, dcc, Output, Input
-from sample_data import week_day,choices,last_week_date, last_year_date, last_month_date,test_type, results_list, genotype_list
+from sample_data import sensitivity_list,choices,last_week_date, last_year_date, last_month_date,test_type, results_list, genotype_list
 from datetime import date
 from be.controllers.types_graph import types_graph
 from be.controllers.filtering_tools import filter_dataframe,make_property_df,new_row_by_column
@@ -12,20 +12,24 @@ from be.controllers.mvp_graph import mvp_graph
 from be.controllers.qc_graph import qc_graph
 from be.controllers.scatter_plot import scatter_graph
 from be.controllers.adequacy_bar_graph import make_adequacy_graph
+from be.controllers.sensitivity_graph import sensitivity_scatter_graph
 #from be.controllers.
 import pandas as pd
 ##################  DATA #####################
+frequency_df=pd.read_csv("frequency.csv")
+frequency_df["day"]=pd.to_datetime(frequency_df["day"])
+
 data_df=pd.read_csv("lab_data.csv")
 data_df["day"]=pd.to_datetime(data_df["day"])
 
-Data={"All types":data_df}
-for tipo in ["Conventional","Liquid based"]:
-    Data[tipo]=data_df[data_df["type"]==tipo]
+# Data={"All types":data_df}
+# for tipo in ["Conventional","Liquid based"]:
+#     Data[tipo]=data_df[data_df["type"]==tipo]
 
-test_df = pd.read_csv('test_dataframe_T.csv')
-test_df["day"]=pd.to_datetime(test_df["day"])
-initial_df = pd.read_csv('test_type_count_T.csv')
-initial_df["day"]=pd.to_datetime(initial_df["day"])
+# test_df = pd.read_csv('test_dataframe_T.csv')
+# test_df["day"]=pd.to_datetime(test_df["day"])
+# initial_df = pd.read_csv('test_type_count_T.csv')
+# initial_df["day"]=pd.to_datetime(initial_df["day"])
 
 ################## MAKE DROPDOWN FROM LIST
 def make_drop(lista,id):
@@ -34,12 +38,12 @@ def make_drop(lista,id):
     if lista[0]=="Last week":
         color="warning"
         size="lg"
-    items=lista
-    atems=list(map(lambda z: dbc.DropdownMenuItem(z,id=z),items))
-    inputs=list(map(lambda z: Input(z,"n_clicks"),items))
+    #items=lista
+    atems=list(map(lambda z: dbc.DropdownMenuItem(z,id=z),lista))
+    inputs=list(map(lambda z: Input(z,"n_clicks"),lista))
 
     menu=dbc.DropdownMenu(atems,
-            label=lista[0],
+            #label="Camilo",
             className="mb-3",
             id= id  #create an id for the dropdown menu to be used in the graph callback to modify the label
         ,color=color,
@@ -51,11 +55,11 @@ def make_drop(lista,id):
 ###################  GENERATE THE DROPDOWN ELEMENTS  #######################
 
 
-dropletter=make_drop(['Last week', 'Last month', 'Last year'],"dropletter")
-type=make_drop(test_type,"type")
-weird=make_drop(results_list,"weird")###### it starts at 1 to rule out the "All results" option
-genotype=make_drop(genotype_list,"genotype")
-mvp=make_drop(choices,"mvp")
+dropletter=make_drop(['Last year', 'Last month', 'Last week'],"dropletter")
+type=make_drop(test_type+["All test types"],"type")
+weird=make_drop(results_list+["All results"],"weird")###### it starts at 1 to rule out the "All results" option
+genotype=make_drop(genotype_list+["All genotypes"],"genotype")
+mvp=make_drop(sensitivity_list,"mvp")
 
 ###################### PAGE HEADER    #######################
 
@@ -96,7 +100,9 @@ page_header=[
                         },
                     #style={"height":"150px","width":"300px"}
                                 ),
-                    )
+                    ),
+                    dbc.Row([html.Div(html.H4(children="Camilo",id="count_tests"))])
+
                                 ],
                 )
             ],
@@ -342,12 +348,12 @@ def update_time_range(input_range):
     Output(component_id='results-graph', component_property='figure'),
     Output(component_id='mvp-graph', component_property='figure'),
     Output(component_id='qc-graph', component_property='figure'),
+    Output(component_id='count_tests', component_property='children'),
 
     Input(component_id= 'date-range', component_property='start_date'),
     Input(component_id= 'date-range', component_property='end_date'),
     #Input(component_id = 'dropletter', component_property='label'),
     Input(component_id='type', component_property='label'),
-    Input(component_id='tree-map', component_property='clickData'),
     Input(component_id='weird', component_property='label'),
     Input(component_id='genotype', component_property='label'),
     Input(component_id='mvp', component_property='label'),
@@ -356,7 +362,7 @@ def update_time_range(input_range):
 
    # Input(component_id='default-time-ranges', component_property='value')
 )
-def update_graphs(start_date,end_date,tipo,click_data,weird_label,genotype_label,mvp_label):
+def update_graphs(start_date,end_date,tipo,result_label,genotype_label,sensitivity_label):
 
     # """Return all graphs based on interactive filters."""
     # if input_range == 'Last week':
@@ -368,49 +374,52 @@ def update_graphs(start_date,end_date,tipo,click_data,weird_label,genotype_label
     # end_date = date.today()
     ####Filter by dates
     #temp_df=Data[tipo]
-    filter_date_df = filter_dataframe(data_df,pd.to_datetime(start_date),pd.to_datetime(end_date))
-
-    #### create graph by test type
-    types_df=make_property_df(filter_date_df,"type")
-    types_graph= scatter_graph(types_df, tipo)
-    ### create graph by result type
-    filtered_df=filter_date_df
-    if tipo in ["Liquid based","Conventional"]:
-        filtered_df=filter_date_df[filter_date_df["type"]==tipo]
-    ##############################
-    results_df=make_property_df(filtered_df,"result")
-    res_graph= scatter_graph(results_df, weird_label)
-    ######create graph by genotype
-    gen_df=make_property_df(filtered_df,"genotype")
-    gen_graph= scatter_graph(gen_df, genotype_label)
-    ############ Create graph of specificity (to do)
 
 
+    if tipo[:3]=="All":
+        tipo="All"
+    if genotype_label[:3]=="All":
+        genotype_label="All"
+    if result_label[:3]=="All":
+        result_label="All"
 
-    ############### Create graph by adequacy (to do)
-    adequate=filtered_df["adequacy"].value_counts()[0]
-    inadequate_processed=filtered_df["adequacy"].value_counts()[1]
-    inadequate_not_processed=filtered_df["adequacy"].value_counts()[2]
+    filtered_df=filter_dataframe(frequency_df,pd.to_datetime(start_date),pd.to_datetime(end_date))
+    type_graph= scatter_graph(filtered_df,tipo,["All"]+test_type)
+    genotype_graph= scatter_graph(filtered_df,genotype_label,["All"]+genotype_list)
+
+    result_graph= scatter_graph(filtered_df,result_label,["All"]+results_list)
+
+    ########################
+    prefix=""
+    if sensitivity_label=="Sensitivity Liquid based":
+        prefix="Liquid based"
+    if sensitivity_label=="Sensitivity Conventional":
+        prefix="Conventional"
+    sensitivity_graph= sensitivity_scatter_graph(filtered_df,prefix)
+
+
+
+
+    ############## Create graph by adequacy (to do)
+    #########define a prefix
+    prefix=tipo
+    if prefix=="All":
+        prefix=""
+
+
+    ##############
+    adequate=filtered_df[prefix+"Sat"].sum()
+    inadequate_processed=filtered_df[prefix+"Insat_NP"].sum()
+    inadequate_not_processed=filtered_df[prefix+"Insat_P"].sum()
+    number_of_tests=filtered_df[tipo].sum()
+
+    message="Tests :"+str(number_of_tests)
     adequacy_graph=make_adequacy_graph(adequate,inadequate_processed,inadequate_not_processed)
 
-    ############### The rest is obsolete
-    # test_dataframe = filter_dataframe(test_df,pd.to_datetime(start_date), pd.to_datetime(end_date))
-    # tree_data = tree_map_graph(test_dataframe, tipo, click_data)
-    # tree_graph = tree_data[0]
-    # # # message =  tree_data[1]
-    # # # processed = tree_data[2]
-    # result_df = tree_data[3]
-    # results_data = result_graph(result_df,
-    # weird_label)
-    # results_graph = results_data[0]
-    # mvp_data = mvp_graph(results_data[1], tipo, weird_label, genotype_label)
-    # mvps_graph = mvp_data[0]
-    # confusion_value=mvp_label
-    # qc = qc_graph(result_df, tipo, weird_label, genotype_label,confusion_value)
-    #qc = mvp_graph(result_df, tipo, weird_label, genotype_label)
 
-#f'{type}'
-    return  types_graph,adequacy_graph,res_graph,gen_graph,gen_graph
+
+
+    return  type_graph,adequacy_graph,result_graph,genotype_graph,sensitivity_graph,message
 
 
 #######################################################

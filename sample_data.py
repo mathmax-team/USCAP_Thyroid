@@ -37,15 +37,16 @@ adequacy_list=["Sat","Insat_P","Insat_NP"]##### This referes to Satisfactory/Ins
 #results_list = ['negative', 'ASC-US', 'ASC-H', 'LSIL', 'MSIL', 'SCC', 'AC', 'JJJ', 'KKK', 'LLL']
 choices = ['True positive', 'False positive', 'False negative', 'True negative']
 value_sign=["Positive","Negative"]
+sensitivity_list=["Sensitivity Conventional", "Sensitivity Liquid based","Sensitivity all types"]
 
 ###################
 #genotype_list=["Genotype A","Genotype B","Genotype C"]
-genotype_list=["HPV genotype 16","HPV genotype 31","HPV genotype 18","HPV genotype 31","HPV genotype 35"]
+genotype_list=["HPV genotype 16","HPV genotype 31","HPV genotype 18","HPV genotype 35"]
 #test_type = ['Urine', 'Spinal Fluid','Blood', 'Pleural Fluid','Pericardial Fluid']
-test_type=["All types","Liquid based","Conventional"]
+test_type=["Liquid based","Conventional",]
 #adequacy_list = [{'Satisfactory': 'Yes'},{'Satisfactory': 'No', 'Processed': 'Not Processed'},{'Satisfactory': 'No', 'Processed': 'Processed'}]
 #results_list = ['Negative', 'ASC-US', 'ASC-H', 'LSIL', 'MSIL', 'SCC', 'AC', 'JJJ', 'KKK', 'LLL']
-results_list = ["All results",'Negative', 'ASC-US', 'ASC-H', 'LSIL', 'SCC']
+results_list = ['Negative', 'ASC-US', 'ASC-H', 'LSIL', 'SCC']
 # choices = ['True positive', 'False positive', 'False negative', 'True negative']
 
 #tree map data
