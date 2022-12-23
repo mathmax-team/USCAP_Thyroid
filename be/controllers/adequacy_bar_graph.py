@@ -1,6 +1,7 @@
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
+
 def make_adequacy_graph(Adequate,Inadequate_processed,Inadequate_not_proccessed):
     my_green="#42D7A7"
     my_orange="#FFC006"
