@@ -4,16 +4,10 @@ import dash_bootstrap_components as dbc
 from dash import html, dcc, Output, Input
 from sample_data import sensitivity_list,choices,last_week_date, last_year_date, last_month_date,results_list, genotype_list,type_list
 from datetime import date
-from be.controllers.types_graph import types_graph
 from be.controllers.filtering_tools import filter_dataframe,make_property_df,new_row_by_column
-from be.controllers.tree_map_graph import tree_map_graph
-from be.controllers.results_graph import result_graph
-from be.controllers.mvp_graph import mvp_graph
-from be.controllers.qc_graph import qc_graph
 from be.controllers.scatter_plot import scatter_graph
 from be.controllers.adequacy_bar_graph import make_adequacy_graph
 from be.controllers.sensitivity_graph import sensitivity_scatter_graph
-#from be.controllers.
 import pandas as pd
 
 
@@ -278,7 +272,7 @@ def update_default_period(*args):
 
     return [button_id]
 
-########################## CALL BACK genotype_drop ###################
+########################## CALL BACK GENOTYPE DROP ###################
 @app.callback(
     [
      Output("genotype", "label")
@@ -293,7 +287,7 @@ def update_default_period(*args):
         button_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
     return [button_id]
-################  CALL BACK results_drop #################
+################  CALL BACK RESULTS DROP #################
 
 @app.callback(
     [
@@ -310,7 +304,7 @@ def update_default_period(*args):
 
     return [button_id]
 
-##################################
+################################## CALL BACK UPDATE DATE RANGES
 @app.callback(
     Output(component_id= 'date-range', component_property='start_date'),
     Output(component_id= 'date-range', component_property='end_date'),
@@ -328,12 +322,8 @@ def update_time_range(input_range):
     return start_date, end_date
 
 
-#####################################################
+######################## CALL BACK UPDATE GRAPHS
 @app.callback(
-    #Output(component_id='type-selected', component_property='children'),
-    #Output(component_id='adequacy-selected', component_property='children'),
-    # Output(component_id='result-selected', component_property='children'),
-    # Output(component_id='genotype-selected', component_property='children'),
 
     Output(component_id='types-graph', component_property='figure'),
     Output(component_id='tree-map', component_property='figure'),
@@ -342,33 +332,18 @@ def update_time_range(input_range):
     Output(component_id='qc-graph', component_property='figure'),
     Output(component_id='tests', component_property='children'),
     Output(component_id='average', component_property='children'),
-
     Input(component_id= 'date-range', component_property='start_date'),
     Input(component_id= 'date-range', component_property='end_date'),
-    #Input(component_id = 'dropletter', component_property='label'),
     Input(component_id='type', component_property='label'),
     Input(component_id='results', component_property='label'),
     Input(component_id='genotype', component_property='label'),
     Input(component_id='mvp', component_property='label'),
-
-    #Input(component_id='default-time-range', component_property='start_date'),
-
-   # Input(component_id='default-time-ranges', component_property='value')
 )
 def update_graphs(start_date,end_date,type_label,result_label,genotype_label,sensitivity_label):
 
-    # """Return all graphs based on interactive filters."""
-    # if input_range == 'Last week':
-    #     start_date = last_year_date
-    # elif input_range == 'Last month':
-    #     start_date =last_month_date
-    # elif input_range == 'Last year':
-    #     start_date = last_year_date
-    # end_date = date.today()
-    ####Filter by dates
-    #temp_df=Data[tipo]
 
 
+############# GRAPH BY TYPE
     if type_label[:3]=="All":
         type_label="All"
     if genotype_label[:3]=="All":
@@ -378,11 +353,16 @@ def update_graphs(start_date,end_date,type_label,result_label,genotype_label,sen
 
     filtered_df=filter_dataframe(frequency_df,pd.to_datetime(start_date),pd.to_datetime(end_date))
     type_graph= scatter_graph(filtered_df,type_label,["All"]+type_list)
+
+    ########## GRAPH BY GENOTYPE
+
     genotype_graph= scatter_graph(filtered_df,genotype_label,["All"]+genotype_list)
+
+    ########### GRAPH BY RESULTS
 
     result_graph= scatter_graph(filtered_df,result_label,["All"]+results_list)
 
-    ########################
+    ######################## GRAPH BY SENSITIVITY
     prefix=""
     if sensitivity_label=="Sensitivity Liquid based":
         prefix="Liquid based"
@@ -393,7 +373,7 @@ def update_graphs(start_date,end_date,type_label,result_label,genotype_label,sen
 
 
 
-    ############## Create graph by adequacy (to do)
+    ############## GRAPH BY ADEQUACY
     #########define a prefix
     prefix=type_label
     if prefix=="All":
@@ -406,9 +386,11 @@ def update_graphs(start_date,end_date,type_label,result_label,genotype_label,sen
     inadequate_not_processed=filtered_df[prefix+"Insat_P"].sum()
 
     adequacy_graph=make_adequacy_graph(adequate,inadequate_processed,inadequate_not_processed)
-    ########### NUMBER OF TESTS
+
+    ########### UPDATE NUMBER OF TEST
     number_of_tests=filtered_df[type_label].sum()
-    ########## AVERAGE
+
+    ########## UPDATE AVERAGE
     N=filtered_df.shape[0]
 
     average="No tests"
