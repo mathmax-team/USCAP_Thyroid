@@ -2,7 +2,7 @@
 import dash
 import dash_bootstrap_components as dbc
 from dash import html, dcc, Output, Input
-from sample_data import sensitivity_list,choices,last_week_date, last_year_date, last_month_date,test_type, results_list, genotype_list
+from sample_data import sensitivity_list,choices,last_week_date, last_year_date, last_month_date,results_list, genotype_list,type_list
 from datetime import date
 from be.controllers.types_graph import types_graph
 from be.controllers.filtering_tools import filter_dataframe,make_property_df,new_row_by_column
@@ -15,24 +15,16 @@ from be.controllers.adequacy_bar_graph import make_adequacy_graph
 from be.controllers.sensitivity_graph import sensitivity_scatter_graph
 #from be.controllers.
 import pandas as pd
+
+
+###########################################
+#  THIS IS A PATHOLOGY MONITOR MOCKUP
 ##################  DATA #####################
 frequency_df=pd.read_csv("frequency.csv")
 frequency_df["day"]=pd.to_datetime(frequency_df["day"])
 
-# data_df=pd.read_csv("lab_data.csv")
-# data_df["day"]=pd.to_datetime(data_df["day"])
-
-# Data={"All types":data_df}
-# for tipo in ["Conventional","Liquid based"]:
-#     Data[tipo]=data_df[data_df["type"]==tipo]
-
-# test_df = pd.read_csv('test_dataframe_T.csv')
-# test_df["day"]=pd.to_datetime(test_df["day"])
-# initial_df = pd.read_csv('test_type_count_T.csv')
-# initial_df["day"]=pd.to_datetime(initial_df["day"])
-
 ################## MAKE DROPDOWN FROM LIST
-def make_drop(lista,id):
+def make_drop(lista:list,id:str):### This generates a dropdown .dbc object from parameters
     color="success"
     size="sm"
     if lista[0][:4]=="Last":
@@ -56,11 +48,13 @@ def make_drop(lista,id):
 
 
 dropletter=make_drop(['Last year', 'Last month', 'Last week'],"dropletter")
-type=make_drop(test_type+["All test types"],"type")
-weird=make_drop(results_list+["All results"],"weird")###### it starts at 1 to rule out the "All results" option
-genotype=make_drop(genotype_list+["All genotypes"],"genotype")
+type_drop=make_drop(type_list+["All test types"],"type")
+results_drop=make_drop(results_list+["All results"],"results")###### it starts at 1 to rule out the "All results" option
+genotype_drop=make_drop(genotype_list+["All genotypes"],"genotype")
 mvp=make_drop(sensitivity_list,"mvp")
-###################### table
+
+
+###################### THE TABLE THAT DISPLAYS COUNT AND AVERAGE
 table_header = [
     html.Thead(html.Tr([html.Th("Number of tests"), html.Th("Daily average")]))
 ]
@@ -71,6 +65,7 @@ row1 = html.Tr([html.Td("Arthur",id="tests"), html.Td("Dent",id="average")])
 table_body = [html.Tbody([row1])]
 
 table = dbc.Table(table_header + table_body, bordered=True,style={"width":"300px","height":"30px"})
+
 ###################### PAGE HEADER    #######################
 
 
@@ -127,11 +122,12 @@ page_header=[
             )
         ]
 #############################     Imgrid   ###################################################
+
 Imgrid=html.Div(children=[
                   #First GRAPH
                     html.Div(
                         dbc.Col([
-                            dbc.Row(type["drop"],style={"textAlign":"center"}),
+                            dbc.Row(type_drop["drop"],style={"textAlign":"center"}),
                             dbc.Row(
                             dcc.Graph(
                                 id='types-graph',
@@ -156,7 +152,7 @@ Imgrid=html.Div(children=[
                         #Second GRAPH
                         html.Div(
                             dbc.Col([
-                                dbc.Row(weird["drop"],style={"textAlign":"center"}),
+                                dbc.Row(results_drop["drop"],style={"textAlign":"center"}),
                                 dbc.Row(
                                 dcc.Graph(id='results-graph', figure={},
                                     config={
@@ -179,7 +175,7 @@ Imgrid=html.Div(children=[
                         #THIRD GRAPH
                         html.Div(dbc.Col(
                             [
-                            dbc.Row(genotype["drop"],style={"textAlign":"center"}),
+                            dbc.Row(genotype_drop["drop"],style={"textAlign":"center"}),
                             dbc.Row(
                                 dcc.Graph(id='mvp-graph', figure={},
                                     config={
@@ -250,54 +246,54 @@ def update_default_period(*args):
         button_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
     return [button_id]
-########################### CALL BACK type ###################
+########################### CALL BACK type_drop ###################
 @app.callback(
     [
      Output("type", "label")
      ],
-    type["inputs"]
+    type_drop["inputs"]
 )
 def update_default_period(*args):
     ctx = dash.callback_context
     if not ctx.triggered:
-        button_id = type["list"][0]
+        button_id = type_drop["list"][0]
     else:
         button_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
     return [button_id]
-################  CALL BACK weird #################
+################  CALL BACK results_drop #################
 
 @app.callback(
     [
-     Output("weird", "label")
+     Output("results", "label")
      ],
-    weird["inputs"]
+    results_drop["inputs"]
 )
 def update_default_period(*args):
     ctx = dash.callback_context
     if not ctx.triggered:
-        button_id = weird["list"][0]
+        button_id = results_drop["list"][0]
     else:
         button_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
     return [button_id]
 
-########################## CALL BACK genotype ###################
+########################## CALL BACK genotype_drop ###################
 @app.callback(
     [
      Output("genotype", "label")
      ],
-    genotype["inputs"]
+    genotype_drop["inputs"]
 )
 def update_default_period(*args):
     ctx = dash.callback_context
     if not ctx.triggered:
-        button_id = genotype["list"][0]
+        button_id = genotype_drop["list"][0]
     else:
         button_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
     return [button_id]
-################  CALL BACK weird #################
+################  CALL BACK results_drop #################
 
 @app.callback(
     [
@@ -331,27 +327,7 @@ def update_time_range(input_range):
     end_date = date.today()
     return start_date, end_date
 
-#####################################################
-# @app.callback(
-#     #Output(component_id='type-selected', component_property='children'),
-#     #Output(component_id='adequacy-selected', component_property='children'),
-#     # Output(component_id='result-selected', component_property='children'),
-#     # Output(component_id='genotype-selected', component_property='children'),
 
-#     Output(component_id='types-graph', component_property='figure'),
-#     Output(component_id='tree-map', component_property='figure'),
-#     Output(component_id='results-graph', component_property='figure'),
-#     Output(component_id='mvp-graph', component_property='figure'),
-#     Output(component_id='qc-graph', component_property='figure'),
-#     Input(component_id = 'type-dropdown', component_property='value'),
-#     Input(component_id='tree-map', component_property='clickData'),
-#     Input(component_id='selected-result', component_property='value'),
-#     Input(component_id='genotype-radio', component_property='value'),
-
-#     # Input(component_id='default-time-range', component_property='start_date'),
-
-#     Input(component_id='default-time-ranges', component_property='value')
-# )
 #####################################################
 @app.callback(
     #Output(component_id='type-selected', component_property='children'),
@@ -371,7 +347,7 @@ def update_time_range(input_range):
     Input(component_id= 'date-range', component_property='end_date'),
     #Input(component_id = 'dropletter', component_property='label'),
     Input(component_id='type', component_property='label'),
-    Input(component_id='weird', component_property='label'),
+    Input(component_id='results', component_property='label'),
     Input(component_id='genotype', component_property='label'),
     Input(component_id='mvp', component_property='label'),
 
@@ -379,7 +355,7 @@ def update_time_range(input_range):
 
    # Input(component_id='default-time-ranges', component_property='value')
 )
-def update_graphs(start_date,end_date,tipo,result_label,genotype_label,sensitivity_label):
+def update_graphs(start_date,end_date,type_label,result_label,genotype_label,sensitivity_label):
 
     # """Return all graphs based on interactive filters."""
     # if input_range == 'Last week':
@@ -393,15 +369,15 @@ def update_graphs(start_date,end_date,tipo,result_label,genotype_label,sensitivi
     #temp_df=Data[tipo]
 
 
-    if tipo[:3]=="All":
-        tipo="All"
+    if type_label[:3]=="All":
+        type_label="All"
     if genotype_label[:3]=="All":
         genotype_label="All"
     if result_label[:3]=="All":
         result_label="All"
 
     filtered_df=filter_dataframe(frequency_df,pd.to_datetime(start_date),pd.to_datetime(end_date))
-    type_graph= scatter_graph(filtered_df,tipo,["All"]+test_type)
+    type_graph= scatter_graph(filtered_df,type_label,["All"]+type_list)
     genotype_graph= scatter_graph(filtered_df,genotype_label,["All"]+genotype_list)
 
     result_graph= scatter_graph(filtered_df,result_label,["All"]+results_list)
@@ -419,7 +395,7 @@ def update_graphs(start_date,end_date,tipo,result_label,genotype_label,sensitivi
 
     ############## Create graph by adequacy (to do)
     #########define a prefix
-    prefix=tipo
+    prefix=type_label
     if prefix=="All":
         prefix=""
 
@@ -431,7 +407,7 @@ def update_graphs(start_date,end_date,tipo,result_label,genotype_label,sensitivi
 
     adequacy_graph=make_adequacy_graph(adequate,inadequate_processed,inadequate_not_processed)
     ########### NUMBER OF TESTS
-    number_of_tests=filtered_df[tipo].sum()
+    number_of_tests=filtered_df[type_label].sum()
     ########## AVERAGE
     N=filtered_df.shape[0]
 

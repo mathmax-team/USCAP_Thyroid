@@ -1,5 +1,5 @@
 """Creates and returns results graph."""
-from sample_data import results_list, test_type,genotype_list
+from sample_data import results_list,type_list,genotype_list
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
@@ -7,7 +7,7 @@ import numpy as np
 def scatter_graph(df,choice,possibilities):
     """Create a scatter graph based on filtered data frame."""
     paleta=(["#FFC006","#95BFE1","#E83283","#42D7A7","#38CBFB","#d6e649","#f230a1","#30bff2","#f24730","#8c7649","#498c6f","#74678f"])
-    cosas=["All"]+test_type+genotype_list+results_list
+    cosas=["All"]+type_list+genotype_list+results_list
     color=dict()
     for i in range(len(cosas)):
         color[cosas[i]]=paleta[i%len(paleta)]

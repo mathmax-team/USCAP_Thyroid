@@ -1,5 +1,5 @@
 """Creates and returns types graph."""
-from sample_data import test_type
+from sample_data import type_list
 import plotly.graph_objects as go
 import pandas as pd
 
@@ -8,7 +8,7 @@ def types_graph(df, type):
     graph = go.Figure()
     count = 0
 
-    for test in test_type:
+    for test in type_list:
         if test == type:
             visibility = True
         else:

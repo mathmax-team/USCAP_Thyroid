@@ -1,11 +1,11 @@
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
-from sample_data import test_type
+from sample_data import type_list
 def sensitivity_scatter_graph(df,prefix):
     """Create a scatter graph based on filtered data frame."""
     graph = go.Figure()
-    for possibility in [""]+test_type:
+    for possibility in [""]+type_list:
         if possibility == prefix:
             visibility_hyst = True
             visibility_cyt=True
