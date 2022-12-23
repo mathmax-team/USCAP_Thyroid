@@ -19,8 +19,8 @@ import pandas as pd
 frequency_df=pd.read_csv("frequency.csv")
 frequency_df["day"]=pd.to_datetime(frequency_df["day"])
 
-data_df=pd.read_csv("lab_data.csv")
-data_df["day"]=pd.to_datetime(data_df["day"])
+# data_df=pd.read_csv("lab_data.csv")
+# data_df["day"]=pd.to_datetime(data_df["day"])
 
 # Data={"All types":data_df}
 # for tipo in ["Conventional","Liquid based"]:
