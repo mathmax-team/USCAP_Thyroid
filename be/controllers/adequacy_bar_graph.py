@@ -38,6 +38,8 @@ def make_adequacy_graph(Adequate,Inadequate_processed,Inadequate_not_proccessed)
     paper_bgcolor=bg,
     plot_bgcolor=bg,
     height=60,
+    width=300,
+
     # bargap=0.30,
     # bargroupgap=0.0
     )

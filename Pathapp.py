@@ -60,7 +60,17 @@ type=make_drop(test_type+["All test types"],"type")
 weird=make_drop(results_list+["All results"],"weird")###### it starts at 1 to rule out the "All results" option
 genotype=make_drop(genotype_list+["All genotypes"],"genotype")
 mvp=make_drop(sensitivity_list,"mvp")
+###################### table
+table_header = [
+    html.Thead(html.Tr([html.Th("Number of tests"), html.Th("Daily average")]))
+]
 
+row1 = html.Tr([html.Td("Arthur",id="tests"), html.Td("Dent",id="average")])
+
+
+table_body = [html.Tbody([row1])]
+
+table = dbc.Table(table_header + table_body, bordered=True,style={"width":"300px","height":"30px"})
 ###################### PAGE HEADER    #######################
 
 
@@ -82,8 +92,9 @@ page_header=[
                 #day_size=30,
                 #style={"width":"10cm","height":"20cm","margin-top":"50px","margin-left":"20px"}
                     ),
-                    width=4
+                    width=3
                 ),
+                dbc.Col(table),
         dbc.Col([
             dbc.Row(dcc.Graph(
                 id='tree-map',
@@ -101,10 +112,11 @@ page_header=[
                     #style={"height":"150px","width":"300px"}
                                 ),
                     ),
-                    dbc.Row([html.Div(html.H4(children="count_tests",id="count_tests"),style={"margin-top":"5px"})]),
-                    dbc.Row([html.Div(html.H4(children="Average:45",id="avg",style={"margin-top":"-12px"}))],
-                    style={"margin-top":"0px"},
-                    ),
+
+                    # dbc.Row([html.Div(html.H4(children="count_tests",id="count_tests"),style={"margin-top":"5px"})]),
+                    # dbc.Row([html.Div(html.H4(children="Average:45",id="avg",style={"margin-top":"-12px"}))],
+                    # style={"margin-top":"0px"},
+                    # ),
 
 
                                 ],
@@ -352,8 +364,8 @@ def update_time_range(input_range):
     Output(component_id='results-graph', component_property='figure'),
     Output(component_id='mvp-graph', component_property='figure'),
     Output(component_id='qc-graph', component_property='figure'),
-    Output(component_id='count_tests', component_property='children'),
-    Output(component_id='avg', component_property='children'),
+    Output(component_id='tests', component_property='children'),
+    Output(component_id='average', component_property='children'),
 
     Input(component_id= 'date-range', component_property='start_date'),
     Input(component_id= 'date-range', component_property='end_date'),
@@ -420,18 +432,17 @@ def update_graphs(start_date,end_date,tipo,result_label,genotype_label,sensitivi
     adequacy_graph=make_adequacy_graph(adequate,inadequate_processed,inadequate_not_processed)
     ########### NUMBER OF TESTS
     number_of_tests=filtered_df[tipo].sum()
-    message="Tests :"+str(number_of_tests)
     ########## AVERAGE
     N=filtered_df.shape[0]
 
     average="No tests"
     if N !=0:
         avg=round(number_of_tests/N,1)
-        average="Daily avg: "+str(avg)
+        average=str(avg)
 
 
 
-    return  type_graph,adequacy_graph,result_graph,genotype_graph,sensitivity_graph,message,average
+    return  type_graph,adequacy_graph,result_graph,genotype_graph,sensitivity_graph,number_of_tests,average
 
 
 #######################################################
