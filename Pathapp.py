@@ -35,7 +35,7 @@ data_df["day"]=pd.to_datetime(data_df["day"])
 def make_drop(lista,id):
     color="success"
     size="sm"
-    if lista[0]=="Last week":
+    if lista[0][:4]=="Last":
         color="warning"
         size="lg"
     #items=lista
@@ -101,7 +101,11 @@ page_header=[
                     #style={"height":"150px","width":"300px"}
                                 ),
                     ),
-                    dbc.Row([html.Div(html.H4(children="Camilo",id="count_tests"))])
+                    dbc.Row([html.Div(html.H4(children="count_tests",id="count_tests"),style={"margin-top":"5px"})]),
+                    dbc.Row([html.Div(html.H4(children="Average:45",id="avg",style={"margin-top":"-12px"}))],
+                    style={"margin-top":"0px"},
+                    ),
+
 
                                 ],
                 )
@@ -349,6 +353,7 @@ def update_time_range(input_range):
     Output(component_id='mvp-graph', component_property='figure'),
     Output(component_id='qc-graph', component_property='figure'),
     Output(component_id='count_tests', component_property='children'),
+    Output(component_id='avg', component_property='children'),
 
     Input(component_id= 'date-range', component_property='start_date'),
     Input(component_id= 'date-range', component_property='end_date'),
@@ -411,15 +416,22 @@ def update_graphs(start_date,end_date,tipo,result_label,genotype_label,sensitivi
     adequate=filtered_df[prefix+"Sat"].sum()
     inadequate_processed=filtered_df[prefix+"Insat_NP"].sum()
     inadequate_not_processed=filtered_df[prefix+"Insat_P"].sum()
-    number_of_tests=filtered_df[tipo].sum()
 
-    message="Tests :"+str(number_of_tests)
     adequacy_graph=make_adequacy_graph(adequate,inadequate_processed,inadequate_not_processed)
+    ########### NUMBER OF TESTS
+    number_of_tests=filtered_df[tipo].sum()
+    message="Tests :"+str(number_of_tests)
+    ########## AVERAGE
+    N=filtered_df.shape[0]
+
+    average="No tests"
+    if N !=0:
+        avg=round(number_of_tests/N,1)
+        average="Daily avg: "+str(avg)
 
 
 
-
-    return  type_graph,adequacy_graph,result_graph,genotype_graph,sensitivity_graph,message
+    return  type_graph,adequacy_graph,result_graph,genotype_graph,sensitivity_graph,message,average
 
 
 #######################################################
