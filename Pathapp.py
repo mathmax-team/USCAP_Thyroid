@@ -14,7 +14,7 @@ import pandas as pd
 ###########################################
 #  THIS IS A PATHOLOGY MONITOR MOCKUP
 ##################  DATA #####################
-frequency_df=pd.read_csv("frequency.csv")
+frequency_df=pd.read_csv("Frequency.csv")
 frequency_df["day"]=pd.to_datetime(frequency_df["day"])
 
 ################## MAKE DROPDOWN FROM LIST
