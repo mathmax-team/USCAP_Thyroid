@@ -23,17 +23,24 @@ def make_drop(lista:list,id:str):### This generates a dropdown .dbc object from 
     size="sm"
     if lista[0][:4]=="Last":
         color="warning"
-        size="lg"
-    #items=lista
+        #size="lg"
+    items=lista
     atems=list(map(lambda z: dbc.DropdownMenuItem(z,id=z),lista))
     inputs=list(map(lambda z: Input(z,"n_clicks"),lista))
 
     menu=dbc.DropdownMenu(atems,
-            #label="Camilo",
-            className="mb-3",
-            id= id  #create an id for the dropdown menu to be used in the graph callback to modify the label
-        ,color=color,
-        size=size
+
+        className="m-1",
+        id= id,  #create an id for the dropdown menu to be used in the graph callback to modify the label
+        color=color,
+        size="sm",
+        toggle_style={
+        #"textTransform": "lowercase",
+        #"background": "#67c29c",
+       # "height":"0px",
+       #siz
+       }
+
         )
     return {"drop":menu,"inputs":inputs,"list":lista}
 
