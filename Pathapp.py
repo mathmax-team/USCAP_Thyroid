@@ -19,7 +19,7 @@ frequency_df["day"]=pd.to_datetime(frequency_df["day"])
 
 ################## MAKE DROPDOWN FROM LIST
 def make_drop(lista:list,id:str):### This generates a dropdown .dbc object from parameters
-    color="success"
+    color="primary"
     size="sm"
     if lista[0][:4]=="Last":
         color="warning"
@@ -58,7 +58,7 @@ row1 = html.Tr([html.Td("Arthur",id="tests"), html.Td("Dent",id="average")])
 
 table_body = [html.Tbody([row1])]
 
-table = dbc.Table(table_header + table_body, bordered=True,style={"width":"300px","height":"30px"})
+table = dbc.Table(table_header + table_body, bordered=True,style={"width":"300px","height":"20px"})
 
 ###################### PAGE HEADER    #######################
 
@@ -67,11 +67,11 @@ page_header=[
     dbc.Row(html.Div(style={"height":"10px"})),
     dbc.Row([
         dbc.Col(
-            [dbc.Row(html.Img(src="assets/medicine.svg",style={'height': '60px'})),
-            dbc.Row(html.H3('Cytopathology Monitor'),style={"textAlign":"center"})
+            [dbc.Row(html.Img(src="assets/UHealth_logo.png",style={'height': '60px'})),
+            #dbc.Row(html.H3('Cytopathology Monitor'),style={"textAlign":"center"})
             ],
             #width="3",
-            align="end"),
+            align="start"),
         dbc.Col(dropletter["drop"]),
         dbc.Col(dcc.DatePickerRange(
                 id = 'date-range',
