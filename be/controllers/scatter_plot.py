@@ -30,7 +30,7 @@ def scatter_graph(df,choice,possibilities):
     ),
     paper_bgcolor="#f5f3f4",
     plot_bgcolor="#f5f3f4",
-    height=300,
+    height=250,
     # title={
     #     'text': title,
     #     'y':0.99,

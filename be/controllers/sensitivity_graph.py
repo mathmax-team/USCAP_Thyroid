@@ -14,8 +14,8 @@ def sensitivity_scatter_graph(df,prefix):
         #     visibility_cyt= False
             # cit=make_property_df(df,"cytology")
             # hist=make_property_df(df,"hystology")
-            graph.add_trace(go.Scatter(x=df['day'], y= 0.8*df[prefix+"Positivecytology"], mode="markers+lines", name="Theoretical sensitivity", showlegend=True, visible=visibility_cyt,fill="tonexty"))
-            graph.add_trace(go.Scatter(x=df['day'], y= df[prefix+"Positivehystology"], mode="markers+lines", name="Real sensitivity", showlegend=True, visible=visibility_hyst,fill="tonexty"))
+            graph.add_trace(go.Scatter(x=df['day'], y= 0.8*df[prefix+"Positivecytology"], mode="markers+lines", name="Theoretical", showlegend=True, visible=visibility_cyt,fill="tonexty"))
+            graph.add_trace(go.Scatter(x=df['day'], y= df[prefix+"Positivehystology"], mode="markers+lines", name="Real", showlegend=True, visible=visibility_hyst,fill="tonexty"))
     #data = df.loc[df['result'] == result]
     graph.update_layout(margin=go.layout.Margin(
     l=0, #left margin
@@ -26,7 +26,7 @@ def sensitivity_scatter_graph(df,prefix):
     ),
     paper_bgcolor="#f5f3f4",
     plot_bgcolor="#f5f3f4",
-    height=300,
+    height=250,
     # title={
     #     'text': title,
     #     'y':0.99,

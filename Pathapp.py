@@ -19,27 +19,27 @@ frequency_df["day"]=pd.to_datetime(frequency_df["day"])
 
 ################## MAKE DROPDOWN FROM LIST
 def make_drop(lista:list,id:str):### This generates a dropdown .dbc object from parameters
-    color="primary"
+    color="secondary"
     size="sm"
     if lista[0][:4]=="Last":
         color="warning"
-        #size="lg"
+        size="lg"
     items=lista
     atems=list(map(lambda z: dbc.DropdownMenuItem(z,id=z),lista))
     inputs=list(map(lambda z: Input(z,"n_clicks"),lista))
 
     menu=dbc.DropdownMenu(atems,
 
-        className="m-1",
-        id= id,  #create an id for the dropdown menu to be used in the graph callback to modify the label
-        color=color,
-        size="sm",
-        toggle_style={
-        #"textTransform": "lowercase",
-        #"background": "#67c29c",
-       # "height":"0px",
-       #siz
-       }
+    className="mb-3",
+    id= id,  #create an id for the dropdown menu to be used in the graph callback to modify the label
+    color=color,
+    size="sm",
+    #     toggle_style={
+    #     #"textTransform": "lowercase",
+    #     #"background": "#67c29c",
+    #    # "height":"0px",
+    #    #siz
+    #    }
 
         )
     return {"drop":menu,"inputs":inputs,"list":lista}
@@ -74,7 +74,7 @@ page_header=[
     dbc.Row(html.Div(style={"height":"10px"})),
     dbc.Row([
         dbc.Col(
-            [dbc.Row(html.Img(src="assets/UHealth_logo.png",style={'height': '60px'})),
+            [dbc.Row(html.Img(src="assets/miami_white.png",style={'width': '300px'},width=5)),
             #dbc.Row(html.H3('Cytopathology Monitor'),style={"textAlign":"center"})
             ],
             #width="3",
@@ -142,7 +142,7 @@ Imgrid=html.Div(children=[
                                     'watermark': False,
                                     # 'modeBarButtonsToRemove': ['pan2d','select2d'],
                                     },
-                            style={"height":"300px"}
+                            style={"height":"250px"}
                             ),
                             style={"padding":"0px"},
                             )
@@ -165,7 +165,7 @@ Imgrid=html.Div(children=[
                                         'watermark': False,
                                         # 'modeBarButtonsToRemove': ['pan2d','select2d'],
                                             },
-                                        style={"height":"300px"}
+                                        style={"height":"250px"}
                                         ),
                                 style={"padding":"0px"}
                                 )
@@ -188,7 +188,7 @@ Imgrid=html.Div(children=[
                                         'watermark': False,
                                         # 'modeBarButtonsToRemove': ['pan2d','select2d'],
                                             },
-                                        style={"height":"300px"}
+                                        style={"height":"250px"}
                                         ),
                             style={"padding":"0px"}
                             )
@@ -210,7 +210,7 @@ Imgrid=html.Div(children=[
                                     'watermark': False,
                                     # 'modeBarButtonsToRemove': ['pan2d','select2d'],
                                     },
-                                    style={"height":"300px"},
+                                    style={"height":"250px","width":"800px"},
                                     ),
                                     style={"padding":"0px"}
                             )
@@ -227,7 +227,7 @@ Imgrid=html.Div(children=[
 
 ######################################
 
-app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = dash.Dash(external_stylesheets=[dbc.themes.SLATE])
 app.layout=dbc.Container([dbc.Row(page_header),dbc.Row(Imgrid)],fluid="True")
 ############## UPDATE DROPDOWN
 

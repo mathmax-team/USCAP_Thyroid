@@ -32,7 +32,7 @@ sensitivity_list=["Sensitivity Conventional", "Sensitivity Liquid based","Sensit
 
 ###################
 
-genotype_list=["HPV genotype 16","HPV genotype 31","HPV genotype 18","HPV genotype 35"]
+genotype_list=["HPV 16","HPV 31","HPV 18","HPV 35"]
 type_list=["Liquid based","Conventional"]
 results_list = ['Negative', 'ASC-US', 'ASC-H', 'LSIL', 'SCC']
 tree_values = [100, 40, 60, 30, 30]
