@@ -38,12 +38,12 @@ table_body = [html.Tbody([row1])]
 
 table = dbc.Table(table_header + table_body, bordered=True,style={"width":"380px","height":"20px","margin-bottom":"20px"})
 ###############
-def make_drop(lista:list,id:str,place_holder):
+def make_drop(lista:list,id:str):
     menu=dcc.Dropdown(id=id,
     options=[ {"label": i, "value": i} for i in lista],
     value=lista[-1],
     clearable=False,
-    placeholder="Select "+ place_holder
+
 
         )
     return {"drop":menu}
@@ -52,11 +52,11 @@ def make_drop(lista:list,id:str,place_holder):
 ###################  GENERATE THE DROPDOWN ELEMENTS  #######################
 
 
-dropletter=make_drop(['Last year', 'Last month', 'Last week'],"dropletter","time range")
-type_drop=make_drop(type_list+["All test types"],"type","test type")
-results_drop=make_drop(results_list+["All results"],"results","result")###### it starts at 1 to rule out the "All results" option
-genotype_drop=make_drop(genotype_list+["All genotypes"],"genotype","genotype")
-mvp=make_drop(sensitivity_list,"mvp","lasdjf")
+dropletter=make_drop(['Last year', 'Last month', 'Last week'],"dropletter")
+type_drop=make_drop(type_list+["All test types"],"type")
+results_drop=make_drop(results_list+["All results"],"results")###### it starts at 1 to rule out the "All results" option
+genotype_drop=make_drop(genotype_list+["All genotypes"],"genotype")
+
 
 
 
