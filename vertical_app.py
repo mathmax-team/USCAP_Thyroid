@@ -41,7 +41,7 @@ table = dbc.Table(table_header + table_body, bordered=True,style={"width":"380px
 def make_drop(lista:list,id:str,place_holder):
     menu=dcc.Dropdown(id=id,
     options=[ {"label": i, "value": i} for i in lista],
-    value=lista[0],
+    value=lista[-1],
     clearable=False,
     placeholder="Select "+ place_holder
 
