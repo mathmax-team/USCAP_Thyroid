@@ -1,324 +1,188 @@
-# 1. Import Dash
 import dash
+from dash import dcc
+from dash import html
+import pandas as pd
+import numpy as np
+import plotly.express as px
+from dash.dependencies import Input, Output
+from plotly import graph_objs as go
+from plotly.graph_objs import *
 import dash_bootstrap_components as dbc
-from dash import html, dcc, Output, Input
-from sample_data import sensitivity_list,choices,last_week_date, last_year_date, last_month_date,results_list, genotype_list,type_list
 from datetime import date
-from be.controllers.filtering_tools import filter_dataframe,make_property_df,new_row_by_column
+from sample_data import sensitivity_list,choices,last_week_date, last_year_date, last_month_date,results_list,genotype_list,type_list
+from be.controllers.filtering_tools import filter_dataframe,make_plotable,next_monday
 from be.controllers.scatter_plot import scatter_graph
 from be.controllers.adequacy_bar_graph import make_adequacy_graph
 from be.controllers.sensitivity_graph import sensitivity_scatter_graph
-import pandas as pd
 
 
-###########################################
-#  THIS IS A PATHOLOGY MONITOR MOCKUP
-##################  DATA #####################
-frequency_df=pd.read_csv("Frequency.csv")
-frequency_df["day"]=pd.to_datetime(frequency_df["day"])
+# frequency_df=pd.read_csv("Frequency.csv")
+# frequency_df["day"]=pd.to_datetime(frequency_df["day"])
+Records_df=pd.read_csv("Records.csv")
+Records_df["day"]=pd.to_datetime(Records_df["day"])
 
-################## MAKE DROPDOWN FROM LIST
-def make_drop(lista:list,id:str):### This generates a dropdown .dbc object from parameters
-    color="secondary"
-    size="sm"
-    if lista[0][:4]=="Last":
-        color="warning"
-        size="lg"
-    items=lista
-    atems=list(map(lambda z: dbc.DropdownMenuItem(z,id=z),lista))
-    inputs=list(map(lambda z: Input(z,"n_clicks"),lista))
+############# GRAPH BY TYPE
 
-    menu=dbc.DropdownMenu(atems,
 
-    className="mb-3",
-    id= id,  #create an id for the dropdown menu to be used in the graph callback to modify the label
-    color=color,
-    size="sm",
-    #     toggle_style={
-    #     #"textTransform": "lowercase",
-    #     #"background": "#67c29c",
-    #    # "height":"0px",
-    #    #siz
-    #    }
+# filtered_df=filter_dataframe(frequency_df,pd.to_datetime(last_month_date),pd.to_datetime(last_week_date))
+# type_graph= scatter_graph(filtered_df,"Liquid based",["All"]+type_list)
+
+table_header = [
+    html.Thead(html.Tr([html.Th("Tests"), html.Th("Daily Avg"),html.Th("Positivity rate")]))
+]
+
+row1 = html.Tr([html.Td("345",id="tests"), html.Td("45.6",id="average"),html.Td("Positivity rate",id="positivity_rate")])
+
+
+table_body = [html.Tbody([row1])]
+
+table = dbc.Table(table_header + table_body, bordered=True,style={"width":"380px","height":"20px","margin-bottom":"20px"})
+###############
+def make_drop(lista:list,id:str,place_holder):
+    menu=dcc.Dropdown(id=id,
+    options=[ {"label": i, "value": i} for i in lista],
+    value=lista[-1],
+    clearable=False,
+    placeholder="Select "+ place_holder
 
         )
-    return {"drop":menu,"inputs":inputs,"list":lista}
+    return {"drop":menu}
 
 
 ###################  GENERATE THE DROPDOWN ELEMENTS  #######################
 
 
-dropletter=make_drop(['Last year', 'Last month', 'Last week'],"dropletter")
-type_drop=make_drop(type_list+["All test types"],"type")
-results_drop=make_drop(results_list+["All results"],"results")###### it starts at 1 to rule out the "All results" option
-genotype_drop=make_drop(genotype_list+["All genotypes"],"genotype")
-mvp=make_drop(sensitivity_list,"mvp")
+dropletter=make_drop(['Last year', 'Last month', 'Last week'],"dropletter","time range")
+type_drop=make_drop(type_list+["All test types"],"type","test type")
+results_drop=make_drop(results_list+["All results"],"results","result")###### it starts at 1 to rule out the "All results" option
+genotype_drop=make_drop(genotype_list+["All genotypes"],"genotype","genotype")
+mvp=make_drop(sensitivity_list,"mvp","lasdjf")
 
 
-###################### THE TABLE THAT DISPLAYS COUNT AND AVERAGE
-table_header = [
-    html.Thead(html.Tr([html.Th("Number of tests"), html.Th("Daily average")]))
-]
 
-row1 = html.Tr([html.Td("Arthur",id="tests"), html.Td("Dent",id="average")])
-
-
-table_body = [html.Tbody([row1])]
-
-table = dbc.Table(table_header + table_body, bordered=True,style={"width":"300px","height":"20px"})
-
-###################### PAGE HEADER    #######################
-
-
-page_header=[
-    dbc.Row(html.Div(style={"height":"10px"})),
-    dbc.Row([
-        dbc.Col(
-            [dbc.Row(html.Img(src="assets/miami_white.png",style={'width': '300px'},width=5)),
-            #dbc.Row(html.H3('Cytopathology Monitor'),style={"textAlign":"center"})
-            ],
-            #width="3",
-            align="start"),
-        dbc.Col(dropletter["drop"]),
-        dbc.Col(dcc.DatePickerRange(
-                id = 'date-range',
-                start_date_placeholder_text = last_month_date,
-                end_date = date.today(),
-                max_date_allowed = date.today(),
-                #day_size=30,
-                #style={"width":"10cm","height":"20cm","margin-top":"50px","margin-left":"20px"}
-                    ),
-                    width=3
-                ),
-                dbc.Col(table),
-        dbc.Col([
-            dbc.Row(dcc.Graph(
-                id='tree-map',
-                figure={},
-                clickData={},
-                config={
-                'staticPlot': False,     # True, False
-                'scrollZoom': True,      # True, False
-                'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
-                'showTips': True,       # True, False
-                'displayModeBar': None,  # True, False, 'hover'
-                'watermark': False,
-                # 'modeBarButtonsToRemove': ['pan2d','select2d'],
-                        },
-                    #style={"height":"150px","width":"300px"}
-                                ),
-                    ),
-
-                    # dbc.Row([html.Div(html.H4(children="count_tests",id="count_tests"),style={"margin-top":"5px"})]),
-                    # dbc.Row([html.Div(html.H4(children="Average:45",id="avg",style={"margin-top":"-12px"}))],
-                    # style={"margin-top":"0px"},
-                    # ),
-
-
-                                ],
+def drawFigure(altura,id):
+    return  html.Div([
+        dbc.Card(
+            dbc.CardBody([
+                dcc.Graph(
+                    figure={},
+                    id=id,
+                    config={
+                        'displayModeBar': False
+                    },
                 )
-            ],
-            id="page_header",
-            justify="end",
-            )
-        ]
-#############################     Imgrid   ###################################################
+            ])
+        ),
+    ])
 
-Imgrid=html.Div(children=[
-                  #First GRAPH
-                    html.Div(
-                        dbc.Col([
-                            dbc.Row(type_drop["drop"],style={"textAlign":"center"}),
-                            dbc.Row(
-                            dcc.Graph(
-                                id='types-graph',
-                                figure={},
-                                config={
-                                    'staticPlot': False,     # True, False
-                                    'scrollZoom': True,      # True, False
-                                    'doubleClick': 'reset+autosize',  # 'reset', 'autosize' or 'reset+autosize', False
-                                    'showTips': False,       # True, False
-                                    'displayModeBar': False,  # True, False, 'hover'
-                                    'watermark': False,
-                                    # 'modeBarButtonsToRemove': ['pan2d','select2d'],
-                                    },
-                            style={"height":"250px"}
+app = dash.Dash()
+
+
+
+
+
+# Layout of Dash App
+app.layout = html.Div(
+    children=[
+        html.Div(
+            className="row",
+            children=[
+                # Column for user controls
+                html.Div(
+                    className="four columns div-user-controls",
+                    children=[
+                        html.A(
+                            html.Img(
+                                className="logo",
+                                src=app.get_asset_url("UHealth_logo.png"),
+                                style={"width":"75%","height":"75%"}
                             ),
-                            style={"padding":"0px"},
-                            )
-                        ],
-                        style={'padding':'5px'}
-                        )
+                            href="https://umiamihealth.org/en/",
                         ),
-                        #Second GRAPH
+                        html.H1("Cytopathology - Monitor"),
+                        html.P(['Select a default time range or a custom time period.',html.Br(), 'On the right you can filter the graphs by Test Type, Result and Genotype']),
                         html.Div(
-                            dbc.Col([
-                                dbc.Row(results_drop["drop"],style={"textAlign":"center"}),
-                                dbc.Row(
-                                dcc.Graph(id='results-graph', figure={},
-                                    config={
-                                        'staticPlot': False,     # True, False
-                                        'scrollZoom': False,      # True, False
-                                        'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
-                                        'showTips': False,       # True, False
-                                        'displayModeBar': False,  # True, False, 'hover'
-                                        'watermark': False,
-                                        # 'modeBarButtonsToRemove': ['pan2d','select2d'],
-                                            },
-                                        style={"height":"250px"}
-                                        ),
-                                style={"padding":"0px"}
-                                )
-                        ],
+                            className="row",
+                            children=[
+                                html.Div(
+                                    className="div-for-dropdown",
+                                    children=[
+                                        dropletter["drop"]
+                                    ],
+                                ),
+                            ],
                         ),
-                        style={'padding':'5px'}
+                        html.Div(
+                            className="div-for-dropdown",
+                            children=[
+                                dcc.DatePickerSingle(
+                                    id = 'date_start',
+                                    style={"width":"100%"}
+                                        )
+                            ],
                         ),
-                        #THIRD GRAPH
-                        html.Div(dbc.Col(
-                            [
-                            dbc.Row(genotype_drop["drop"],style={"textAlign":"center"}),
-                            dbc.Row(
-                                dcc.Graph(id='mvp-graph', figure={},
-                                    config={
-                                        'staticPlot': False,     # True, False
-                                        'scrollZoom': False,      # True, False
-                                        'doubleClick': 'reset+autosize',  # 'reset', 'autosize' or 'reset+autosize', False
-                                        'showTips': False,       # True, False
-                                        'displayModeBar': False,  # True, False, 'hover'
-                                        'watermark': False,
-                                        # 'modeBarButtonsToRemove': ['pan2d','select2d'],
-                                            },
-                                        style={"height":"250px"}
-                                        ),
-                            style={"padding":"0px"}
-                            )
-                        ],
-                        style={'padding':'5px'}
+                        # Change to side-by-side for mobile layout
+                        html.Div(
+                            className="div-for-dropdown",
+                            children=[
+                                dcc.DatePickerSingle(
+                                    id = 'date_end',
+                                    style={"width":"100%"}
+                                        )
+                            ],
                         ),
-                        ),
-                        #FOURTH GRAPH
-                        html.Div(dbc.Col([
-                            dbc.Row(mvp["drop"],style={"textAlign":"center"},),#
-                            dbc.Row(
-                                dcc.Graph(id='qc-graph', figure={},
-                                config={
-                                    'staticPlot': False,     # True, False
-                                    'scrollZoom': False,      # True, False
-                                    'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
-                                    'showTips': False,       # True, False
-                                    'displayModeBar': False,  # True, False, 'hover'
-                                    'watermark': False,
-                                    # 'modeBarButtonsToRemove': ['pan2d','select2d'],
-                                    },
-                                    style={"height":"250px","width":"800px"},
-                                    ),
-                                    style={"padding":"0px"}
-                            )
-                        ],
-                        style={'padding':'5px'},
-                        ),
-                        )
-                        ],
-                        #html.Div('6', style={'padding':'0px', 'border':None}),
-                    id="grid",
-                    style={'display': 'grid', 'gridTemplateRows':"repeat(2, 1fr)",'gridTemplateColumns': 'repeat(2, 1fr)', 'gridAutoFlow': 'row',"height":"100px"}
+                        table,
+                        drawFigure("200px","sensitivity-graph"),
+                        drawFigure("200px","adequacy-graph"),
+                    ],
+                ),
+                # Column for app graphs and plots
+                html.Div(
+                    className="eight columns div-for-charts bg-grey",
+                    children=[
+                        html.Div(
+                                    className="div-for-dropdown",
+                                    children=[
+                                        type_drop["drop"]
+                                    ],
+                                    style={"height":"50px"}
+                                ),
+                        drawFigure("230px","types-graph"),
+                        #dcc.Graph(id="map-graph"),
+                        html.Div(
+                                    className="div-for-dropdown",
+                                    children=[
+                                        # Dropdown to select times
+                                        results_drop["drop"]
+                                    ],
+                                ),
+                        #dcc.Graph(id="histogram"),
+                        drawFigure("230px","result-graph"),
+                        html.Div(
+                                    className="div-for-dropdown",
+                                    children=[
+                                        genotype_drop["drop"]
+                                    ],
+                                ),
+                        drawFigure("230px","genotype-graph")
+                    ],
+                ),
+            ],
+            style={"margin-top":"0px","padding":"0px"}
+        )
+    ]
 )
 
 
-######################################
-
-app = dash.Dash(external_stylesheets=[dbc.themes.SLATE])
-app.layout=dbc.Container([dbc.Row(page_header),dbc.Row(Imgrid)],fluid="True")
-############## UPDATE DROPDOWN
-
-
-########################### CALL BACK letterdrop ###################
 @app.callback(
-    [
-     Output("dropletter", "label")
-     ],
-    dropletter["inputs"]
-)
-def update_default_period(*args):
-    ctx = dash.callback_context
-    if not ctx.triggered:
-        button_id = dropletter["list"][0]
-    else:
-        button_id = ctx.triggered[0]["prop_id"].split(".")[0]
-
-    return [button_id]
-########################### CALL BACK type_drop ###################
-@app.callback(
-    [
-     Output("type", "label")
-     ],
-    type_drop["inputs"]
-)
-def update_default_period(*args):
-    ctx = dash.callback_context
-    if not ctx.triggered:
-        button_id = type_drop["list"][0]
-    else:
-        button_id = ctx.triggered[0]["prop_id"].split(".")[0]
-
-    return [button_id]
-################  CALL BACK results_drop #################
-
-@app.callback(
-    [
-     Output("results", "label")
-     ],
-    results_drop["inputs"]
-)
-def update_default_period(*args):
-    ctx = dash.callback_context
-    if not ctx.triggered:
-        button_id = results_drop["list"][0]
-    else:
-        button_id = ctx.triggered[0]["prop_id"].split(".")[0]
-
-    return [button_id]
-
-########################## CALL BACK GENOTYPE DROP ###################
-@app.callback(
-    [
-     Output("genotype", "label")
-     ],
-    genotype_drop["inputs"]
-)
-def update_default_period(*args):
-    ctx = dash.callback_context
-    if not ctx.triggered:
-        button_id = genotype_drop["list"][0]
-    else:
-        button_id = ctx.triggered[0]["prop_id"].split(".")[0]
-
-    return [button_id]
-################  CALL BACK RESULTS DROP #################
-
-@app.callback(
-    [
-     Output("mvp", "label")
-     ],
-    mvp["inputs"]
-)
-def update_default_period(*args):
-    ctx = dash.callback_context
-    if not ctx.triggered:
-        button_id = mvp["list"][0]
-    else:
-        button_id = ctx.triggered[0]["prop_id"].split(".")[0]
-
-    return [button_id]
-
-################################## CALL BACK UPDATE DATE RANGES
-@app.callback(
-    Output(component_id= 'date-range', component_property='start_date'),
-    Output(component_id= 'date-range', component_property='end_date'),
-    Input(component_id='dropletter', component_property='label')
+    Output(component_id= 'date_start', component_property='date'),
+    Output(component_id= 'date_end', component_property='date'),
+    Input(component_id='dropletter', component_property='value')
 )
 def update_time_range(input_range):
     """Control time range selection."""
+    start_date=last_year_date
+    end_date=date.today()
     if input_range == 'Last week':
         start_date = last_week_date
     elif input_range == 'Last month':
@@ -328,25 +192,64 @@ def update_time_range(input_range):
     end_date = date.today()
     return start_date, end_date
 
-
-######################## CALL BACK UPDATE GRAPHS
+####################### CALL BACK UPDATE GRAPHS
 @app.callback(
 
     Output(component_id='types-graph', component_property='figure'),
-    Output(component_id='tree-map', component_property='figure'),
-    Output(component_id='results-graph', component_property='figure'),
-    Output(component_id='mvp-graph', component_property='figure'),
-    Output(component_id='qc-graph', component_property='figure'),
+    Output(component_id='result-graph', component_property='figure'),
+    Output(component_id='genotype-graph', component_property='figure'),
+    Output(component_id='adequacy-graph', component_property='figure'),
+    Output(component_id='sensitivity-graph', component_property='figure'),
     Output(component_id='tests', component_property='children'),
     Output(component_id='average', component_property='children'),
-    Input(component_id= 'date-range', component_property='start_date'),
-    Input(component_id= 'date-range', component_property='end_date'),
-    Input(component_id='type', component_property='label'),
-    Input(component_id='results', component_property='label'),
-    Input(component_id='genotype', component_property='label'),
-    Input(component_id='mvp', component_property='label'),
+    Output(component_id='positivity_rate', component_property='children'),
+
+    Input(component_id= 'date_start', component_property='date'),
+    Input(component_id= 'date_end', component_property='date'),
+    Input(component_id='type', component_property='value'),
+    Input(component_id='results', component_property='value'),
+    Input(component_id='genotype', component_property='value'),
+
 )
-def update_graphs(start_date,end_date,type_label,result_label,genotype_label,sensitivity_label):
+def update_graphs(start_date,end_date,type_label,result_label,genotype_label):
+    if type_label==None:
+        type_label="Liquid based"
+    if result_label==None:
+        type_label="Negative"
+    if genotype_label==None:
+        genotype_label="HPV 16"
+
+    type_label=str(type_label)
+    result_label=str(result_label)
+    genotype_label=str(genotype_label)
+
+    #################### FILTER BY DATE
+
+    filtered_Rec_df=filter_dataframe(Records_df,pd.to_datetime(start_date),pd.to_datetime(end_date))
+
+########### UPDATE NUMBER OF TEST
+    number_of_tests=filtered_Rec_df.shape[0]
+
+ ########## UPDATE AVERAGE
+    number_of_days=filtered_Rec_df["day"].nunique()
+
+    average="No tests"
+    if number_of_days !=0:
+        average=round(number_of_tests/number_of_days,1)
+
+########## UPDATE POSITIVE RATE
+    number_of_negatives=filtered_Rec_df[filtered_Rec_df["result"]=="Negative"].shape[0]
+    number_of_positives=number_of_tests-number_of_negatives
+    positive_rate = "No tests"
+    if number_of_tests !=0:
+        positive_rate=round(number_of_positives/number_of_tests,3)
+
+
+################### GROUP BY WEEK WHEN NEEDED
+
+    if pd.Timedelta(pd.to_datetime(end_date)-pd.to_datetime(start_date)).days>100:
+        filtered_Rec_df["day"]=filtered_Rec_df["day"].apply(lambda z:next_monday(z))
+
 
 
 
@@ -358,58 +261,49 @@ def update_graphs(start_date,end_date,type_label,result_label,genotype_label,sen
     if result_label[:3]=="All":
         result_label="All"
 
-    filtered_df=filter_dataframe(frequency_df,pd.to_datetime(start_date),pd.to_datetime(end_date))
-    type_graph= scatter_graph(filtered_df,type_label,["All"]+type_list)
+    types_dict=dict()
+    for possibility in ["All"]+type_list:
+        types_dict[possibility]=make_plotable(filtered_Rec_df,{"type":possibility})
 
-    ########## GRAPH BY GENOTYPE
+    type_graph=scatter_graph(type_label,types_dict)
 
-    genotype_graph= scatter_graph(filtered_df,genotype_label,["All"]+genotype_list)
+#################################### GRAPH BY RESULT ############
 
-    ########### GRAPH BY RESULTS
+    results_dict=dict()
+    for possibility in ["All"]+results_list:
+        results_dict[possibility]=make_plotable(filtered_Rec_df,{"result":possibility,"type":type_label})
 
-    result_graph= scatter_graph(filtered_df,result_label,["All"]+results_list)
+    results_graph=scatter_graph(result_label,results_dict)
 
-    ######################## GRAPH BY SENSITIVITY
-    prefix=""
-    if sensitivity_label=="Sensitivity Liquid based":
-        prefix="Liquid based"
-    if sensitivity_label=="Sensitivity Conventional":
-        prefix="Conventional"
-    sensitivity_graph= sensitivity_scatter_graph(filtered_df,prefix)
+#################################### GRAPH BY RESULT ############
 
+    genotype_dict=dict()
+    for possibility in ["All"]+genotype_list:
+        genotype_dict[possibility]=make_plotable(filtered_Rec_df,{"genotype":possibility,"type":type_label,"result":result_label})
 
-
-
-    ############## GRAPH BY ADEQUACY
-    #########define a prefix
-    prefix=type_label
-    if prefix=="All":
-        prefix=""
+    genotype_graph=scatter_graph(genotype_label,genotype_dict)
 
 
-    ##############
-    adequate=filtered_df[prefix+"Sat"].sum()
-    inadequate_processed=filtered_df[prefix+"Insat_NP"].sum()
-    inadequate_not_processed=filtered_df[prefix+"Insat_P"].sum()
+############################################### SENSITIVITY GRAPH
 
+    sensitivity_dict=dict()
+    sensitivity_dict["Real Sensitivity"]=make_plotable(filtered_Rec_df,{"cytology":"Positivecytology","hystology":"Positivehystology"})
+    sensitivity_dict["Theoretical"]=make_plotable(filtered_Rec_df,{"cytology":"Positivecytology"})
+    sensitivity_graph=sensitivity_scatter_graph(sensitivity_dict)
+
+
+    ############## GRAPH ADEQUAC
+
+    adequate=filtered_Rec_df[filtered_Rec_df["adequacy"]=="Sat"].shape[0]
+    inadequate_processed=filtered_Rec_df[filtered_Rec_df["adequacy"]=="Insat_P"].shape[0]
+    inadequate_not_processed=filtered_Rec_df[filtered_Rec_df["adequacy"]=="Insat_NP"].shape[0]
     adequacy_graph=make_adequacy_graph(adequate,inadequate_processed,inadequate_not_processed)
 
-    ########### UPDATE NUMBER OF TEST
-    number_of_tests=filtered_df[type_label].sum()
-
-    ########## UPDATE AVERAGE
-    N=filtered_df.shape[0]
-
-    average="No tests"
-    if N !=0:
-        avg=round(number_of_tests/N,1)
-        average=str(avg)
-
-
-
-    return  type_graph,adequacy_graph,result_graph,genotype_graph,sensitivity_graph,number_of_tests,average
+    return  type_graph,results_graph,genotype_graph,sensitivity_graph,adequacy_graph,number_of_tests,average,positive_rate
 
 
 #######################################################
+
+
 if __name__ == "__main__":
     app.run_server(debug=True)
