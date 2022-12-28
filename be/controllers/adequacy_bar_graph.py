@@ -5,8 +5,7 @@ import pandas as pd
 def make_adequacy_graph(Adequate,Inadequate_processed,Inadequate_not_proccessed):
     my_green="#42D7A7"
     my_orange="#FFC006"
-    bg="#f5f3f4"
-    newbg="#807b6f"
+
     fig = go.Figure()
     fig.add_trace(go.Bar(
         y=['Inadequate','Adequate','Total'],
@@ -15,7 +14,6 @@ def make_adequacy_graph(Adequate,Inadequate_processed,Inadequate_not_proccessed)
         orientation='h',
         marker=dict(
             color=my_green,
-            #line=dict(color='rgba(246, 78, 139, 1.0)', width=3)
         )
     ))
     fig.add_trace(go.Bar(
@@ -25,7 +23,6 @@ def make_adequacy_graph(Adequate,Inadequate_processed,Inadequate_not_proccessed)
         orientation='h',
         marker=dict(
             color=my_orange,
-            #line=dict(color='rgba(58, 71, 80, 1.0)', width=3)
         )
     ))
 
@@ -36,13 +33,10 @@ def make_adequacy_graph(Adequate,Inadequate_processed,Inadequate_not_proccessed)
         b=0, #bottom margin
         t=0, #top margin
     ),
-    paper_bgcolor=bg,
-    plot_bgcolor=bg,
     height=80,
-    width=300,
-
-    # bargap=0.30,
-    # bargroupgap=0.0
+    template="plotly_dark",
+    plot_bgcolor= 'rgba(0, 0, 0, 0)',
+    paper_bgcolor= 'rgba(0, 0, 0, 0)',
     )
     fig.update_traces(width=0.5)
     fig.update_layout(xaxis=dict(showgrid=False,showline=False,showticklabels=False),

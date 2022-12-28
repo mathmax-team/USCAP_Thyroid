@@ -27,3 +27,20 @@ def make_property_df(df,column):
         prop_df=pd.concat([prop_df,new_row_by_column(df,fecha,column)],axis=0, ignore_index=True)
 
     return prop_df
+
+
+def next_monday(date):
+    day=date.weekday()
+    delta=str((6-day)%7)
+
+    return date+pd.Timedelta(delta+" days")
+
+
+
+def make_plotable(df,dictionary_of_choices):
+    short_df=df[["day",*list(dictionary_of_choices.keys())]]
+    for key in list(dictionary_of_choices.keys()):
+        if dictionary_of_choices[key]!="All":
+            short_df=short_df[short_df[key]==dictionary_of_choices[key]]
+
+    return pd.DataFrame(short_df["day"].value_counts().reset_index().values,columns=["x","y"]).sort_values(by="x")

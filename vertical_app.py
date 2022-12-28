@@ -8,77 +8,78 @@ from dash.dependencies import Input, Output
 from plotly import graph_objs as go
 from plotly.graph_objs import *
 import dash_bootstrap_components as dbc
-from datetime import datetime as dt
+from datetime import date
+from sample_data import sensitivity_list,choices,last_week_date, last_year_date, last_month_date,results_list,genotype_list,type_list
+from be.controllers.filtering_tools import filter_dataframe,make_plotable,next_monday
+from be.controllers.scatter_plot import scatter_graph
+from be.controllers.adequacy_bar_graph import make_adequacy_graph
+from be.controllers.sensitivity_graph import sensitivity_scatter_graph
 
-dflower = px.data.iris()
-def drawFigure():
+
+# frequency_df=pd.read_csv("Frequency.csv")
+# frequency_df["day"]=pd.to_datetime(frequency_df["day"])
+Records_df=pd.read_csv("Records.csv")
+Records_df["day"]=pd.to_datetime(Records_df["day"])
+
+############# GRAPH BY TYPE
+
+
+# filtered_df=filter_dataframe(frequency_df,pd.to_datetime(last_month_date),pd.to_datetime(last_week_date))
+# type_graph= scatter_graph(filtered_df,"Liquid based",["All"]+type_list)
+
+table_header = [
+    html.Thead(html.Tr([html.Th("Tests"), html.Th("Daily Avg"),html.Th("Positivity rate")]))
+]
+
+row1 = html.Tr([html.Td("345",id="tests"), html.Td("45.6",id="average"),html.Td("Positivity rate",id="positivity_rate")])
+
+
+table_body = [html.Tbody([row1])]
+
+table = dbc.Table(table_header + table_body, bordered=True,style={"width":"380px","height":"20px","margin-bottom":"20px"})
+###############
+def make_drop(lista:list,id:str,place_holder):
+    menu=dcc.Dropdown(id=id,
+    options=[ {"label": i, "value": i} for i in lista],
+    value=lista[0],
+    clearable=False,
+    placeholder="Select "+ place_holder
+
+        )
+    return {"drop":menu}
+
+
+###################  GENERATE THE DROPDOWN ELEMENTS  #######################
+
+
+dropletter=make_drop(['Last year', 'Last month', 'Last week'],"dropletter","time range")
+type_drop=make_drop(type_list+["All test types"],"type","test type")
+results_drop=make_drop(results_list+["All results"],"results","result")###### it starts at 1 to rule out the "All results" option
+genotype_drop=make_drop(genotype_list+["All genotypes"],"genotype","genotype")
+mvp=make_drop(sensitivity_list,"mvp","lasdjf")
+
+
+
+def drawFigure(altura,id):
     return  html.Div([
         dbc.Card(
             dbc.CardBody([
                 dcc.Graph(
-                    figure=px.bar(
-                        dflower, x="sepal_width", y="sepal_length", color="species"
-                    ).update_layout(
-                        template='plotly_dark',
-                        plot_bgcolor= 'rgba(0, 0, 0, 0)',
-                        paper_bgcolor= 'rgba(0, 0, 0, 0)',
-                    ),
+                    figure={},
+                    id=id,
                     config={
                         'displayModeBar': False
                     },
-                    #style={"height":"230px"}
                 )
             ])
         ),
     ])
 
-app = dash.Dash(
-    __name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}],
-)
-app.title = "New York Uber Rides"
-server = app.server
+app = dash.Dash()
 
 
-# Plotly mapbox public token
-mapbox_access_token = "pk.eyJ1IjoicGxvdGx5bWFwYm94IiwiYSI6ImNrOWJqb2F4djBnMjEzbG50amg0dnJieG4ifQ.Zme1-Uzoi75IaFbieBDl3A"
 
-# Dictionary of important locations in New York
-list_of_locations = {
-    "Madison Square Garden": {"lat": 40.7505, "lon": -73.9934},
-    "Yankee Stadium": {"lat": 40.8296, "lon": -73.9262},
-    "Empire State Building": {"lat": 40.7484, "lon": -73.9857},
-    "New York Stock Exchange": {"lat": 40.7069, "lon": -74.0113},
-    "JFK Airport": {"lat": 40.644987, "lon": -73.785607},
-    "Grand Central Station": {"lat": 40.7527, "lon": -73.9772},
-    "Times Square": {"lat": 40.7589, "lon": -73.9851},
-    "Columbia University": {"lat": 40.8075, "lon": -73.9626},
-    "United Nations HQ": {"lat": 40.7489, "lon": -73.9680},
-}
 
-# Initialize data frame
-df1 = pd.read_csv(
-    "https://raw.githubusercontent.com/plotly/datasets/master/uber-rides-data1.csv",
-    dtype=object,
-)
-df2 = pd.read_csv(
-    "https://raw.githubusercontent.com/plotly/datasets/master/uber-rides-data2.csv",
-    dtype=object,
-)
-df3 = pd.read_csv(
-    "https://raw.githubusercontent.com/plotly/datasets/master/uber-rides-data3.csv",
-    dtype=object,
-)
-df = pd.concat([df1, df2, df3], axis=0)
-df["Date/Time"] = pd.to_datetime(df["Date/Time"], format="%Y-%m-%d %H:%M")
-df.index = df["Date/Time"]
-df.drop("Date/Time", 1, inplace=True)
-totalList = []
-for month in df.groupby(df.index.month):
-    dailyList = []
-    for day in month[1].groupby(month[1].index.day):
-        dailyList.append(day[1])
-    totalList.append(dailyList)
-totalList = np.array(totalList)
 
 # Layout of Dash App
 app.layout = html.Div(
@@ -93,440 +94,215 @@ app.layout = html.Div(
                         html.A(
                             html.Img(
                                 className="logo",
-                                src=app.get_asset_url("miami_white.png"),
+                                src=app.get_asset_url("UHealth_logo.png"),
                                 style={"width":"75%","height":"75%"}
                             ),
                             href="https://umiamihealth.org/en/",
                         ),
-                        html.H2("Cytopathology - Monitor"),
-                        html.P(
-                            """Select a default time range or a custom time period."""
-                        ),
-                        html.Div(
-                            className="div-for-dropdown",
-                            children=[
-                                dcc.DatePickerSingle(
-                                    id="date-picker",
-                                    min_date_allowed=dt(2014, 4, 1),
-                                    max_date_allowed=dt(2014, 9, 30),
-                                    initial_visible_month=dt(2014, 4, 1),
-                                    date=dt(2014, 4, 1).date(),
-                                    display_format="MMMM D, YYYY",
-                                    style={"border": "0px solid black"},
-                                )
-                            ],
-                        ),
-                        # Change to side-by-side for mobile layout
+                        html.H1("Cytopathology - Monitor"),
+                        html.P(['Select a default time range or a custom time period.',html.Br(), 'On the right you can filter the graphs by Test Type, Result and Genotype']),
                         html.Div(
                             className="row",
                             children=[
                                 html.Div(
                                     className="div-for-dropdown",
                                     children=[
-                                        # Dropdown for locations on map
-                                        dcc.Dropdown(
-                                            id="location-dropdown",
-                                            options=[
-                                                {"label": i, "value": i}
-                                                for i in list_of_locations
-                                            ],
-                                            placeholder="Select a location",
-                                        )
-                                    ],
-                                ),
-                                html.Div(
-                                    className="div-for-dropdown",
-                                    children=[
-                                        # Dropdown to select times
-                                        dcc.Dropdown(
-                                            id="bar-selector",
-                                            options=[
-                                                {
-                                                    "label": str(n) + ":00",
-                                                    "value": str(n),
-                                                }
-                                                for n in range(24)
-                                            ],
-                                            multi=True,
-                                            placeholder="Select certain hours",
-                                        )
+                                        dropletter["drop"]
                                     ],
                                 ),
                             ],
                         ),
-                        html.P(id="total-rides"),
-                        html.P(id="total-rides-selection"),
-                        html.P(id="date-value"),
-                        drawFigure(),
-                        # dcc.Markdown(
-                        #     """
-                        #     Source: [FiveThirtyEight](https://github.com/fivethirtyeight/uber-tlc-foil-response/tree/master/uber-trip-data)
-
-                        #     Links: [Source Code](https://github.com/plotly/dash-sample-apps/tree/main/apps/dash-uber-rides-demo) | [Enterprise Demo](https://plotly.com/get-demo/)
-                        #     """
-                        # ),
+                        html.Div(
+                            className="div-for-dropdown",
+                            children=[
+                                dcc.DatePickerSingle(
+                                    id = 'date_start',
+                                    style={"width":"100%"}
+                                        )
+                            ],
+                        ),
+                        # Change to side-by-side for mobile layout
+                        html.Div(
+                            className="div-for-dropdown",
+                            children=[
+                                dcc.DatePickerSingle(
+                                    id = 'date_end',
+                                    style={"width":"100%"}
+                                        )
+                            ],
+                        ),
+                        table,
+                        drawFigure("200px","sensitivity-graph"),
+                        drawFigure("200px","adequacy-graph"),
                     ],
                 ),
                 # Column for app graphs and plots
                 html.Div(
                     className="eight columns div-for-charts bg-grey",
                     children=[
-                        drawFigure(),
+                        html.Div(
+                                    className="div-for-dropdown",
+                                    children=[
+                                        type_drop["drop"]
+                                    ],
+                                    style={"height":"50px"}
+                                ),
+                        drawFigure("230px","types-graph"),
                         #dcc.Graph(id="map-graph"),
                         html.Div(
-                            className="text-padding",
-                            children=[
-                                "Select any of the bars on the histogram to section data by time."
-                            ],
-                        ),
+                                    className="div-for-dropdown",
+                                    children=[
+                                        # Dropdown to select times
+                                        results_drop["drop"]
+                                    ],
+                                ),
                         #dcc.Graph(id="histogram"),
-                        drawFigure()
+                        drawFigure("230px","result-graph"),
+                        html.Div(
+                                    className="div-for-dropdown",
+                                    children=[
+                                        genotype_drop["drop"]
+                                    ],
+                                ),
+                        drawFigure("230px","genotype-graph")
                     ],
                 ),
             ],
+            style={"margin-top":"0px","padding":"0px"}
         )
     ]
 )
 
-# Gets the amount of days in the specified month
-# Index represents month (0 is April, 1 is May, ... etc.)
-daysInMonth = [30, 31, 30, 31, 31, 30]
 
-# Get index for the specified month in the dataframe
-monthIndex = pd.Index(["Apr", "May", "June", "July", "Aug", "Sept"])
+@app.callback(
+    Output(component_id= 'date_start', component_property='date'),
+    Output(component_id= 'date_end', component_property='date'),
+    Input(component_id='dropletter', component_property='value')
+)
+def update_time_range(input_range):
+    """Control time range selection."""
+    start_date=last_year_date
+    end_date=date.today()
+    if input_range == 'Last week':
+        start_date = last_week_date
+    elif input_range == 'Last month':
+        start_date =last_month_date
+    elif input_range == 'Last year':
+        start_date = last_year_date
+    end_date = date.today()
+    return start_date, end_date
 
-# Get the amount of rides per hour based on the time selected
-# This also higlights the color of the histogram bars based on
-# if the hours are selected
-def get_selection(month, day, selection):
-    xVal = []
-    yVal = []
-    xSelected = []
-    colorVal = [
-        "#F4EC15",
-        "#DAF017",
-        "#BBEC19",
-        "#9DE81B",
-        "#80E41D",
-        "#66E01F",
-        "#4CDC20",
-        "#34D822",
-        "#24D249",
-        "#25D042",
-        "#26CC58",
-        "#28C86D",
-        "#29C481",
-        "#2AC093",
-        "#2BBCA4",
-        "#2BB5B8",
-        "#2C99B4",
-        "#2D7EB0",
-        "#2D65AC",
-        "#2E4EA4",
-        "#2E38A4",
-        "#3B2FA0",
-        "#4E2F9C",
-        "#603099",
-    ]
+####################### CALL BACK UPDATE GRAPHS
+@app.callback(
 
-    # Put selected times into a list of numbers xSelected
-    xSelected.extend([int(x) for x in selection])
+    Output(component_id='types-graph', component_property='figure'),
+    Output(component_id='result-graph', component_property='figure'),
+    Output(component_id='genotype-graph', component_property='figure'),
+    Output(component_id='adequacy-graph', component_property='figure'),
+    Output(component_id='sensitivity-graph', component_property='figure'),
+    Output(component_id='tests', component_property='children'),
+    Output(component_id='average', component_property='children'),
+    Output(component_id='positivity_rate', component_property='children'),
 
-    for i in range(24):
-        # If bar is selected then color it white
-        if i in xSelected and len(xSelected) < 24:
-            colorVal[i] = "#FFFFFF"
-        xVal.append(i)
-        # Get the number of rides at a particular time
-        yVal.append(len(totalList[month][day][totalList[month][day].index.hour == i]))
-    return [np.array(xVal), np.array(yVal), np.array(colorVal)]
+    Input(component_id= 'date_start', component_property='date'),
+    Input(component_id= 'date_end', component_property='date'),
+    Input(component_id='type', component_property='value'),
+    Input(component_id='results', component_property='value'),
+    Input(component_id='genotype', component_property='value'),
 
+)
+def update_graphs(start_date,end_date,type_label,result_label,genotype_label):
+    if type_label==None:
+        type_label="Liquid based"
+    if result_label==None:
+        type_label="Negative"
+    if genotype_label==None:
+        genotype_label="HPV 16"
 
-# Selected Data in the Histogram updates the Values in the Hours selection dropdown menu
-# @app.callback(
-#     Output("bar-selector", "value"),
-#     [Input("histogram", "selectedData"), Input("histogram", "clickData")],
-# )
-# def update_bar_selector(value, clickData):
-#     holder = []
-#     if clickData:
-#         holder.append(str(int(clickData["points"][0]["x"])))
-#     if value:
-#         for x in value["points"]:
-#             holder.append(str(int(x["x"])))
-#     return list(set(holder))
+    type_label=str(type_label)
+    result_label=str(result_label)
+    genotype_label=str(genotype_label)
 
+    #################### FILTER BY DATE
 
-# # Clear Selected Data if Click Data is used
-# @app.callback(Output("histogram", "selectedData"), [Input("histogram", "clickData")])
-# def update_selected_data(clickData):
-#     if clickData:
-#         return {"points": []}
+    filtered_Rec_df=filter_dataframe(Records_df,pd.to_datetime(start_date),pd.to_datetime(end_date))
+
+########### UPDATE NUMBER OF TEST
+    number_of_tests=filtered_Rec_df.shape[0]
+
+ ########## UPDATE AVERAGE
+    number_of_days=filtered_Rec_df["day"].nunique()
+
+    average="No tests"
+    if number_of_days !=0:
+        average=round(number_of_tests/number_of_days,1)
+
+########## UPDATE POSITIVE RATE
+    number_of_negatives=filtered_Rec_df[filtered_Rec_df["result"]=="Negative"].shape[0]
+    number_of_positives=number_of_tests-number_of_negatives
+    positive_rate = "No tests"
+    if number_of_tests !=0:
+        positive_rate=round(number_of_positives/number_of_tests,3)
 
 
-# # Update the total number of rides Tag
-# @app.callback(Output("total-rides", "children"), [Input("date-picker", "date")])
-# def update_total_rides(datePicked):
-#     date_picked = dt.strptime(datePicked, "%Y-%m-%d")
-#     return "Total Number of rides: {:,d}".format(
-#         len(totalList[date_picked.month - 4][date_picked.day - 1])
-#     )
+################### GROUP BY WEEK WHEN NEEDED
+
+    if pd.Timedelta(pd.to_datetime(end_date)-pd.to_datetime(start_date)).days>100:
+        filtered_Rec_df["day"]=filtered_Rec_df["day"].apply(lambda z:next_monday(z))
 
 
-# # Update the total number of rides in selected times
-# @app.callback(
-#     [Output("total-rides-selection", "children"), Output("date-value", "children")],
-#     [Input("date-picker", "date"), Input("bar-selector", "value")],
-# )
-# def update_total_rides_selection(datePicked, selection):
-#     firstOutput = ""
-
-#     if selection != None or len(selection) != 0:
-#         date_picked = dt.strptime(datePicked, "%Y-%m-%d")
-#         totalInSelection = 0
-#         for x in selection:
-#             totalInSelection += len(
-#                 totalList[date_picked.month - 4][date_picked.day - 1][
-#                     totalList[date_picked.month - 4][date_picked.day - 1].index.hour
-#                     == int(x)
-#                 ]
-#             )
-#         firstOutput = "Total rides in selection: {:,d}".format(totalInSelection)
-
-#     if (
-#         datePicked is None
-#         or selection is None
-#         or len(selection) == 24
-#         or len(selection) == 0
-#     ):
-#         return firstOutput, (datePicked, " - showing hour(s): All")
-
-#     holder = sorted([int(x) for x in selection])
-
-#     if holder == list(range(min(holder), max(holder) + 1)):
-#         return (
-#             firstOutput,
-#             (
-#                 datePicked,
-#                 " - showing hour(s): ",
-#                 holder[0],
-#                 "-",
-#                 holder[len(holder) - 1],
-#             ),
-#         )
-
-#     holder_to_string = ", ".join(str(x) for x in holder)
-#     return firstOutput, (datePicked, " - showing hour(s): ", holder_to_string)
 
 
-# # Update Histogram Figure based on Month, Day and Times Chosen
-# @app.callback(
-#     Output("histogram", "figure"),
-#     [Input("date-picker", "date"), Input("bar-selector", "value")],
-# )
-# def update_histogram(datePicked, selection):
-#     date_picked = dt.strptime(datePicked, "%Y-%m-%d")
-#     monthPicked = date_picked.month - 4
-#     dayPicked = date_picked.day - 1
+############# GRAPH BY TYPE
+    if type_label[:3]=="All":
+        type_label="All"
+    if genotype_label[:3]=="All":
+        genotype_label="All"
+    if result_label[:3]=="All":
+        result_label="All"
 
-#     [xVal, yVal, colorVal] = get_selection(monthPicked, dayPicked, selection)
+    types_dict=dict()
+    for possibility in ["All"]+type_list:
+        types_dict[possibility]=make_plotable(filtered_Rec_df,{"type":possibility})
 
-#     layout = go.Layout(
-#         bargap=0.01,
-#         bargroupgap=0,
-#         barmode="group",
-#         margin=go.layout.Margin(l=10, r=0, t=0, b=50),
-#         showlegend=False,
-#         plot_bgcolor="#323130",
-#         paper_bgcolor="#323130",
-#         dragmode="select",
-#         font=dict(color="white"),
-#         xaxis=dict(
-#             range=[-0.5, 23.5],
-#             showgrid=False,
-#             nticks=25,
-#             fixedrange=True,
-#             ticksuffix=":00",
-#         ),
-#         yaxis=dict(
-#             range=[0, max(yVal) + max(yVal) / 4],
-#             showticklabels=False,
-#             showgrid=False,
-#             fixedrange=True,
-#             rangemode="nonnegative",
-#             zeroline=False,
-#         ),
-#         annotations=[
-#             dict(
-#                 x=xi,
-#                 y=yi,
-#                 text=str(yi),
-#                 xanchor="center",
-#                 yanchor="bottom",
-#                 showarrow=False,
-#                 font=dict(color="white"),
-#             )
-#             for xi, yi in zip(xVal, yVal)
-#         ],
-#     )
+    type_graph=scatter_graph(type_label,types_dict)
 
-#     return go.Figure(
-#         data=[
-#             go.Bar(x=xVal, y=yVal, marker=dict(color=colorVal), hoverinfo="x"),
-#             go.Scatter(
-#                 opacity=0,
-#                 x=xVal,
-#                 y=yVal / 2,
-#                 hoverinfo="none",
-#                 mode="markers",
-#                 marker=dict(color="rgb(66, 134, 244, 0)", symbol="square", size=40),
-#                 visible=True,
-#             ),
-#         ],
-#         layout=layout,
-#     )
+#################################### GRAPH BY RESULT ############
+
+    results_dict=dict()
+    for possibility in ["All"]+results_list:
+        results_dict[possibility]=make_plotable(filtered_Rec_df,{"result":possibility,"type":type_label})
+
+    results_graph=scatter_graph(result_label,results_dict)
+
+#################################### GRAPH BY RESULT ############
+
+    genotype_dict=dict()
+    for possibility in ["All"]+genotype_list:
+        genotype_dict[possibility]=make_plotable(filtered_Rec_df,{"genotype":possibility,"type":type_label,"result":result_label})
+
+    genotype_graph=scatter_graph(genotype_label,genotype_dict)
 
 
-# # Get the Coordinates of the chosen months, dates and times
-# def getLatLonColor(selectedData, month, day):
-#     listCoords = totalList[month][day]
+############################################### SENSITIVITY GRAPH
 
-#     # No times selected, output all times for chosen month and date
-#     if selectedData == None or len(selectedData) == 0:
-#         return listCoords
-#     listStr = "listCoords["
-#     for time in selectedData:
-#         if selectedData.index(time) is not len(selectedData) - 1:
-#             listStr += "(totalList[month][day].index.hour==" + str(int(time)) + ") | "
-#         else:
-#             listStr += "(totalList[month][day].index.hour==" + str(int(time)) + ")]"
-#     return eval(listStr)
+    sensitivity_dict=dict()
+    sensitivity_dict["Real Sensitivity"]=make_plotable(filtered_Rec_df,{"cytology":"Positivecytology","hystology":"Positivehystology"})
+    sensitivity_dict["Theoretical"]=make_plotable(filtered_Rec_df,{"cytology":"Positivecytology"})
+    sensitivity_graph=sensitivity_scatter_graph(sensitivity_dict)
 
 
-# # Update Map Graph based on date-picker, selected data on histogram and location dropdown
-# @app.callback(
-#     Output("map-graph", "figure"),
-#     [
-#         Input("date-picker", "date"),
-#         Input("bar-selector", "value"),
-#         Input("location-dropdown", "value"),
-#     ],
-# )
-# def update_graph(datePicked, selectedData, selectedLocation):
-#     zoom = 12.0
-#     latInitial = 40.7272
-#     lonInitial = -73.991251
-#     bearing = 0
+    ############## GRAPH ADEQUAC
 
-#     if selectedLocation:
-#         zoom = 15.0
-#         latInitial = list_of_locations[selectedLocation]["lat"]
-#         lonInitial = list_of_locations[selectedLocation]["lon"]
+    adequate=filtered_Rec_df[filtered_Rec_df["adequacy"]=="Sat"].shape[0]
+    inadequate_processed=filtered_Rec_df[filtered_Rec_df["adequacy"]=="Insat_P"].shape[0]
+    inadequate_not_processed=filtered_Rec_df[filtered_Rec_df["adequacy"]=="Insat_NP"].shape[0]
+    adequacy_graph=make_adequacy_graph(adequate,inadequate_processed,inadequate_not_processed)
 
-#     date_picked = dt.strptime(datePicked, "%Y-%m-%d")
-#     monthPicked = date_picked.month - 4
-#     dayPicked = date_picked.day - 1
-#     listCoords = getLatLonColor(selectedData, monthPicked, dayPicked)
+    return  type_graph,results_graph,genotype_graph,sensitivity_graph,adequacy_graph,number_of_tests,average,positive_rate
 
-#     return go.Figure(
-#         data=[
-#             # Data for all rides based on date and time
-#             Scattermapbox(
-#                 lat=listCoords["Lat"],
-#                 lon=listCoords["Lon"],
-#                 mode="markers",
-#                 hoverinfo="lat+lon+text",
-#                 text=listCoords.index.hour,
-#                 marker=dict(
-#                     showscale=True,
-#                     color=np.append(np.insert(listCoords.index.hour, 0, 0), 23),
-#                     opacity=0.5,
-#                     size=5,
-#                     colorscale=[
-#                         [0, "#F4EC15"],
-#                         [0.04167, "#DAF017"],
-#                         [0.0833, "#BBEC19"],
-#                         [0.125, "#9DE81B"],
-#                         [0.1667, "#80E41D"],
-#                         [0.2083, "#66E01F"],
-#                         [0.25, "#4CDC20"],
-#                         [0.292, "#34D822"],
-#                         [0.333, "#24D249"],
-#                         [0.375, "#25D042"],
-#                         [0.4167, "#26CC58"],
-#                         [0.4583, "#28C86D"],
-#                         [0.50, "#29C481"],
-#                         [0.54167, "#2AC093"],
-#                         [0.5833, "#2BBCA4"],
-#                         [1.0, "#613099"],
-#                     ],
-#                     colorbar=dict(
-#                         title="Time of<br>Day",
-#                         x=0.93,
-#                         xpad=0,
-#                         nticks=24,
-#                         tickfont=dict(color="#d8d8d8"),
-#                         titlefont=dict(color="#d8d8d8"),
-#                         thicknessmode="pixels",
-#                     ),
-#                 ),
-#             ),
-#             # Plot of important locations on the map
-#             Scattermapbox(
-#                 lat=[list_of_locations[i]["lat"] for i in list_of_locations],
-#                 lon=[list_of_locations[i]["lon"] for i in list_of_locations],
-#                 mode="markers",
-#                 hoverinfo="text",
-#                 text=[i for i in list_of_locations],
-#                 marker=dict(size=8, color="#ffa0a0"),
-#             ),
-#         ],
-#         layout=Layout(
-#             autosize=True,
-#             margin=go.layout.Margin(l=0, r=35, t=0, b=0),
-#             showlegend=False,
-#             mapbox=dict(
-#                 accesstoken=mapbox_access_token,
-#                 center=dict(lat=latInitial, lon=lonInitial),  # 40.7272  # -73.991251
-#                 style="dark",
-#                 bearing=bearing,
-#                 zoom=zoom,
-#             ),
-#             updatemenus=[
-#                 dict(
-#                     buttons=(
-#                         [
-#                             dict(
-#                                 args=[
-#                                     {
-#                                         "mapbox.zoom": 12,
-#                                         "mapbox.center.lon": "-73.991251",
-#                                         "mapbox.center.lat": "40.7272",
-#                                         "mapbox.bearing": 0,
-#                                         "mapbox.style": "dark",
-#                                     }
-#                                 ],
-#                                 label="Reset Zoom",
-#                                 method="relayout",
-#                             )
-#                         ]
-#                     ),
-#                     direction="left",
-#                     pad={"r": 0, "t": 0, "b": 0, "l": 0},
-#                     showactive=False,
-#                     type="buttons",
-#                     x=0.45,
-#                     y=0.02,
-#                     xanchor="left",
-#                     yanchor="bottom",
-#                     bgcolor="#323130",
-#                     borderwidth=1,
-#                     bordercolor="#6d6d6d",
-#                     font=dict(color="#FFFFFF"),
-#                 )
-#             ],
-#         ),
-#     )
+
+#######################################################
 
 
 if __name__ == "__main__":
