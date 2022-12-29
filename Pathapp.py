@@ -16,8 +16,7 @@ from be.controllers.adequacy_bar_graph import make_adequacy_graph
 from be.controllers.sensitivity_graph import sensitivity_scatter_graph
 
 
-# frequency_df=pd.read_csv("Frequency.csv")
-# frequency_df["day"]=pd.to_datetime(frequency_df["day"])
+
 Records_df=pd.read_csv("Records.csv")
 Records_df["day"]=pd.to_datetime(Records_df["day"])
 
