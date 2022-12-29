@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 
 
-#Initialization of variables
+#Initialization of variables to be used
 days = 90
 amplitude = 20
 displacement = 50
