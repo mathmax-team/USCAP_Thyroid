@@ -27,15 +27,15 @@ Records_df["day"]=pd.to_datetime(Records_df["day"])
 # type_graph= scatter_graph(filtered_df,"Liquid based",["All"]+type_list)
 
 table_header = [
-    html.Thead(html.Tr([html.Th("Tests"), html.Th("Daily Avg"),html.Th("Positivity rate")]))
+    html.Thead(html.Tr([html.Th("Tests"), html.Th("Daily avg"),html.Th("Positive rate"),html.Th("False negative rate")]))
 ]
 
-row1 = html.Tr([html.Td("345",id="tests"), html.Td("45.6",id="average"),html.Td("Positivity rate",id="positivity_rate")])
+row1 = html.Tr([html.Td("345",id="tests"), html.Td("45.6",id="average"),html.Td("Positivity rate",id="positivity_rate"),html.Td("0.4")])
 
 
 table_body = [html.Tbody([row1])]
 
-table = dbc.Table(table_header + table_body, bordered=True,style={"width":"380px","height":"20px","margin-bottom":"20px"})
+table = dbc.Table(table_header + table_body, bordered=True,style={"width":"420px","height":"20px","margin-bottom":"20px"})
 ###############
 def make_drop(lista:list,id:str):
     menu=dcc.Dropdown(id=id,
