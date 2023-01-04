@@ -7,10 +7,10 @@ def sensitivity_scatter_graph(sensitivity_dict):
     my_green="#42D7A7"
     my_orange="#FFC006"
     graph = go.Figure()
-    graph.add_trace(go.Scatter(x=sensitivity_dict["Theoretical"]['x'], y= 0.8*sensitivity_dict["Theoretical"]["y"],
-            mode="markers+lines", name="Theoretical", showlegend=True,fill="tonexty",marker=dict(color=my_orange)))
+    graph.add_trace(go.Scatter(x=sensitivity_dict["Theoretical"]['x'], y= sensitivity_dict["Theoretical"]["y"],
+            mode="markers+lines", name="Theoretical", showlegend=True,fill=None,marker=dict(color=my_orange)))
     graph.add_trace(go.Scatter(x=sensitivity_dict["Real Sensitivity"]['x'], y= sensitivity_dict["Real Sensitivity"]["y"],
-            mode="markers+lines", name="Real Sensitivity", showlegend=True,fill="tonexty",marker=dict(color=my_green)))
+            mode="markers+lines", name="Real Sensitivity", showlegend=True,fill=None,marker=dict(color=my_green)))
     graph.update_layout(margin=go.layout.Margin(
     l=0, #left margin
     r=0, #right margin

@@ -17,9 +17,10 @@ def scatter_graph(choice:str,possibilities:dict):
             visibility = True
         else:
             visibility = 'legendonly'
-        graph.add_trace(go.Scatter(x=possibilities[possibility]["x"], y= possibilities[possibility]["y"],mode="markers+lines", name=possibility, showlegend=True, visible=visibility,fill="tonexty",line=dict(color=paleta[count%N])))
+        graph.add_trace(go.Scatter(x=possibilities[possibility]["x"], y= possibilities[possibility]["y"],mode="markers+lines", name=possibility, showlegend=True, visible=visibility,fill=None,line=dict(color=paleta[count%N])))
         count=count+1
-    graph.update_yaxes(title_text='Tests')
+    graph.update_yaxes(title_text='Tests',gridcolor="gray")
+    graph.update_xaxes(gridcolor="gray")
     graph.update_layout(margin=go.layout.Margin(
         l=0, #left margin
         r=0, #right margin
