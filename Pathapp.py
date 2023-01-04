@@ -132,7 +132,7 @@ app.layout = html.Div(
                         ),
                         table,
                         drawFigure("200px","sensitivity-graph"),
-                        drawFigure("200px","adequacy-graph"),
+                        html.Div(drawFigure("250px","adequacy-graph"),style={"margin-top":"15px"}),
                     ],
                 ),
                 # Column for app graphs and plots
@@ -286,8 +286,9 @@ def update_graphs(start_date,end_date,type_label,result_label,genotype_label):
 ############################################### SENSITIVITY GRAPH
 
     sensitivity_dict=dict()
-    sensitivity_dict["Real Sensitivity"]=make_plotable(filtered_Rec_df,{"cytology":"Positivecytology","hystology":"Positivehystology"})
-    sensitivity_dict["Theoretical"]=make_plotable(filtered_Rec_df,{"cytology":"Positivecytology"})
+
+    sensitivity_dict["Positive cytology"]=make_plotable(filtered_Rec_df,{"cytology":"Positivecytology"})
+    sensitivity_dict["Positive histology"]=make_plotable(filtered_Rec_df,{"cytology":"Positivecytology","hystology":"Positivehystology"})
     sensitivity_graph=sensitivity_scatter_graph(sensitivity_dict)
 
 
