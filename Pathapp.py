@@ -30,7 +30,7 @@ table_header = [
     html.Thead(html.Tr([html.Th("Tests"), html.Th("Daily avg"),html.Th("Positive rate"),html.Th("False negative rate")]))
 ]
 
-row1 = html.Tr([html.Td("345",id="tests"), html.Td("45.6",id="average"),html.Td("Positivity rate",id="positivity_rate"),html.Td("0.4")])
+row1 = html.Tr([html.Td("345",id="tests"), html.Td("45.6",id="average"),html.Td("Positivity rate",id="positivity_rate"),html.Td("0.4",id="false_negative_rate")])
 
 
 table_body = [html.Tbody([row1])]
@@ -202,6 +202,7 @@ def update_time_range(input_range):
     Output(component_id='tests', component_property='children'),
     Output(component_id='average', component_property='children'),
     Output(component_id='positivity_rate', component_property='children'),
+    Output(component_id='false_negative_rate', component_property='children'),
 
     Input(component_id= 'date_start', component_property='date'),
     Input(component_id= 'date_end', component_property='date'),
@@ -241,8 +242,13 @@ def update_graphs(start_date,end_date,type_label,result_label,genotype_label):
     number_of_positives=number_of_tests-number_of_negatives
     positive_rate = "No tests"
     if number_of_tests !=0:
-        positive_rate=round(number_of_positives/number_of_tests,3)
-
+        positive_rate=round(number_of_positives/number_of_tests,4)
+##################################################### UPDATE FALSE NEGATIVE RATE
+    number_of_negative_cytologies=filtered_Rec_df[filtered_Rec_df["cytology"]=="Negativecytology"].shape[0]
+    number_of_false_negatives=filtered_Rec_df["need_surgery"].sum()
+    false_negative_rate = "No tests"
+    if number_of_negative_cytologies !=0:
+        false_negative_rate=round(0.1*number_of_false_negatives/number_of_negative_cytologies,4)
 
 ################### GROUP BY WEEK WHEN NEEDED
 
@@ -299,7 +305,7 @@ def update_graphs(start_date,end_date,type_label,result_label,genotype_label):
     inadequate_not_processed=filtered_Rec_df[filtered_Rec_df["adequacy"]=="Insat_NP"].shape[0]
     adequacy_graph=make_adequacy_graph(adequate,inadequate_processed,inadequate_not_processed)
 
-    return  type_graph,results_graph,genotype_graph,sensitivity_graph,adequacy_graph,number_of_tests,average,positive_rate
+    return  type_graph,results_graph,genotype_graph,sensitivity_graph,adequacy_graph,number_of_tests,average,positive_rate,false_negative_rate
 
 
 #######################################################
