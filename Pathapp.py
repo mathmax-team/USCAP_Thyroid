@@ -90,14 +90,25 @@ app.layout = html.Div(
                 html.Div(
                     className="four columns div-user-controls",
                     children=[
-                        html.A(
+                        html.Div([
+                            html.A(
                             html.Img(
                                 className="logo",
                                 src=app.get_asset_url("UHealth_logo.png"),
-                                style={"width":"75%","height":"75%"}
+                                style={"width":"50%","height":"50%"}
                             ),
                             href="https://umiamihealth.org/en/",
-                        ),
+                            style={'display': 'inline-block'}),
+                            html.A(
+                            html.Img(
+                                className="logo",
+                                src=app.get_asset_url("logo_IC_nobg.png"),
+                                style={"width":"50%","height":"50%"}
+                            ),
+                            href="https://impossiblecode.ai/",
+                            style={'display': 'inline-block'}
+                        )],
+                        ),#style={"display": "flex"}),
                         html.H1("Cytopathology - Monitor"),
                         html.P(['Select a default time range or a custom time period.',html.Br(), 'On the right you can filter the graphs by Test Type, Result and Genotype']),
                         html.Div(
