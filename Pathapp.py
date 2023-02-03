@@ -76,13 +76,31 @@ def drawFigure(altura,id):
 
 app = dash.Dash()
 
-
-
+navbar = dbc.NavbarSimple(
+        children=[
+        dbc.NavItem(dbc.NavLink("Page 1", href="#")),
+        dbc.DropdownMenu(
+            children=[
+                dbc.DropdownMenuItem("More pages", header=True),
+                dbc.DropdownMenuItem("Page 2", href="#"),
+                dbc.DropdownMenuItem("Page 3", href="#"),
+            ],
+            nav=True,
+            in_navbar=True,
+            label="More",
+        ),
+            ],
+            brand="NavbarSimple",
+            brand_href="#",
+            color="primary",
+            dark=True,
+        )
 
 
 # Layout of Dash App
 app.layout = html.Div(
     children=[
+        html.Div(html.P("camilo"),style={"display":"flex","justify-content":"center"}),
         html.Div(
             className="row",
             children=[
@@ -90,60 +108,70 @@ app.layout = html.Div(
                 html.Div(
                     className="four columns div-user-controls",
                     children=[
-                        html.Div([
-                            html.A(
-                            html.Img(
-                                className="logo",
-                                src=app.get_asset_url("UHealth_logo.png"),
-                                style={"width":"50%","height":"50%"}
-                            ),
-                            href="https://umiamihealth.org/en/",
-                            style={'display': 'inline-block'}),
-                            html.A(
-                            html.Img(
-                                className="logo",
-                                src=app.get_asset_url("logo_IC_nobg.png"),
-                                style={"width":"50%","height":"50%"}
-                            ),
-                            href="https://impossiblecode.ai/",
-                            style={'display': 'inline-block'}
-                        )],
-                        ),#style={"display": "flex"}),
+                        html.Div(
+                    [
+                        html.A(
+                    html.Img(
+                        className="logo",
+                        src=app.get_asset_url("UHealth_logo.png"),
+                        style={"justify-self":"center","height":"100px"}
+                    ),
+                    href="https://umiamihealth.org/en/",
+                    # style={'display': 'inline-block'}),
+                    ),
+                    ],
+                    style={"display":"flex","justify-content":"center"}
+                    ),
+                    html.Div([
+                    html.P(
+                        "POWERED BY",
+                        style={"font-size":"0.4em","align-self":"center"}),
+                    html.Img(
+                        className="logo",
+                        src=app.get_asset_url("logo_IC_nobg.png"),
+                        style={'display': 'inline-block',"height":"50px"}),
+                    ],style={"display":"flex","height":"50px","justify-content":"center","margin-top":"0px"}
+                    ),
+                    html.Div([
                         html.H1("Cytopathology - Monitor"),
-                        html.P(['Select a default time range or a custom time period.',html.Br(), 'On the right you can filter the graphs by Test Type, Result and Genotype']),
-                        html.Div(
-                            className="row",
-                            children=[
-                                html.Div(
-                                    className="div-for-dropdown",
-                                    children=[
-                                        dropletter["drop"]
-                                    ],
-                                ),
-                            ],
+                         ],style={"display":"flex","justify-content":"center"}),
+                    html.Div([
+                        html.P("Here I asay something")
+                    ],
+                    style={"display":"flex","justify-content":"center"}),
+                    html.Div(
+                        className="row",
+                        children=[
+                            html.Div(
+                                className="div-for-dropdown",
+                                children=[
+                                    dropletter["drop"]
+                                ],
+                            ),
+                        ],
                         ),
-                        html.Div(
-                            className="div-for-dropdown",
-                            children=[
-                                dcc.DatePickerSingle(
-                                    id = 'date_start',
-                                    style={"width":"100%"}
-                                        )
-                            ],
-                        ),
-                        # Change to side-by-side for mobile layout
-                        html.Div(
-                            className="div-for-dropdown",
-                            children=[
-                                dcc.DatePickerSingle(
-                                    id = 'date_end',
-                                    style={"width":"100%"}
-                                        )
-                            ],
-                        ),
-                        table,
-                        drawFigure("200px","sensitivity-graph"),
-                        html.Div(drawFigure("250px","adequacy-graph"),style={"margin-top":"15px"}),
+                    html.Div(
+                        className="div-for-dropdown",
+                        children=[
+                            dcc.DatePickerSingle(
+                                id = 'date_start',
+                                style={"width":"100%"}
+                                    )
+                        ],
+                    ),
+                    # Change to side-by-side for mobile layout
+                    html.Div(
+                        className="div-for-dropdown",
+                        children=[
+                            dcc.DatePickerSingle(
+                                id = 'date_end',
+                                style={"width":"100%"}
+                                    )
+                        ],
+                    ),
+                    table,
+                    drawFigure("200px","sensitivity-graph"),
+                    html.Div(drawFigure("250px","adequacy-graph"),style={"margin-top":"15px"}),
                     ],
                 ),
                 # Column for app graphs and plots
@@ -157,7 +185,7 @@ app.layout = html.Div(
                                     ],
                                     style={"height":"50px"}
                                 ),
-                        drawFigure("230px","types-graph"),
+                        drawFigure("200px","types-graph"),
                         #dcc.Graph(id="map-graph"),
                         html.Div(
                                     className="div-for-dropdown",
@@ -167,21 +195,21 @@ app.layout = html.Div(
                                     ],
                                 ),
                         #dcc.Graph(id="histogram"),
-                        drawFigure("230px","result-graph"),
+                        drawFigure("200px","result-graph"),
                         html.Div(
                                     className="div-for-dropdown",
                                     children=[
                                         genotype_drop["drop"]
                                     ],
                                 ),
-                        drawFigure("230px","genotype-graph")
+                        drawFigure("200px","genotype-graph"),
                     ],
                 ),
             ],
             style={"margin-top":"0px","padding":"0px"}
         )
-    ]
-)
+        ]
+        )
 
 
 @app.callback(

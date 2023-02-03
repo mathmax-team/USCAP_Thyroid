@@ -5,7 +5,7 @@
 /* Main Layout ––––––––––––––––––––––––––––––––––––––––––––––––––*/
 body {
   /* background-color: #1E1E1E; */
-  background-color: #426b8a;
+  background-color: #28608e;
   color: #d8d8d8;
   margin: 0;
   padding: 0;
@@ -27,7 +27,7 @@ a {
   text-decoration: none;
 }
 .bg-grey{
-  background-color: #31302F;
+  background-color: #31302f;
 }
 .text-padding{
   padding: 5px;
@@ -50,8 +50,8 @@ a {
 }
 /* Graph Control Objects ––––––––––––––––––––––––––––––––––––––––––––––––––*/
 .div-user-controls {
-  padding-left: 55px;
-  padding-top: 64px;
+  padding-left: 25px;
+  padding-top: 32px;
 }
 .div-for-dropdown {
   padding-top: 4px;
@@ -64,11 +64,11 @@ a {
 }
 .logo {
   height: 35px;
-  padding-bottom: 12px;
+  padding-bottom: 0px;
   margin-left: 8px;
 }
 .Select-control, .Select-menu-outer, .Select-multi-value-wrapper, .select-up, .is-open .Select-control {
-  background-color: #1E1E1E;
+  background-color: #3f515f;
   color: white;
 
 }
@@ -99,11 +99,11 @@ a {
 
 
 #date {
-  background-color: #1e1e1e;
+  background-color: #3f515f;
   font-family: "Open Sans";
   font-weight: 400;
   color: #dbdbdb;
-  border: 0.5px solid #dbdbdb44;
+  border: 0.8px solid #dbdbdb44;
 }
 
 #date-picker{
@@ -121,14 +121,14 @@ a {
 }
 
 .DateInput.DateInput_1 {
-  background-color: #1e1e1e;
+  background-color: #3f515f;
 }
 
 .SingleDatePickerInput__withBorder {
   border-radius: 3px;
   color: #dbdbdb;
-  background: #1e1e1e;
-  background-color: #1e1e1e;
+  background: #3f515f;
+  background-color: #3f515f;
 }
 .SingleDatePickerInput.SingleDatePickerInput_1.SingleDatePickerInput__withBorder.SingleDatePickerInput__withBorder_2 {
   border: 0.0px solid #dbdbdb;
