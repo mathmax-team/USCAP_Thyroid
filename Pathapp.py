@@ -35,7 +35,7 @@ row1 = html.Tr([html.Td("345",id="tests"), html.Td("45.6",id="average"),html.Td(
 
 table_body = [html.Tbody([row1])]
 
-table = dbc.Table(table_header + table_body, bordered=True,style={"width":"420px","height":"20px","margin-bottom":"20px"})
+table = dbc.Table(table_header + table_body, bordered=True,style={"width":"100%","height":"20px","margin-bottom":"20px"})
 ###############
 def make_drop(lista:list,id:str):
     menu=dcc.Dropdown(id=id,
@@ -119,7 +119,7 @@ dbc.Container(
                     # dbc.Col(html.Img(src="/assets/USCAPheaderlogo.png", height="50px")),
                     # dbc.Col(html.P(""),width=2),
                     # dbc.Col(html.P("POWER BY",style={"color":"white","font-size":"12px"}),width=2),
-                    dbc.Col(html.Img(src="/assets/logo_IC_nobg.png", height="70px"),width=2),
+                    dbc.Col(html.Img(src="/assets/logo_IC_nobg.png", height="80px")),
                 ],
                 align="center",
                 # className="g-0",
@@ -140,10 +140,10 @@ dbc.Container(
         ),
     ],
 ),
-color="#5e8e6a",
+color="#69ad7a",
 dark=True,
 className="mb-5",
-style={"color":"blue","height":"70px"}
+# style={"color":"blue","height":"70px"}
 )
 
 
