@@ -390,3 +390,6 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
   /* Larger than Desktop HD */
   @media (min-width: 1200px) {
   }
+.card-body{
+  padding:0;
+}

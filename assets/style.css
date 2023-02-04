@@ -5,7 +5,7 @@
 /* Main Layout ––––––––––––––––––––––––––––––––––––––––––––––––––*/
 body {
   /* background-color: #1E1E1E; */
-  background-color: #28608e;
+  background-color: #0a2f49;
   color: #d8d8d8;
   margin: 0;
   padding: 0;
@@ -27,7 +27,7 @@ a {
   text-decoration: none;
 }
 .bg-grey{
-  background-color: #31302f;
+  background-color: transparent;
 }
 .text-padding{
   padding: 5px;
@@ -80,7 +80,7 @@ a {
 }
 
 .Select-control{
-  border: 0.5px solid #dbdbdb44;
+  border: 0.5px solid #d3d2d244;
 }
 
 .has-value.Select--single>.Select-control .Select-value .Select-value-label, .has-value.is-pseudo-focused.Select--single>.Select-control .Select-value .Select-value-label {
@@ -185,8 +185,8 @@ a {
 
 /* width */
 ::-webkit-scrollbar {
-  width: 10px !important;
-  display: block !important;
+  /* width: 10px !important;
+  display: block !important; */
 }
 
 /* Track */
@@ -219,3 +219,11 @@ a {
   padding-left: 3px !important;
   padding-right: 3px !important;
   }
+
+.dropdown-menu{
+  background-color: balck;
+}
+@media (min-width: 550px)
+/* .container {
+    width: 95%;
+} */

@@ -74,7 +74,7 @@ def drawFigure(altura,id):
         ),
     ])
 
-app = dash.Dash()
+app = dash.Dash(external_stylesheets=[dbc.themes.CYBORG])
 
 navbar = dbc.NavbarSimple(
         children=[
@@ -90,17 +90,67 @@ navbar = dbc.NavbarSimple(
             label="More",
         ),
             ],
-            brand="NavbarSimple",
+            brand=["camilo","matilde",""
+                    ],
             brand_href="#",
-            color="primary",
+            color="green",
             dark=True,
+            style={"font-color":"red"}
         )
+dropdown = dbc.DropdownMenu(
+    children=[
+        dbc.DropdownMenuItem("Math"),
+        dbc.DropdownMenuItem("Physics"),
+        # dbc.DropdownMenuItem(divider=True),
+        dbc.DropdownMenuItem("Computing"),
+    ],
+    nav=True,
+    in_navbar=True,
+    label="Options",
+)
+logo = dbc.Navbar(
+dbc.Container(
+    [
+        html.A(
+            # Use row and col to control vertical alignment of logo / brand
+            dbc.Row(
+                [
+                    dbc.Col(html.Img(src="/assets/UHealth_logo.png", height="50px")),
+                    # dbc.Col(html.Img(src="/assets/USCAPheaderlogo.png", height="50px")),
+                    # dbc.Col(html.P(""),width=2),
+                    # dbc.Col(html.P("POWER BY",style={"color":"white","font-size":"12px"}),width=2),
+                    dbc.Col(html.Img(src="/assets/logo_IC_nobg.png", height="70px"),width=2),
+                ],
+                align="center",
+                # className="g-0",
+                justify="center"
+            ),
+            href="https://plotly.com",
+            style={"textDecoration": "none","content-align":"left"},
+        ),
+        dbc.NavbarToggler(id="navbar-toggler2", n_clicks=0),
+        dbc.Collapse(
+            dbc.Nav(
+                [dropdown],
+                className="ms-auto",
+                navbar=True,
+            ),
+            id="navbar-collapse2",
+            navbar=True,
+        ),
+    ],
+),
+color="#5e8e6a",
+dark=True,
+className="mb-5",
+style={"color":"blue","height":"70px"}
+)
 
 
 # Layout of Dash App
 app.layout = html.Div(
-    children=[
-        html.Div(html.P("camilo"),style={"display":"flex","justify-content":"center"}),
+    children=[logo,
+        # html.Div(html.P("camilo"),style={"display":"flex","justify-content":"center"}),
         html.Div(
             className="row",
             children=[
@@ -108,30 +158,30 @@ app.layout = html.Div(
                 html.Div(
                     className="four columns div-user-controls",
                     children=[
-                        html.Div(
-                    [
-                        html.A(
-                    html.Img(
-                        className="logo",
-                        src=app.get_asset_url("UHealth_logo.png"),
-                        style={"justify-self":"center","height":"100px"}
-                    ),
-                    href="https://umiamihealth.org/en/",
-                    # style={'display': 'inline-block'}),
-                    ),
-                    ],
-                    style={"display":"flex","justify-content":"center"}
-                    ),
-                    html.Div([
-                    html.P(
-                        "POWERED BY",
-                        style={"font-size":"0.4em","align-self":"center"}),
-                    html.Img(
-                        className="logo",
-                        src=app.get_asset_url("logo_IC_nobg.png"),
-                        style={'display': 'inline-block',"height":"50px"}),
-                    ],style={"display":"flex","height":"50px","justify-content":"center","margin-top":"0px"}
-                    ),
+                    #     html.Div(
+                    # [
+                    # #     html.A(
+                    # # html.Img(
+                    # #     className="logo",
+                    # #     src=app.get_asset_url("UHealth_logo.png"),
+                    # #     style={"justify-self":"center","height":"100px"}
+                    # # ),
+                    # # href="https://umiamihealth.org/en/",
+                    # # # style={'display': 'inline-block'}),
+                    # # ),
+                    # ],
+                    # style={"display":"flex","justify-content":"center"}
+                    # ),
+                    # html.Div([
+                    # html.P(
+                    #     "POWERED BY",
+                    #     style={"font-size":"0.4em","align-self":"center"}),
+                    # html.Img(
+                    #     className="logo",
+                    #     src=app.get_asset_url("logo_IC_nobg.png"),
+                    #     style={'display': 'inline-block',"height":"50px"}),
+                    # ],style={"display":"flex","height":"50px","justify-content":"center","margin-top":"0px"}
+                    # ),
                     html.Div([
                         html.H1("Cytopathology - Monitor"),
                          ],style={"display":"flex","justify-content":"center"}),
@@ -231,25 +281,25 @@ def update_time_range(input_range):
     return start_date, end_date
 
 ####################### CALL BACK UPDATE GRAPHS
-@app.callback(
+# @app.callback(
 
-    Output(component_id='types-graph', component_property='figure'),
-    Output(component_id='result-graph', component_property='figure'),
-    Output(component_id='genotype-graph', component_property='figure'),
-    Output(component_id='adequacy-graph', component_property='figure'),
-    Output(component_id='sensitivity-graph', component_property='figure'),
-    Output(component_id='tests', component_property='children'),
-    Output(component_id='average', component_property='children'),
-    Output(component_id='positivity_rate', component_property='children'),
-    Output(component_id='false_negative_rate', component_property='children'),
+#     Output(component_id='types-graph', component_property='figure'),
+#     Output(component_id='result-graph', component_property='figure'),
+#     Output(component_id='genotype-graph', component_property='figure'),
+#     Output(component_id='adequacy-graph', component_property='figure'),
+#     Output(component_id='sensitivity-graph', component_property='figure'),
+#     Output(component_id='tests', component_property='children'),
+#     Output(component_id='average', component_property='children'),
+#     Output(component_id='positivity_rate', component_property='children'),
+#     Output(component_id='false_negative_rate', component_property='children'),
 
-    Input(component_id= 'date_start', component_property='date'),
-    Input(component_id= 'date_end', component_property='date'),
-    Input(component_id='type', component_property='value'),
-    Input(component_id='results', component_property='value'),
-    Input(component_id='genotype', component_property='value'),
+#     Input(component_id= 'date_start', component_property='date'),
+#     Input(component_id= 'date_end', component_property='date'),
+#     Input(component_id='type', component_property='value'),
+#     Input(component_id='results', component_property='value'),
+#     Input(component_id='genotype', component_property='value'),
 
-)
+# )
 def update_graphs(start_date,end_date,type_label,result_label,genotype_label):
     if type_label==None:
         type_label="Liquid based"
