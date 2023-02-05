@@ -115,18 +115,19 @@ dbc.Container(
             # Use row and col to control vertical alignment of logo / brand
             dbc.Row(
                 [
-                    dbc.Col(html.Img(src="/assets/UHealth_logo.png", height="60px")),
+                    dbc.Col(html.Img(src="/assets/UHealth_logo.png", height="50px"),width=2),
                     # dbc.Col(html.Img(src="/assets/USCAPheaderlogo.png", height="50px")),
-                    # dbc.Col(html.P(""),width=2),
+                    # dbc.Col(html.P(""),width=0),
                     # dbc.Col(html.P("POWER BY",style={"color":"white","font-size":"12px"}),width=2),
-                    dbc.Col(html.Img(src="/assets/logo_IC_nobg.png", height="90px")),
+                    dbc.Col(html.Img(src="/assets/USCAPheaderlogo.png", height="50px"),width=2),
+                    dbc.Col(html.P("",style={"color":"yellow","font-size":"30px","justify":"center"}),width=8,),
                 ],
                 align="center",
                 className="g-0",
-                justify="center"
+                justify="center",
             ),
-            href="https://plotly.com",
-            style={"textDecoration": "none","content-align":"left"},
+            href="#",
+            style={"textDecoration": "none","content-align":"left","width":"90%"},
         ),
         dbc.NavbarToggler(id="navbar-toggler2", n_clicks=0),
         dbc.Collapse(
@@ -149,7 +150,7 @@ className="mb-5",
 
 # Layout of Dash App
 app.layout = html.Div(
-    children=[logo,
+     children=[#logo,
         # html.Div(html.P("camilo"),style={"display":"flex","justify-content":"center"}),
         html.Div(
             className="row",
@@ -183,7 +184,7 @@ app.layout = html.Div(
                     # ],style={"display":"flex","height":"50px","justify-content":"center","margin-top":"0px"}
                     # ),
                     html.Div([
-                        html.H1("Cytopathology - Monitor"),
+                        html.H1("CYTOPATHOLOGY"),
                          ],style={"display":"flex","justify-content":"center"}),
                     html.Div([
                         html.P("Here I asay something")
@@ -222,6 +223,16 @@ app.layout = html.Div(
                     table,
                     drawFigure("200px","sensitivity-graph"),
                     html.Div(drawFigure("250px","adequacy-graph"),style={"margin-top":"15px"}),
+                    html.Div([
+                        html.P(
+                            "POWERED BY ",
+                            style={"font-size":"0.4em","align-self":"center"}),
+                        html.Img(
+                            className="logo",
+                            src=app.get_asset_url("logo_IC_nobg.png"),
+                            style={'display': 'inline-block',"height":"80px"}),
+                    ],style={"display":"flex","height":"80px","justify-content":"center","margin-top":"20px","color":"white"}
+                    ),
                     ],
                 ),
                 # Column for app graphs and plots
