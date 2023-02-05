@@ -76,27 +76,27 @@ def drawFigure(altura,id):
 
 app = dash.Dash(external_stylesheets=[dbc.themes.CYBORG])
 
-navbar = dbc.NavbarSimple(
-        children=[
-        dbc.NavItem(dbc.NavLink("Page 1", href="#")),
-        dbc.DropdownMenu(
-            children=[
-                dbc.DropdownMenuItem("More pages", header=True),
-                dbc.DropdownMenuItem("Page 2", href="#"),
-                dbc.DropdownMenuItem("Page 3", href="#"),
-            ],
-            nav=True,
-            in_navbar=True,
-            label="More",
-        ),
-            ],
-            brand=["camilo","matilde",""
-                    ],
-            brand_href="#",
-            color="green",
-            dark=True,
-            style={"font-color":"red"}
-        )
+# navbar = dbc.NavbarSimple(
+#         children=[
+#         dbc.NavItem(dbc.NavLink("Page 1", href="#")),
+#         dbc.DropdownMenu(
+#             children=[
+#                 dbc.DropdownMenuItem("More pages", header=True),
+#                 dbc.DropdownMenuItem("Page 2", href="#"),
+#                 dbc.DropdownMenuItem("Page 3", href="#"),
+#             ],
+#             nav=True,
+#             in_navbar=True,
+#             label="More",
+#         ),
+#             ],
+#             brand=["camilo","matilde",""
+#                     ],
+#             brand_href="#",
+#             color="green",
+#             dark=True,
+#             style={"font-color":"red"}
+#         )
 dropdown = dbc.DropdownMenu(
     children=[
         dbc.DropdownMenuItem("Math"),
@@ -115,14 +115,14 @@ dbc.Container(
             # Use row and col to control vertical alignment of logo / brand
             dbc.Row(
                 [
-                    dbc.Col(html.Img(src="/assets/UHealth_logo.png", height="50px")),
+                    dbc.Col(html.Img(src="/assets/UHealth_logo.png", height="60px")),
                     # dbc.Col(html.Img(src="/assets/USCAPheaderlogo.png", height="50px")),
                     # dbc.Col(html.P(""),width=2),
                     # dbc.Col(html.P("POWER BY",style={"color":"white","font-size":"12px"}),width=2),
-                    dbc.Col(html.Img(src="/assets/logo_IC_nobg.png", height="80px")),
+                    dbc.Col(html.Img(src="/assets/logo_IC_nobg.png", height="90px")),
                 ],
                 align="center",
-                # className="g-0",
+                className="g-0",
                 justify="center"
             ),
             href="https://plotly.com",
@@ -140,7 +140,7 @@ dbc.Container(
         ),
     ],
 ),
-color="#69ad7a",
+color="#459595",
 dark=True,
 className="mb-5",
 # style={"color":"blue","height":"70px"}
@@ -233,7 +233,7 @@ app.layout = html.Div(
                                     children=[
                                         type_drop["drop"]
                                     ],
-                                    style={"height":"50px"}
+                                    style={"height":"50px","padding-top":"0px"}
                                 ),
                         drawFigure("200px","types-graph"),
                         #dcc.Graph(id="map-graph"),
@@ -281,25 +281,25 @@ def update_time_range(input_range):
     return start_date, end_date
 
 ####################### CALL BACK UPDATE GRAPHS
-# @app.callback(
+@app.callback(
 
-#     Output(component_id='types-graph', component_property='figure'),
-#     Output(component_id='result-graph', component_property='figure'),
-#     Output(component_id='genotype-graph', component_property='figure'),
-#     Output(component_id='adequacy-graph', component_property='figure'),
-#     Output(component_id='sensitivity-graph', component_property='figure'),
-#     Output(component_id='tests', component_property='children'),
-#     Output(component_id='average', component_property='children'),
-#     Output(component_id='positivity_rate', component_property='children'),
-#     Output(component_id='false_negative_rate', component_property='children'),
+    Output(component_id='types-graph', component_property='figure'),
+    Output(component_id='result-graph', component_property='figure'),
+    Output(component_id='genotype-graph', component_property='figure'),
+    Output(component_id='adequacy-graph', component_property='figure'),
+    Output(component_id='sensitivity-graph', component_property='figure'),
+    Output(component_id='tests', component_property='children'),
+    Output(component_id='average', component_property='children'),
+    Output(component_id='positivity_rate', component_property='children'),
+    Output(component_id='false_negative_rate', component_property='children'),
 
-#     Input(component_id= 'date_start', component_property='date'),
-#     Input(component_id= 'date_end', component_property='date'),
-#     Input(component_id='type', component_property='value'),
-#     Input(component_id='results', component_property='value'),
-#     Input(component_id='genotype', component_property='value'),
+    Input(component_id= 'date_start', component_property='date'),
+    Input(component_id= 'date_end', component_property='date'),
+    Input(component_id='type', component_property='value'),
+    Input(component_id='results', component_property='value'),
+    Input(component_id='genotype', component_property='value'),
 
-# )
+)
 def update_graphs(start_date,end_date,type_label,result_label,genotype_label):
     if type_label==None:
         type_label="Liquid based"

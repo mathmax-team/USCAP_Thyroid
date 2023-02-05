@@ -24,6 +24,7 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
     margin: 0 auto;
     padding: 0 20px;
     box-sizing: border-box;
+    max-width: 100%;
   }
 
 
