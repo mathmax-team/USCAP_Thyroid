@@ -33,7 +33,7 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
     float: left;
     box-sizing: border-box;
   }
-  /* For devices larger than 400px */
+  For devices larger than 400px */
   @media (min-width: 400px) {
     .container {
         width: 85%;
@@ -41,7 +41,7 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
    }
   }
   /* For devices larger than 550px */
-  @media (min-width: 550px) {
+    @media (min-width: 550px) {
     .container {
         width: 95%;
    }
@@ -140,14 +140,14 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
     .offset-by-one-half.column, .offset-by-one-half.columns {
         margin-left: 52%;
    }
-  }
+  } */
   /* Base Styles –––––––––––––––––––––––––––––––––––––––––––––––––– */
   /* NOTE html is set to 62.5% so that all the REM measurements throughout Skeleton are based on 10px sizing. So basically 1.5rem = 15px :) */
   html {
     font-size: 62.5%;
   }
   body {
-    font-size: 1.5em;
+    font-size: medium;
    /* currently ems cause chrome bug misinterpreting rems on body element */
     line-height: 1.6;
     font-weight: 400;
@@ -164,7 +164,7 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
     font-size: 2rem;
     line-height: 1.2;
     letter-spacing: -.1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
   }
   h2 {
     font-size: 3.6rem;
@@ -261,13 +261,13 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
     height: 38px;
     padding: 6px 10px;
    /* The 6px vertically centers text on FF, ignored by Webkit */
-    background-color: #fff;
+    /* background-color: #fff; */
     border: 1px solid #D1D1D1;
     border-radius: 4px;
     box-shadow: none;
     box-sizing: border-box;
     font-family: inherit;
-    font-size: inherit;
+    /* font-size: inherit; */
    /*https://stackoverflow.com/questions/6080413/why-doesnt-input-inherit-the-font-from-body*/
   }
   /* Removes awkward default styles on some inputs for iOS */
@@ -407,10 +407,19 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
 .eight.columns{
   width:69.3%;
 }
-.table{
+/* .table{
   color:white;
   background-color:transparent;
   border-color:transparent;
   --bs-table-accent-bg: none;
 
-}
+} */
+/* .dropdown-menu{
+  font-size: 1.4rem;
+} */
+/* .row{
+  padding-left: 0px;
+  padding-right: 0px;
+  margin-left: 0;
+  margin-right: 0;
+} */

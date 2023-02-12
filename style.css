@@ -7,22 +7,22 @@ body {
   /* background-color: #1E1E1E; */
   /* background-color: #0a2f49; */
   background-color: #282828;
-  color: #d8d8d8;
-  margin: 0;
+  color: white;
+  margin: 0px;
   padding: 0;
 }
 h1, h2, h3, h4, h5 {
   font-family: "Open Sans";
   font-weight: bold;
-  letter-spacing: 2.1px;
+  /* letter-spacing: 2.1px; */
   font-size: 21px;
-  padding-left: 12px;
+  /* padding-left: 12px; */
 }
 p {
   font-family: "Open Sans";
   font-weight: 400;
-  font-size: 14px;
-  padding-left: 12px;
+  font-size: 0.8em;
+  /* padding-left: 12px; */
 }
 a {
   text-decoration: none;
@@ -37,7 +37,7 @@ a {
 .div-for-charts{
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  /* height: 100vh; */
   width: 100%;
 }
 #histogram {
@@ -51,12 +51,14 @@ a {
 }
 /* Graph Control Objects ––––––––––––––––––––––––––––––––––––––––––––––––––*/
 .div-user-controls {
-  padding-left: 25px;
-  padding-top: 32px;
+  /* padding-left: 25px; */
+  padding-top: 20px;
 }
 .div-for-dropdown {
   padding-top: 4px;
   padding-bottom: 4px;
+  padding-left:20px;
+  padding-right:20px;
 
 }
 .div-for-slider {
@@ -69,8 +71,17 @@ a {
   margin-left: 8px;
 }
 .Select-control, .Select-menu-outer, .Select-multi-value-wrapper, .select-up, .is-open .Select-control {
-  background-color: #3f515f;
-  color: white;
+  /* background-color: #41b3c6; */
+
+  /* color: white;
+  text-align: "middle";*/
+  /* height:30px; */
+
+}
+.Select-control,.is-open {
+background-color: #41b3c6;
+font-size: inherit;
+text-align: center;
 
 }
 
@@ -82,30 +93,40 @@ a {
 
 .Select-control{
   border: 0.5px solid #d3d2d244;
+  width:100%;
+  align-self: center;
+  height:0px;
+}
+Select-arrow {
+  border-color: #e61010 transparent transparent;
+  border-style: solid;
+  border-width: 5px 5px 2.5px;
+  height: 0;
+  width: 0;
+  position: relative;
 }
 
-.has-value.Select--single>.Select-control .Select-value .Select-value-label, .has-value.is-pseudo-focused.Select--single>.Select-control .Select-value .Select-value-label {
-  color: white;
-}
+
 ._dash-app-content {
   overflow-x: hidden;
   overflow-y: hidden;
   position: relative;
 }
 .has-value.Select--single>.Select-control .Select-value .Select-value-label, .has-value.is-pseudo-focused.Select--single>.Select-control .Select-value .Select-value-label{
-  color: #d8d8d8;
+  color: white;
   font-weight: 400;
-  font-size: 14px;
+  font-size: medium;
+
 }
 
 
-#date {
-  background-color: #3f515f;
+/* #date {
+  background-color: #41b3c6;
   font-family: "Open Sans";
   font-weight: 400;
-  color: #dbdbdb;
+  color: white;
   border: 0.8px solid #dbdbdb44;
-}
+} */
 
 #date-picker{
   width: 100%;
@@ -120,16 +141,21 @@ a {
 .SingleDatePickerInput__withBorder{
   border:none;
 }
-
+.DateInput{
+  font-size: medium;
+}
 .DateInput.DateInput_1 {
-  background-color: #3f515f;
+  background-color: transparent;
 }
 
-.SingleDatePickerInput__withBorder {
-  border-radius: 3px;
-  color: #dbdbdb;
+.SingleDatePickerInput__withBorder{}
+
+.RangeDatePickerInput__withBorder {
+  border-radius: 8px;
+  color: white;
   background: #3f515f;
   background-color: #3f515f;
+  /* font-size: smaller; */
 }
 .SingleDatePickerInput.SingleDatePickerInput_1.SingleDatePickerInput__withBorder.SingleDatePickerInput__withBorder_2 {
   border: 0.0px solid #dbdbdb;
@@ -143,6 +169,15 @@ a {
 .SingleDatePicker_picker, .SingleDatePicker_picker_1, .SingleDatePicker_picker__directionLeft,
 .SingleDatePicker_picker__directionLeft_2{
   filter:invert(100%);
+}
+
+.DateRangePickerInput__withBorder {
+  border-radius: 8px;
+  border: none;
+  background-color:white;
+  /* color:red; */
+  font-size: 0.8em;
+
 }
 
 /* For Mobile Phones and small screens ––––––––––––––––––––––––––––––––––––––––––––––––––*/
@@ -211,16 +246,32 @@ a {
   padding: unset;
 }
 
-.DateInput_input, .DateInput_input_1 {
-  color:inherit !important;
+.DateInput_input_1{
+  background-color:#41b3c6;
+  color:white;
+
+}
+
+
+/* .DateInput,.DateInput_input_1 {
+  color:white;
   text-align: center;
-  font-size: inherit ! important;
-  Height: 25px !important;
+  font-size: medium;
+  Height: 30px !important;
   Width: 100% !important;
-  padding-left: 3px !important;
-  padding-right: 3px !important;
-  }
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  background-color: #41b3c6 !important;
+  } */
 
 .dropdown-menu{
-  background-color: balck;
+  background-color: black;
+}
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color:#ffffff8c; #replace blue with whatever color your want your font to be
+  opacity: 1; /* Firefox */
+}
+.navbar-dark .navbar-nav .nav-link {
+  color: rgba(255,255,255,.55);
+  font-size: 16px;
 }
