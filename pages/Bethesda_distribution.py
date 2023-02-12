@@ -4,8 +4,17 @@ from dash import html, dcc
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 
+table_header = [
+    html.Thead(html.Tr([html.Th("Tests"), html.Th("Daily avg"),html.Th("Positive rate"),html.Th("False negative rate")]))
+]
 
-def make_drop(lista:list,id:str):
+row1 = html.Tr([html.Td("345",id="tests"), html.Td("45.6",id="average"),html.Td("Positivity rate",id="positivity_rate"),html.Td("0.4",id="false_negative_rate")])
+
+
+table_body = [html.Tbody([row1])]
+
+table = dbc.Table(table_header + table_body, bordered=True,style={"width":"100%","height":"20px","margin-bottom":"20px"})
+def oldmake_drop(lista:list,id:str):
     menu=dcc.Dropdown(id=id,
     options=[ {"label": html.Span([i],style={"color":"yellow"}), "value": i} for i in lista],
     value=lista[-1],
@@ -15,9 +24,23 @@ def make_drop(lista:list,id:str):
         )
     return {"drop":menu}
 
+############################################################
+def make_drop(lista:list,id:str):
+    menu=dcc.Dropdown(
+    lista,
+    lista[0],
+    id=id,
+    maxHeight=300,
+    clearable=False,
+        )
+    return menu
+
 
 ###################  GENERATE THE DROPDOWN ELEMENTS  #######################
-
+time_period_choice=make_drop(["Historical","Last week","Last Month","Year to date"],"time_period_choice")
+sex_choice=make_drop(["All sexes","Female","Male"],"sex_choice")
+responsable_choice=make_drop(["Laboratory","Peter","Jane","Alice"],"responsable_choice")
+age_choice=make_drop(["All ages","Young","Old"],"age_choice")
 simpledrop=dcc.Dropdown(
     ['New York City', 'Montreal', 'Paris', 'London', 'Amsterdam', 'Berlin', 'Rome'],
     'Paris', id='height-example-dropdown', maxHeight=300,clearable=False
@@ -75,26 +98,30 @@ fig.update_layout(
         t=0,
         pad=0
     ),
-    template="plotly_dark"
-    # paper_bgcolor="gray",
-    # plot_bgcolor="gray"
+    template="plotly_dark",
+    paper_bgcolor=" rgb(18, 18, 18)",
+    plot_bgcolor=" rgb(18, 18, 18)"
 )
 
 card = dbc.Card(
     dbc.CardBody(
         [dcc.Graph(
     figure=fig,
-style={"height":"30vh"})
+style={"height":"30vh"},
+config={
+                        'displayModeBar': False
+                    })
             # html.H4("Title", id="card-title"),
             # html.H2("100", id="card-value"),
             # html.P("Description", id="card-description")
         ]
     )
-,style={"height":"35vh","background-color":"black"})##8af2a6"})
+,style={"height":"35vh"," background-color":"rgb(18, 18, 18)"},
+)##8af2a6"})
 
 smallcard = dbc.Card(
     dbc.CardBody(
-        [
+        [table,
             # html.H4("Title", id="card-title"),
             # html.H2("100", id="card-value"),
             # html.P("Description", id="card-description")
@@ -111,8 +138,8 @@ layout = html.Div(
                 html.Div(
                     className="three columns div-user-controls",
                     children=[
-                    html.Div([
-                        html.H1("Bethesda"),
+                    html.H5([
+                        html.P("Bethesda Classification"),
                          ],style={"display":"flex","justify-content":"center"}),
                     html.Div([
                         html.H5("Here I asay something")
@@ -120,6 +147,12 @@ layout = html.Div(
                     style={"display":"flex","justify-content":"center"}),
 
                         # className="row",
+                    html.Div(
+                        className="div-for-dropdown",
+                        children=[
+                            time_period_choice
+                        ],
+                    ),
                     html.Div(
                     className="div-for-dropdown",
                     children=[
@@ -132,13 +165,13 @@ layout = html.Div(
                     html.Div(
                         className="div-for-dropdown",
                         children=[
-                            simpledrop
+                            responsable_choice
                         ],
                     ),
                     html.Div(
                         className="div-for-dropdown",
                         children=[
-                            simpledrop
+                           age_choice
                         ],
                     ),
 
@@ -166,13 +199,7 @@ layout = html.Div(
                 html.Div(
                         className="div-for-dropdown",
                         children=[
-                            simpledrop
-                        ],
-                    ),
-                html.Div(
-                        className="div-for-dropdown",
-                        children=[
-                            simpledrop
+                            sex_choice
                         ],
                     ),
                 smallcard,
@@ -201,5 +228,5 @@ layout = html.Div(
         style={"margin-top":"0px","padding":"0px","height":"40vh","background-color":"1f1f1f"}
     )
 
-                    ],)
+                    ])
     #    style={"height":"500px"} )

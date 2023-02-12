@@ -1,7 +1,6 @@
 import dash
 from dash import dcc
 from dash import html
-import pandas as pd
 import numpy as np
 import plotly.express as px
 from dash.dependencies import Input, Output
@@ -16,6 +15,7 @@ from be.controllers.adequacy_bar_graph import make_adequacy_graph
 from be.controllers.sensitivity_graph import sensitivity_scatter_graph
 # Connect to your app pages
 from pages import Bethesda_distribution, Comparison, Molecular
+import pandas as pd
 
 
 Records_df=pd.read_csv("Records.csv")
@@ -81,7 +81,8 @@ def drawFigure(altura,id):
                         'displayModeBar': False
                     },
                 )
-            ])
+            ],
+            )
         ),
     ])
 
@@ -111,7 +112,7 @@ app = dash.Dash(external_stylesheets=[dbc.themes.CYBORG])
 dropdown = dbc.DropdownMenu(
     children=[
         dbc.DropdownMenuItem("Bethesda",href="/Bethesda_distribution"),
-        dbc.DropdownMenuItem("Molecular",href="/Molacular"),
+        dbc.DropdownMenuItem("Molecular",href="/Molecular"),
         dbc.DropdownMenuItem("Comparison",href="/Comparison"),
 
 
@@ -150,13 +151,13 @@ dbc.Container(
             ),
             id="navbar-collapse2",
             navbar=True,
-        style={"margin-left":"-20px"}),
+        ),
     ],
 ),
 color="#3b98ac",
 dark=True,
 className="mb-5",
-style={"height":"10vh"}
+style={"height":"10vh"},
 )
 
 
@@ -282,7 +283,7 @@ app.layout = html.Div(
         #     style={"margin-top":"0px","padding":"0px"}
         # )
         dcc.Location(id='url', refresh=False),
-        html.Div(id='page-content', children=[],style={"height":"76vh","backgkround-color":"white"}),
+        html.Div(id='page-content', children=[],style={"height":"80vh","backgkround-color":"white","margin-top":"0px"}),
         html.Div([
                         html.P(
                             "POWERED BY ",
@@ -290,8 +291,8 @@ app.layout = html.Div(
                         html.Img(
                             className="logo",
                             src=app.get_asset_url("logo_IC_nobg.png"),
-                            style={'display': 'inline-block',"height":"8vh"}),
-                    ],style={"display":"flex","height":"8vh","justify-content":"center","color":"white","background-color":"black","margin-bottom":"0px"}
+                            style={'display': 'inline-block',"height":"9vh"}),
+                    ],style={"display":"flex","height":"10vh","justify-content":"center","color":"white","background-color":"black","margin-bottom":"0px"}
                     ),
                     ],
         )
@@ -437,9 +438,9 @@ def update_graphs(start_date,end_date,type_label,result_label,genotype_label):
 @app.callback(Output('page-content', 'children'),
               [Input('url', 'pathname')])
 def display_page(pathname):
-    if pathname == '/Math':
+    if pathname == '/Molecular':
         return Molecular.layout
-    if pathname == '/Physics':
+    if pathname == '/Comparison':
         return Comparison.layout
     if pathname == '/Bethesda_distribution':
         return Bethesda_distribution.layout
