@@ -15,7 +15,7 @@ from be.controllers.scatter_plot import scatter_graph
 from be.controllers.adequacy_bar_graph import make_adequacy_graph
 from be.controllers.sensitivity_graph import sensitivity_scatter_graph
 # Connect to your app pages
-from pages import Math, Physics,Computing
+from pages import Bethesda_distribution, Comparison, Molecular
 
 
 Records_df=pd.read_csv("Records.csv")
@@ -110,10 +110,11 @@ app = dash.Dash(external_stylesheets=[dbc.themes.CYBORG])
 #         )
 dropdown = dbc.DropdownMenu(
     children=[
-        dbc.DropdownMenuItem("Math",href="/Math"),
-        dbc.DropdownMenuItem("Physics",href="/Physics"),
-        # dbc.DropdownMenuItem(divider=True),
-        dbc.DropdownMenuItem("Computing",href="/Computing"),
+        dbc.DropdownMenuItem("Bethesda",href="/Bethesda_distribution"),
+        dbc.DropdownMenuItem("Molecular",href="/Molacular"),
+        dbc.DropdownMenuItem("Comparison",href="/Comparison"),
+
+
     ],
     nav=True,
     in_navbar=True,
@@ -149,10 +150,10 @@ dbc.Container(
             ),
             id="navbar-collapse2",
             navbar=True,
-        ),
+        style={"margin-left":"-20px"}),
     ],
 ),
-color="#aed3b8",
+color="#3b98ac",
 dark=True,
 className="mb-5",
 style={"height":"10vh"}
@@ -289,8 +290,8 @@ app.layout = html.Div(
                         html.Img(
                             className="logo",
                             src=app.get_asset_url("logo_IC_nobg.png"),
-                            style={'display': 'inline-block',"height":"7vh"}),
-                    ],style={"display":"flex","height":"6vh","justify-content":"center","color":"white","background-color":"black","margin-bottom":"0px"}
+                            style={'display': 'inline-block',"height":"8vh"}),
+                    ],style={"display":"flex","height":"8vh","justify-content":"center","color":"white","background-color":"black","margin-bottom":"0px"}
                     ),
                     ],
         )
@@ -437,11 +438,11 @@ def update_graphs(start_date,end_date,type_label,result_label,genotype_label):
               [Input('url', 'pathname')])
 def display_page(pathname):
     if pathname == '/Math':
-        return Math.layout
+        return Molecular.layout
     if pathname == '/Physics':
-        return Physics.layout
-    if pathname == '/Computing':
-        return Computing.layout
+        return Comparison.layout
+    if pathname == '/Bethesda_distribution':
+        return Bethesda_distribution.layout
     else:
         return "404 Page Error! Please choose a link"
 ###################################################
