@@ -111,7 +111,7 @@ app = dash.Dash(external_stylesheets=[dbc.themes.CYBORG])
 #         )
 dropdown = dbc.DropdownMenu(
     children=[
-        dbc.DropdownMenuItem("Bethesda",href="/Bethesda_distribution"),
+        dbc.DropdownMenuItem("TBSRTC",href="/Bethesda_distribution"),
         dbc.DropdownMenuItem("Molecular",href="/Molecular"),
         dbc.DropdownMenuItem("Comparison",href="/Comparison"),
 
@@ -133,7 +133,7 @@ dbc.Container(
                     # dbc.Col(html.P(""),width=0),
                     # dbc.Col(html.P("POWER BY",style={"color":"white","font-size":"12px"}),width=2),
                     dbc.Col(html.Img(src="/assets/USCAPheaderlogo.png", height="50px"),width=2),
-                    dbc.Col(html.P("",style={"color":"yellow","font-size":"30px","justify":"center"}),width=8,),
+                    dbc.Col(html.P("",style={"color":"white","font-size":"30px","justify":"right","align-self":"end"}),width=8,),
                 ],
                 align="center",
                 className="g-0",
@@ -154,7 +154,7 @@ dbc.Container(
         ),
     ],
 ),
-color="#3b98ac",
+color="#0dcdf6",
 dark=True,
 className="mb-5",
 style={"height":"10vh"},
@@ -296,6 +296,11 @@ app.layout = html.Div(
                     ),
                     ],
         )
+################### CALL BACKS FOR PAGE BETHESDA ###############
+################################################################
+################################################################
+
+
 
 
 # @app.callback(
@@ -432,7 +437,7 @@ def update_graphs(start_date,end_date,type_label,result_label,genotype_label):
 
     return  type_graph,results_graph,genotype_graph,sensitivity_graph,adequacy_graph,number_of_tests,average,positive_rate,false_negative_rate
 
-
+app.config.suppress_callback_exceptions=True
 #######################################################
 
 @app.callback(Output('page-content', 'children'),

@@ -80,7 +80,7 @@ fig.update_layout(
     # plot_bgcolor="gray"
 )
 
-dfa=pd.read_excel("pages/data/USCAP.xlsx")
+dfa=pd.read_excel("data/USCAP.xlsx")
 
 card = dbc.Card(
     dbc.CardBody(
