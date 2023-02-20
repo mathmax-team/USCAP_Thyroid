@@ -191,6 +191,26 @@ def make_card(id):
 #     )
 # ,style={"height":"20vh","background-color":"#8af2a6","margin-top":"40px"})
 
+tab1_content = dbc.Card(
+    dbc.CardBody(
+        # [
+        #     html.P("This is tab 1!", className="card-text"),
+        #     dbc.Button("Click here", color="success"),
+        # ]
+    ),
+    className="mt-3",
+)
+
+tab2_content = dbc.Card(
+    dbc.CardBody(
+        # [
+        #     html.P("This is tab 2!", className="card-text"),
+        #     dbc.Button("Don't click here", color="danger"),
+        # ]
+    ),
+    className="mt-3",
+)
+
 layout = html.Div(
      children=[
         html.Div(
@@ -279,6 +299,15 @@ layout = html.Div(
                 html.Div(
                     className="nine columns div-for-charts bg-grey",
                     children=[
+                    dbc.Tabs(id="id_tabs",
+                        children=[
+                        dbc.Tab( label="Histograms"),
+                        dbc.Tab(label="Tables")]
+                            # dbc.Tab(
+                            #     "This tab's content is never seen", label="Tab 3", disabled=True
+                            ),
+                    #     ],
+                    #  ),
                     html.Div([
                     dbc.Row([
                         dbc.Col([make_card("id_first_graph")]), dbc.Col([make_card("id_second_graph")])
@@ -369,9 +398,11 @@ def update_time_range(input_range):
     Input(component_id='id_responsable_choice', component_property='value'),
     Input(component_id='id_age_choice', component_property='value'),
     Input(component_id='id_sex_choice', component_property='value'),
+    Input(component_id='id_tabs', component_property='active_tab'),
+
 )
 
-def update_time_range(start_date,end_date,responsable,age,sex):
+def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     data=df
 
     """Apply Date filter"""
@@ -415,22 +446,25 @@ def update_time_range(start_date,end_date,responsable,age,sex):
     if molecular_tests>0:
         positivity_molecular=round(positives_molecular/molecular_tests,2)
 
-   ######## FIRST GRAPH
+   ######## PIE GRAPH CATEGORIES
     title="Bethesda Category Distribution"
     Beth_info=data["Bethesda Cathegory"].value_counts().to_dict()
     numeric_names=sorted(list(Beth_info.keys()))
     values=[Beth_info[x] for x in numeric_names]
     names=[make_roman(x) for x in numeric_names]
-    first_graph=make_pie(names,values,title)
+    pie_data=pd.DataFrame()
+    pie_data["pie_values"]=values
+    pie_data["pie_names"]=names
+    pie_graph=make_pie(pie_data,"pie_names","pie_values",title)
 
-    ######################  SECOND GRAPH
+    ######################  BAR GRAPH CATEGORIES
     labels_bar=sorted(list(data["Bethesda Cathegory"].unique()))
     values_bar=[len(data[data["Bethesda Cathegory"]==label])for label in labels_bar]
     bar_data=pd.DataFrame()
     bar_data["Count"]=values_bar
     bar_data["Category"]=[make_roman(x) for x in labels_bar]
     # bar_data["labels"]=bar_data["labels"].astype(str)
-    second_graph=make_bar(bar_data,"Category","Count","Bethesda Category Counts")
+    bar_categories=make_bar(bar_data,"Category","Count","Bethesda Category Counts")
 
     ######################  ROM GRAPH
     labels_bar=list(data["ROM"].unique())
@@ -451,7 +485,74 @@ def update_time_range(start_date,end_date,responsable,age,sex):
     bar_data["Count"]=values_bar
     bar_data["GENE MUTATED"]=labels_bar
     bar_data["GENE MUTATED"]=bar_data["GENE MUTATED"].astype(str)
-    gene_graph=make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated")
+    gene_graph=make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count")
+
+    ######################  MUTATION GRAPH
+    labels_bar=list(data["MUTATION"].unique())
+    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+    values_bar=[len(data[data["MUTATION"]==label])for label in labels_bar]
+    bar_data=pd.DataFrame()
+    bar_data["Count"]=values_bar
+    bar_data["MUTATION"]=labels_bar
+    bar_data["MUTATION"]=bar_data["MUTATION"].astype(str)
+    mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count")
+
+    first_graph=bar_categories
+    second_graph=rom_graph
+    third_graph=gene_graph
+    fourth_graph=mutation_graph
+
+###################################### DURATION GRAPH
+
+    data["duration"]=(data["SIGN_DATE"]-data["ACCESS_DATE"])
+    data["duration"]=data["duration"].apply(lambda z:z.days)
+    Duration=data["duration"].value_counts().to_dict()
+    numeric_names=sorted(list(Duration.keys()))
+    names=[str(x) for x in numeric_names]
+    values=[Duration[x] for x in numeric_names]
+    duration_data=pd.DataFrame()
+    duration_data["Processing days"]=values
+    duration_data["duration_names"]=names
+    duration_graph=make_rom(duration_data,"duration_names","Processing days","Processing Time in Days")
+
+
+
+
+
+    fig_tab = go.Figure(data=[go.Table(header=dict(values=['A Scores', 'B Scores']),
+                 cells=dict(values=[[100, 90, 80, 90], [95, 85, 75, 95]]))
+                     ])
+    fig_tab.update_layout(
+            autosize=True,
+            margin=dict(
+                l=0,
+                r=0,
+                b=0,
+                t=40,
+                pad=0
+            ),
+            template="plotly_dark",
+            title={
+            "text":"Somethings else",
+            'y':0.98,
+            'x':0.46,
+            'xanchor': 'center',
+            'yanchor': 'top',
+            },
+            legend_title="",
+            xaxis_title=None,
+
+
+            # legend_traceorder="reversed",
+
+        )
+    if active_tab=="tab-1":
+        first_graph=fig_tab
+        second_graph=duration_graph
+        third_graph=rom_graph
+        fourth_graph=bar_categories
+
+
     ##################
     # tests=data.shape[0]
     # positivity="No data"
@@ -460,6 +561,7 @@ def update_time_range(start_date,end_date,responsable,age,sex):
 
     # if tests>0:
     #     positivity=round(positives/tests,2)
+    # if active_tab=="tab-1":
+    #     first_graph=rom_graph
 
-
-    return first_graph,second_graph,rom_graph,gene_graph,tests,positives_overall,positivity_overall,molecular_tests,positivity_molecular
+    return first_graph,second_graph,third_graph,fourth_graph,tests,positives_overall,positivity_overall,molecular_tests,positivity_molecular

@@ -2,15 +2,16 @@ import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 
-def make_pie(names,values,title):
+def make_pie(dataframe,names,values,title):
     # fig = px.pie( names=names,values=values, sort=False)
-    fig = go.Figure(
-    data=[go.Pie(
+    fig =px.pie(dataframe,
         labels=names,
         values=values,
+        # colors=names,
+        color_discrete_sequence=px.colors.qualitative.T10,
         # Second, make sure that Plotly won't reorder your data while plotting
-        sort=False)
-    ])
+        )
+
     fig.update_layout(
         autosize=False,
         margin=dict(

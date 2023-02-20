@@ -4,7 +4,7 @@ import pandas as pd
 
 def make_rom(data_frame,labels_column,values_column,title):
     fig = px.bar( data_frame,x=labels_column, y=values_column, title="Wide-Form Input",color=labels_column,
-     color_discrete_sequence=px.colors.qualitative.Light24
+     color_discrete_sequence=px.colors.qualitative.T10
     )
     fig.update_layout(
             autosize=True,

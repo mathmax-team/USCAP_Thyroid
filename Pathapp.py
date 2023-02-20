@@ -154,10 +154,11 @@ dbc.Container(
         ),
     ],
 ),
-color="#0dcdf6",
+# color="#0dcdf6",
+color="#aab8b1",
 dark=True,
 className="mb-5",
-style={"height":"10vh"},
+style={"height":"6vh"},
 )
 
 
@@ -283,7 +284,7 @@ app.layout = html.Div(
         #     style={"margin-top":"0px","padding":"0px"}
         # )
         dcc.Location(id='url', refresh=False),
-        html.Div(id='page-content', children=[],style={"height":"80vh","backgkround-color":"white","margin-top":"0px"}),
+        html.Div(id='page-content', children=[Bethesda_distribution.layout],style={"height":"85vh","backgkround-color":"white","margin-top":"0px"}),
         html.Div([
                         html.P(
                             "POWERED BY ",
@@ -440,8 +441,8 @@ def update_graphs(start_date,end_date,type_label,result_label,genotype_label):
 app.config.suppress_callback_exceptions=True
 #######################################################
 
-@app.callback(Output('page-content', 'children'),
-              [Input('url', 'pathname')])
+# @app.callback(Output('page-content', 'children'),
+#               [Input('url', 'pathname')])
 def display_page(pathname):
     if pathname == '/Molecular':
         return Molecular.layout

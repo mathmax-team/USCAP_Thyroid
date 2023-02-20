@@ -4,6 +4,7 @@ import pandas as pd
 
 def make_bar(data_frame,labels_column,values_column,title):
     feg = px.bar( data_frame,x=labels_column, y=values_column, title="Wide-Form Input",color=labels_column,
+    color_discrete_sequence=px.colors.qualitative.T10
     # color_discrete_sequence=["red", "green", "blue", "goldenrod", "magenta","orange"]
     )
     feg.update_layout(
