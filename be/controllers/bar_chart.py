@@ -7,7 +7,7 @@ def make_bar(data_frame,labels_column,values_column,title):
     # color_discrete_sequence=["red", "green", "blue", "goldenrod", "magenta","orange"]
     )
     feg.update_layout(
-            autosize=False,
+            autosize=True,
             margin=dict(
                 l=0,
                 r=0,
@@ -23,6 +23,8 @@ def make_bar(data_frame,labels_column,values_column,title):
             'xanchor': 'center',
             'yanchor': 'top'
             },
+            legend_title="",
+            xaxis_title=None,
             # legend_traceorder="reversed",
 
         )

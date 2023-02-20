@@ -10,6 +10,8 @@ import pandas as pd
 from be.controllers.pie_chart import make_pie
 from be.controllers.roman import make_roman
 from be.controllers.bar_chart import make_bar
+from be.controllers.ROM_chart import make_rom
+from be.controllers.Gene_mutated import make_gene
 import numpy as np
 ##################################################
 
@@ -166,7 +168,7 @@ def make_card(id):
         dbc.CardBody(
             [dcc.Graph(id=id,
         figure=fig,
-    style={"height":"30vh"},
+    style={"height":"100%"},
     config={
                             'displayModeBar': False
                         })
@@ -200,7 +202,7 @@ layout = html.Div(
                     children=[
 
                     html.Div(className="div_for_text",
-                    children=[html.H5("Bethesda Cathegory")
+                    children=[html.H5("Bethesda Category")
                     ]),
                     html.Div(className="div_for_text",
                         children=[html.P("Default time periods")],style={"height":"25px"}),
@@ -279,7 +281,7 @@ layout = html.Div(
                     children=[
                     html.Div([
                     dbc.Row([
-                        dbc.Col([make_card("id_first_graph")]), dbc.Col([make_card("id_second_graph")]),
+                        dbc.Col([make_card("id_first_graph")]), dbc.Col([make_card("id_second_graph")])
                     ]),
                     dbc.Row([
                         dbc.Col([make_card("id_third_graph")]), dbc.Col([make_card("id_fourth_graph")]),
@@ -414,7 +416,7 @@ def update_time_range(start_date,end_date,responsable,age,sex):
         positivity_molecular=round(positives_molecular/molecular_tests,2)
 
    ######## FIRST GRAPH
-    title="Bethesda category distribution"
+    title="Bethesda Category Distribution"
     Beth_info=data["Bethesda Cathegory"].value_counts().to_dict()
     numeric_names=sorted(list(Beth_info.keys()))
     values=[Beth_info[x] for x in numeric_names]
@@ -428,8 +430,28 @@ def update_time_range(start_date,end_date,responsable,age,sex):
     bar_data["Count"]=values_bar
     bar_data["Category"]=[make_roman(x) for x in labels_bar]
     # bar_data["labels"]=bar_data["labels"].astype(str)
-    second_graph=make_bar(bar_data,"Category","Count","Bethesda category counts")
+    second_graph=make_bar(bar_data,"Category","Count","Bethesda Category Counts")
 
+    ######################  ROM GRAPH
+    labels_bar=list(data["ROM"].unique())
+    labels_bar=sorted([x for x in labels_bar if str(x) not in ["?","nan"]])
+    values_bar=[len(data[data["ROM"]==label])for label in labels_bar]
+    labels_bar=[str(x)+ "%" for x in labels_bar]
+    bar_data=pd.DataFrame()
+    bar_data["Count"]=values_bar
+    bar_data["ROM"]=labels_bar
+    bar_data["ROM"]=bar_data["ROM"].astype(str)
+    rom_graph=make_rom(bar_data,"ROM","Count","Risk of Malignancy")
+
+    ######################  GENE GRAPH
+    labels_bar=list(data["GENE MUTATED"].unique())
+    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+    values_bar=[len(data[data["GENE MUTATED"]==label])for label in labels_bar]
+    bar_data=pd.DataFrame()
+    bar_data["Count"]=values_bar
+    bar_data["GENE MUTATED"]=labels_bar
+    bar_data["GENE MUTATED"]=bar_data["GENE MUTATED"].astype(str)
+    gene_graph=make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated")
     ##################
     # tests=data.shape[0]
     # positivity="No data"
@@ -440,4 +462,4 @@ def update_time_range(start_date,end_date,responsable,age,sex):
     #     positivity=round(positives/tests,2)
 
 
-    return first_graph,second_graph,first_graph,first_graph,tests,positives_overall,positivity_overall,molecular_tests,positivity_molecular
+    return first_graph,second_graph,rom_graph,gene_graph,tests,positives_overall,positivity_overall,molecular_tests,positivity_molecular
