@@ -49,7 +49,7 @@ pathologists=["All pathologists"]+pathologists
 ##########################
 
 table_headerI = [
-    html.Thead(html.Tr([html.Th("Number of tests"),html.Th("Positive test"),html.Th("Positivity overall")]))
+    html.Thead(html.Tr([html.Th("Tests"),html.Th("+ Tests"),html.Th("+ Rate Overall")]))
 ]
 
 row1I = html.Tr([html.Td("345",id="id_tests"), html.Td("45.6",id="id_positive_tests"),html.Td("someother",id="id_positivity_overall")])
@@ -62,10 +62,10 @@ tableI = dbc.Table(table_headerI + table_bodyI, bordered=True,style={"width":"10
 ################# TABLE II
 
 table_headerII = [
-    html.Thead(html.Tr([html.Th("Molecular tests"),html.Th("Positivity molecular")]))
+    html.Thead(html.Tr([html.Th("Mol Tests"),html.Th("Mol +Rate"),html.Th("CatIII +Rate"),html.Th("CatIV +Rate")]))
 ]
 
-row1II = html.Tr([html.Td("345",id="id_molecular_tests"), html.Td("45.6",id="id_positivity_molecular")])
+row1II = html.Tr([html.Td("345",id="id_molecular_tests"), html.Td("0",id="id_positivity_molecular"), html.Td("0",id="id_positivity_catIII"), html.Td("0",id="id_positivity_catIV")])
 
 
 table_bodyII = [html.Tbody([row1II])]
@@ -301,8 +301,13 @@ layout = html.Div(
                     children=[
                     dbc.Tabs(id="id_tabs",
                         children=[
-                        dbc.Tab( label="Histograms"),
-                        dbc.Tab(label="Tables")]
+                        dbc.Tab( label="Overall Information",tab_id="Overall"),
+                        dbc.Tab( label="Mutations by category",tab_id="Mutations by category"),
+                        dbc.Tab(label="Mutations by result",tab_id="Mutations by result"),
+                        dbc.Tab(label="ROM",tab_id="ROM"),
+
+
+                        ]
                             # dbc.Tab(
                             #     "This tab's content is never seen", label="Tab 3", disabled=True
                             ),
@@ -310,7 +315,7 @@ layout = html.Div(
                     #  ),
                     html.Div([
                     dbc.Row([
-                        dbc.Col([make_card("id_first_graph")]), dbc.Col([make_card("id_second_graph")])
+                        dbc.Col(make_card("id_first_graph")), dbc.Col([make_card("id_second_graph")])
                     ]),
                     dbc.Row([
                         dbc.Col([make_card("id_third_graph")]), dbc.Col([make_card("id_fourth_graph")]),
@@ -393,6 +398,8 @@ def update_time_range(input_range):
     Output(component_id= 'id_positivity_overall', component_property='children'),
     Output(component_id= 'id_molecular_tests', component_property='children'),
     Output(component_id= 'id_positivity_molecular', component_property='children'),
+    Output(component_id= 'id_positivity_catIII', component_property='children'),
+    Output(component_id= 'id_positivity_catIV', component_property='children'),
     Input(component_id= 'id_date_range', component_property='start_date'),
     Input(component_id= 'id_date_range', component_property='end_date'),
     Input(component_id='id_responsable_choice', component_property='value'),
@@ -430,21 +437,45 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
         data=data[(data["AGE"]>=60)&(data["AGE"]<70)]
     if age =="70 or older":
         data=data[data["AGE"]>=70]
+
+        #################################### FILTERED DATA
+    positive_data=data[data["RESULT"]=="POSITIVE"]
+    negative_data=data[data["RESULT"]=="NEGATIVE"]
+    category3_data=data[data["Bethesda Cathegory"]==3]
+    category4_data=data[data["Bethesda Cathegory"]==4]
+
 ################################### TABLE DATA
     tests=data.shape[0]
-    positivity_overall="No data"
+    positivity_overall="----"
     positives_overall=data[data["RESULT"]=="POSITIVE"].shape[0]
 
 
     if tests>0:
         positivity_overall=round(positives_overall/tests,2)
     molecular_tests=data[data["MOLECULAR "]=="THYROSEQ"].shape[0]
-    positivity_molecular="No data"
-    positives_molecular=data[data["RESULT"]=="POSITIVE"].shape[0]
+    positivity_molecular="----"
+    positives_molecular=data[(data["RESULT"]=="POSITIVE")&(data["MOLECULAR "]=="THYROSEQ")].shape[0]
 
 
     if molecular_tests>0:
         positivity_molecular=round(positives_molecular/molecular_tests,2)
+
+    ###################### CatIII positivity
+    catIII_tests=data[data["Bethesda Cathegory"]==3].shape[0]
+    positivity_catIII="----"
+    positives_catIII=data[(data["RESULT"]=="POSITIVE")&(data["Bethesda Cathegory"]==3)].shape[0]
+
+
+    if catIII_tests>0:
+        positivity_catIII=round(positives_catIII/catIII_tests,2)
+     ###################### CatIII positivity
+    catIV_tests=data[data["Bethesda Cathegory"]==4].shape[0]
+    positivity_catIV="----"
+    positives_catIV=data[(data["RESULT"]=="POSITIVE")&(data["Bethesda Cathegory"]==4)].shape[0]
+
+
+    if catIV_tests>0:
+        positivity_catIV=round(positives_catIV/catIV_tests,2)
 
    ######## PIE GRAPH CATEGORIES
     title="Bethesda Category Distribution"
@@ -466,7 +497,7 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     # bar_data["labels"]=bar_data["labels"].astype(str)
     bar_categories=make_bar(bar_data,"Category","Count","Bethesda Category Counts")
 
-    ######################  ROM GRAPH
+    ######################  ROM GRAPH OVERALL
     labels_bar=list(data["ROM"].unique())
     labels_bar=sorted([x for x in labels_bar if str(x) not in ["?","nan"]])
     values_bar=[len(data[data["ROM"]==label])for label in labels_bar]
@@ -477,7 +508,7 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     bar_data["ROM"]=bar_data["ROM"].astype(str)
     rom_graph=make_rom(bar_data,"ROM","Count","Risk of Malignancy")
 
-    ######################  GENE GRAPH
+    ######################  OVERALL GENE GRAPH
     labels_bar=list(data["GENE MUTATED"].unique())
     labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
     values_bar=[len(data[data["GENE MUTATED"]==label])for label in labels_bar]
@@ -485,9 +516,9 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     bar_data["Count"]=values_bar
     bar_data["GENE MUTATED"]=labels_bar
     bar_data["GENE MUTATED"]=bar_data["GENE MUTATED"].astype(str)
-    gene_graph=make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count")
+    gene_graph=make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Molecular Tests")
 
-    ######################  MUTATION GRAPH
+    ######################  OVERALL MUTATION GRAPH
     labels_bar=list(data["MUTATION"].unique())
     labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
     values_bar=[len(data[data["MUTATION"]==label])for label in labels_bar]
@@ -495,10 +526,52 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     bar_data["Count"]=values_bar
     bar_data["MUTATION"]=labels_bar
     bar_data["MUTATION"]=bar_data["MUTATION"].astype(str)
-    mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count")
+    mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count Molecular Tests")
 
-    first_graph=bar_categories
-    second_graph=rom_graph
+    ######################  POSITIVE GENE GRAPH
+    labels_bar=list(positive_data["GENE MUTATED"].unique())
+    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+    values_bar=[len(positive_data[positive_data["GENE MUTATED"]==label])for label in labels_bar]
+    bar_data=pd.DataFrame()
+    bar_data["Count"]=values_bar
+    bar_data["GENE MUTATED"]=labels_bar
+    bar_data["GENE MUTATED"]=bar_data["GENE MUTATED"].astype(str)
+    positive_gene_graph=make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Positive Tests")
+
+    ######################  POSITIVE MUTATION GRAPH
+    labels_bar=list(positive_data["MUTATION"].unique())
+    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+    values_bar=[len(positive_data[positive_data["MUTATION"]==label])for label in labels_bar]
+    bar_data=pd.DataFrame()
+    bar_data["Count"]=values_bar
+    bar_data["MUTATION"]=labels_bar
+    bar_data["MUTATION"]=bar_data["MUTATION"].astype(str)
+    positive_mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count Positive Tests")
+    ######################  NEGATIVE GENE GRAPH
+    labels_bar=list(negative_data["GENE MUTATED"].unique())
+    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+    values_bar=[len(negative_data[negative_data["GENE MUTATED"]==label])for label in labels_bar]
+    bar_data=pd.DataFrame()
+    bar_data["Count"]=values_bar
+    bar_data["GENE MUTATED"]=labels_bar
+    bar_data["GENE MUTATED"]=bar_data["GENE MUTATED"].astype(str)
+    negative_gene_graph=make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Negative Tests")
+
+    ######################  NEGATIVE MUTATION GRAPH
+    labels_bar=list(negative_data["MUTATION"].unique())
+    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+    values_bar=[len(negative_data[negative_data["MUTATION"]==label])for label in labels_bar]
+    bar_data=pd.DataFrame()
+    bar_data["Count"]=values_bar
+    bar_data["MUTATION"]=labels_bar
+    bar_data["MUTATION"]=bar_data["MUTATION"].astype(str)
+    negative_mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count Negative Tests")
+
+########################    RESULTS OVERALL ##############################################################
+
+
+    first_graph=pie_graph
+    second_graph=bar_categories
     third_graph=gene_graph
     fourth_graph=mutation_graph
 
@@ -546,12 +619,24 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
             # legend_traceorder="reversed",
 
         )
-    if active_tab=="tab-1":
+    #################### MUTATIONS BY RESULT
+    if active_tab=="Mutations by result":
+        first_graph=positive_gene_graph
+        second_graph=positive_mutation_graph
+        third_graph=negative_gene_graph
+        fourth_graph=negative_mutation_graph
+    ###################### MUTATIONS BY CATEGORY
+    if active_tab=="Mutations by category":
         first_graph=fig_tab
-        second_graph=duration_graph
-        third_graph=rom_graph
-        fourth_graph=bar_categories
-
+        second_graph=positive_mutation_graph
+        third_graph=negative_gene_graph
+        fourth_graph=negative_mutation_graph
+##############################ROM
+    if active_tab=="ROM":
+        first_graph=fig_tab
+        second_graph=positive_mutation_graph
+        third_graph=negative_gene_graph
+        fourth_graph=negative_mutation_graph
 
     ##################
     # tests=data.shape[0]
@@ -564,4 +649,4 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     # if active_tab=="tab-1":
     #     first_graph=rom_graph
 
-    return first_graph,second_graph,third_graph,fourth_graph,tests,positives_overall,positivity_overall,molecular_tests,positivity_molecular
+    return first_graph,second_graph,third_graph,fourth_graph,tests,positives_overall,positivity_overall,molecular_tests,positivity_molecular,positivity_catIII,positivity_catIV
