@@ -14,7 +14,7 @@ from be.controllers.ROM_chart import make_rom
 from be.controllers.Gene_mutated import make_gene
 from be.controllers.table_chart import make_table_graph
 from be.controllers.stacked_bar_graph import make_stacked_bar
-from be.controllers.counters import count_by_result,count_cases,count_categories
+from be.controllers.counters import count_by_result,count_cases,count_categories,count_result_by_category
 import numpy as np
 ##################################################
 
@@ -445,6 +445,7 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
         data=data[(data["AGE"]>=60)&(data["AGE"]<70)]
     if age =="70 or older":
         data=data[data["AGE"]>=70]
+    all_paths_df=data
 
     """Apply Pathologist filter"""
     if responsable !="All pathologists":
@@ -716,14 +717,59 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     ###############################################
     ################### GRAPHS FOR COMPARING PATHOLOGISTS
     #########################
+    count_data=pd.DataFrame()
+    pathologists=list(all_paths_df["CYTOPATHOLOGIST"].unique())
+    count_data["pathologists"]=pathologists
+    for i in range(1,8):
+        count_data[make_roman(i)]=[count_categories(all_paths_df,pathologist,i) for pathologist in pathologists]
+    count_data["cases"]=[count_cases(all_paths_df,pathologist) for pathologist in pathologists]
+    count_data["positives"]=[count_by_result(all_paths_df,pathologist,"POSITIVE") for pathologist in pathologists]
+    count_data["positive_rate"]=count_data["positives"]/count_data["cases"]
+    count_data["positive_rate"]=count_data["positive_rate"].apply(lambda z:round(z,2))
+    for i in range(1,8):
+        count_data["Cat "+make_roman(i)+" Calling Rate"]=count_data[make_roman(i)]/count_data["cases"]
+        count_data["Cat "+make_roman(i)+" Calling Rate"]=count_data["Cat "+make_roman(i)+" Calling Rate"].apply(lambda z:round(z,2))
+    count_data["pathologists"]=pathologists
 
+    count_data["Cat III positives"]=[count_result_by_category(df,pathologist,3,"POSITIVE") for pathologist in pathologists]
+    count_data["Cat III Positivity Rate"]=count_data["Cat III positives"]/count_data["III"]
+    compare_frequencies=make_stacked_bar(count_data,"pathologists",[make_roman(i) for i in range(1,8)], "Category Count by Pathologist")
+    compare_ratios=make_stacked_bar(count_data,"pathologists",["Cat "+make_roman(i)+" Calling Rate"  for i in range(1,4)], "Category distribution by Pathologist")
 
+    scat= px.scatter(count_data,x='Cat III Calling Rate',
+                y='Cat III Positivity Rate',
+                color='pathologists',
+                size='cases',
+                 hover_data=['pathologists', 'positive_rate']
+                )
+    scat.update_layout(
+            autosize=True,
+            margin=dict(
+                l=0,
+                r=0,
+                b=0,
+                t=40,
+                pad=0
+            ),
+            template="plotly_dark",
+            title={
+            "text":"Cat III  Calling Rate vs Positivity",
+            'y':0.98,
+            'x':0.46,
+            'xanchor': 'center',
+            'yanchor': 'top'
+            },
+            legend_title="",
+            # xaxis_title=None,
+            # legend_traceorder="reversed",
+
+        )
     ##############################COMPARING CP
     if active_tab=="Comparing CP":
-        first_graph=make_table_graph(["A","B"],[[3,4],[1,8]],"IDEAS ARE CHEAP")
-        second_graph=positive_mutation_graph
-        third_graph=negative_gene_graph
-        fourth_graph=negative_mutation_graph
+        first_graph=compare_frequencies
+        second_graph=compare_ratios
+        third_graph=scat
+        fourth_graph=scat
 
     ##################
     ###################### MUTATIONS BY CATEGORY

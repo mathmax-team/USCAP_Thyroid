@@ -8,3 +8,6 @@ def count_cases(data,pathologist):
 
 def count_by_result(data,pathologist,result):
     return data[(data["RESULT"]==result)&(data["CYTOPATHOLOGIST"]== pathologist)].shape[0]
+
+def count_result_by_category(data,pathologist,category,result):
+    return data[(data["RESULT"]==result)&(data["CYTOPATHOLOGIST"]== pathologist)&(data["Bethesda Cathegory"]== category)].shape[0]
