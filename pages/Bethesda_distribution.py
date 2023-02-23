@@ -12,6 +12,9 @@ from be.controllers.roman import make_roman
 from be.controllers.bar_chart import make_bar
 from be.controllers.ROM_chart import make_rom
 from be.controllers.Gene_mutated import make_gene
+from be.controllers.table_chart import make_table_graph
+from be.controllers.stacked_bar_graph import make_stacked_bar
+from be.controllers.counters import count_by_result,count_cases,count_categories
 import numpy as np
 ##################################################
 
@@ -49,10 +52,10 @@ pathologists=["All pathologists"]+pathologists
 ##########################
 
 table_headerI = [
-    html.Thead(html.Tr([html.Th("Tests"),html.Th("+ Tests"),html.Th("+ Rate Overall")]))
+    html.Thead(html.Tr([html.Th("Tests"),html.Th("Molecular Tests"),html.Th("+ Tests")]))
 ]
 
-row1I = html.Tr([html.Td("345",id="id_tests"), html.Td("45.6",id="id_positive_tests"),html.Td("someother",id="id_positivity_overall")])
+row1I = html.Tr([html.Td("345",id="id_tests"), html.Td("45.6",id="id_molecular_tests"),html.Td("---",id="id_positive_tests")])
 
 
 table_bodyI = [html.Tbody([row1I])]
@@ -62,10 +65,10 @@ tableI = dbc.Table(table_headerI + table_bodyI, bordered=True,style={"width":"10
 ################# TABLE II
 
 table_headerII = [
-    html.Thead(html.Tr([html.Th("Mol Tests"),html.Th("Mol +Rate"),html.Th("CatIII +Rate"),html.Th("CatIV +Rate")]))
+    html.Thead(html.Tr([html.Th("Cat III tests"),html.Th("Cat IV tests")]))
 ]
 
-row1II = html.Tr([html.Td("345",id="id_molecular_tests"), html.Td("0",id="id_positivity_molecular"), html.Td("0",id="id_positivity_catIII"), html.Td("0",id="id_positivity_catIV")])
+row1II = html.Tr([html.Td("345",id="id_catIII_tests"), html.Td("0",id="id_catIV_tests")])
 
 
 table_bodyII = [html.Tbody([row1II])]
@@ -73,6 +76,18 @@ table_bodyII = [html.Tbody([row1II])]
 tableII = dbc.Table(table_headerII + table_bodyII, bordered=True,style={"width":"100%","height":"20px","margin-bottom":"0px"})
 
 
+
+############################# TABS
+# header_tabs=dbc.Tabs(id="id_tabs",
+#                         children=[
+#                         dbc.Tab( label="Overall Information",tab_id="Overall"),
+#                         dbc.Tab( label="Mutations by Category",tab_id="Mutations by Category"),
+#                         dbc.Tab(label="Mutations by Result",tab_id="Mutations by Result"),
+#                         dbc.Tab(label="ROM",tab_id="ROM"),
+#                         ]
+#                             )
+
+##############################
 def oldmake_drop(lista:list,id:str):
     menu=dcc.Dropdown(id=id,
     options=[ {"label": html.Span([i],style={"color":"yellow"}), "value": i} for i in lista],
@@ -177,7 +192,7 @@ def make_card(id):
                 # html.P("Description", id="card-description")
             ]
         )
-    ,style={"height":"35vh"," background-color":"rgb(18, 18, 18)"},
+    ,style={"height":"40vh"," background-color":"rgb(18, 18, 18)"},
     )
     return card
 
@@ -222,7 +237,7 @@ layout = html.Div(
                     children=[
 
                     html.Div(className="div_for_text",
-                    children=[html.H5("Bethesda Category")
+                    children=[html.H5("Cytopathology Monitor")
                     ]),
                     html.Div(className="div_for_text",
                         children=[html.P("Default time periods")],style={"height":"25px"}),
@@ -299,19 +314,14 @@ layout = html.Div(
                 html.Div(
                     className="nine columns div-for-charts bg-grey",
                     children=[
-                    dbc.Tabs(id="id_tabs",
-                        children=[
-                        dbc.Tab( label="Overall Information",tab_id="Overall"),
-                        dbc.Tab( label="Mutations by category",tab_id="Mutations by category"),
-                        dbc.Tab(label="Mutations by result",tab_id="Mutations by result"),
-                        dbc.Tab(label="ROM",tab_id="ROM"),
+                    # header_tabs,
 
 
-                        ]
+                        # ]
                             # dbc.Tab(
                             #     "This tab's content is never seen", label="Tab 3", disabled=True
-                            ),
-                    #     ],
+                            # ),
+                        # ],
                     #  ),
                     html.Div([
                     dbc.Row([
@@ -329,7 +339,7 @@ layout = html.Div(
 
 
         ],
-        style={"margin-top":"0px","padding":"0px","height":"40vh","background-color":"1f1f1f"}
+        style={"margin-top":"0px","padding":"0px","background-color":"1f1f1f"}
     )
 
                     ])
@@ -351,13 +361,13 @@ layout = html.Div(
 #     return no_update if ans!=0 else None
 
 #############################################CALL BACK FOR DATES
-@callback(
-    Output(component_id= 'id_date_range', component_property='start_date'),
-    Output(component_id= 'id_date_range', component_property='end_date'),
-    Input(component_id='id_time_period_choice', component_property='value'),
-    # State(component_id= 'id_date_range', component_property='start_date'),
-    # State(component_id= 'id_date_range', component_property='end_date'),
-)
+# @callback(
+#     Output(component_id= 'id_date_range', component_property='start_date'),
+#     Output(component_id= 'id_date_range', component_property='end_date'),
+#     Input(component_id='id_time_period_choice', component_property='value'),
+#     # State(component_id= 'id_date_range', component_property='start_date'),
+#     # State(component_id= 'id_date_range', component_property='end_date'),
+# )
 def update_time_range(input_range):
     """Control time range selection."""
 
@@ -395,11 +405,11 @@ def update_time_range(input_range):
     Output(component_id= 'id_fourth_graph', component_property='figure'),
     Output(component_id= 'id_tests', component_property='children'),
     Output(component_id= 'id_positive_tests', component_property='children'),
-    Output(component_id= 'id_positivity_overall', component_property='children'),
+    # Output(component_id= 'id_positivity_overall', component_property='children'),
     Output(component_id= 'id_molecular_tests', component_property='children'),
-    Output(component_id= 'id_positivity_molecular', component_property='children'),
-    Output(component_id= 'id_positivity_catIII', component_property='children'),
-    Output(component_id= 'id_positivity_catIV', component_property='children'),
+    Output(component_id= 'id_catIII_tests', component_property='children'),
+    # Output(component_id= 'id_positivity_catIII', component_property='children'),
+    Output(component_id= 'id_catIV_tests', component_property='children'),
     Input(component_id= 'id_date_range', component_property='start_date'),
     Input(component_id= 'id_date_range', component_property='end_date'),
     Input(component_id='id_responsable_choice', component_property='value'),
@@ -416,9 +426,7 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
 
     data=data[(data["SIGN_DATE"]>=pd.to_datetime(start_date))&(data["SIGN_DATE"]<=pd.to_datetime(end_date))]
 
-    """Apply Pathologist filter"""
-    if responsable !="All pathologists":
-        data=data[data["CYTOPATHOLOGIST"]==responsable]
+
 
     """Apply Sex filter"""
     if sex !="All sexes":
@@ -438,6 +446,10 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     if age =="70 or older":
         data=data[data["AGE"]>=70]
 
+    """Apply Pathologist filter"""
+    if responsable !="All pathologists":
+        data=data[data["CYTOPATHOLOGIST"]==responsable]
+
         #################################### FILTERED DATA
     positive_data=data[data["RESULT"]=="POSITIVE"]
     negative_data=data[data["RESULT"]=="NEGATIVE"]
@@ -447,35 +459,50 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
 ################################### TABLE DATA
     tests=data.shape[0]
     positivity_overall="----"
+    negativity_overall="----"
     positives_overall=data[data["RESULT"]=="POSITIVE"].shape[0]
+    negatives_overall=data[data["RESULT"]!="POSITIVE"].shape[0]
 
 
     if tests>0:
         positivity_overall=round(positives_overall/tests,2)
-    molecular_tests=data[data["MOLECULAR "]=="THYROSEQ"].shape[0]
-    positivity_molecular="----"
-    positives_molecular=data[(data["RESULT"]=="POSITIVE")&(data["MOLECULAR "]=="THYROSEQ")].shape[0]
+        negativity_overall=round(negatives_overall/tests,2)
 
+
+
+    molecular_tests=data[data["MOLECULAR "]=="THYROSEQ"].shape[0]
+
+    positivity_molecular="----"
+    negativity_molecular="----"
+    positives_molecular=data[(data["RESULT"]=="POSITIVE")&(data["MOLECULAR "]=="THYROSEQ")].shape[0]
+    negatives_molecular=data[(data["RESULT"]=="NEGATIVE")&(data["MOLECULAR "]=="THYROSEQ")].shape[0]
 
     if molecular_tests>0:
         positivity_molecular=round(positives_molecular/molecular_tests,2)
+        negativity_molecular=round(negatives_molecular/molecular_tests,2)
 
     ###################### CatIII positivity
     catIII_tests=data[data["Bethesda Cathegory"]==3].shape[0]
     positivity_catIII="----"
+    negativity_catIII="-----"
     positives_catIII=data[(data["RESULT"]=="POSITIVE")&(data["Bethesda Cathegory"]==3)].shape[0]
+    negatives_catIII=data[(data["RESULT"]=="NEGATIVE")&(data["Bethesda Cathegory"]==3)].shape[0]
 
 
     if catIII_tests>0:
         positivity_catIII=round(positives_catIII/catIII_tests,2)
+        negativity_catIII=round(negatives_catIII/catIII_tests,2)
      ###################### CatIII positivity
     catIV_tests=data[data["Bethesda Cathegory"]==4].shape[0]
     positivity_catIV="----"
+    negativity_catIV="----"
     positives_catIV=data[(data["RESULT"]=="POSITIVE")&(data["Bethesda Cathegory"]==4)].shape[0]
+    negatives_catIV=data[(data["RESULT"]=="NEGATIVE")&(data["Bethesda Cathegory"]==4)].shape[0]
 
 
     if catIV_tests>0:
         positivity_catIV=round(positives_catIV/catIV_tests,2)
+        negativity_catIV=round(negatives_catIV/catIV_tests,2)
 
    ######## PIE GRAPH CATEGORIES
     title="Bethesda Category Distribution"
@@ -506,8 +533,27 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     bar_data["Count"]=values_bar
     bar_data["ROM"]=labels_bar
     bar_data["ROM"]=bar_data["ROM"].astype(str)
-    rom_graph=make_rom(bar_data,"ROM","Count","Risk of Malignancy")
-
+    rom_graph=make_rom(bar_data,"ROM","Count","Risk of Malignancy Overall")
+######################  ROM GRAPH CAT III
+    labels_bar=list(category3_data["ROM"].unique())
+    labels_bar=sorted([x for x in labels_bar if str(x) not in ["?","nan"]])
+    values_bar=[len(category3_data[category3_data["ROM"]==label])for label in labels_bar]
+    labels_bar=[str(x)+ "%" for x in labels_bar]
+    bar_data=pd.DataFrame()
+    bar_data["Count"]=values_bar
+    bar_data["ROM"]=labels_bar
+    bar_data["ROM"]=bar_data["ROM"].astype(str)
+    rom_graph_cat3=make_rom(bar_data,"ROM","Count","Risk of Malignancy Category III")
+    ######################  ROM GRAPH CAT IV
+    labels_bar=list(category4_data["ROM"].unique())
+    labels_bar=sorted([x for x in labels_bar if str(x) not in ["?","nan"]])
+    values_bar=[len(category4_data[category4_data["ROM"]==label])for label in labels_bar]
+    labels_bar=[str(x)+ "%" for x in labels_bar]
+    bar_data=pd.DataFrame()
+    bar_data["Count"]=values_bar
+    bar_data["ROM"]=labels_bar
+    bar_data["ROM"]=bar_data["ROM"].astype(str)
+    rom_graph_cat4=make_rom(bar_data,"ROM","Count","Risk of Malignancy Category IV")
     ######################  OVERALL GENE GRAPH
     labels_bar=list(data["GENE MUTATED"].unique())
     labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
@@ -566,14 +612,55 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     bar_data["MUTATION"]=labels_bar
     bar_data["MUTATION"]=bar_data["MUTATION"].astype(str)
     negative_mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count Negative Tests")
+######################### CATEGORY GRAPHS
+#########################
+
+######################  CATEGORY III GENE GRAPH
+    labels_bar=list(category3_data["GENE MUTATED"].unique())
+    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+    values_bar=[len(category3_data[category3_data["GENE MUTATED"]==label])for label in labels_bar]
+    bar_data=pd.DataFrame()
+    bar_data["Count"]=values_bar
+    bar_data["GENE MUTATED"]=labels_bar
+    bar_data["GENE MUTATED"]=bar_data["GENE MUTATED"].astype(str)
+    category3_gene_graph=make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Category III")
+
+    ######################  CATEGORY III MUTATION GRAPH
+    labels_bar=list(category3_data["MUTATION"].unique())
+    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+    values_bar=[len(category3_data[category3_data["MUTATION"]==label])for label in labels_bar]
+    bar_data=pd.DataFrame()
+    bar_data["Count"]=values_bar
+    bar_data["MUTATION"]=labels_bar
+    bar_data["MUTATION"]=bar_data["MUTATION"].astype(str)
+    category3_mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count Category III")
+    ######################  CATEGORY IV GENE GRAPH
+    labels_bar=list(category4_data["GENE MUTATED"].unique())
+    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+    values_bar=[len(category4_data[category4_data["GENE MUTATED"]==label])for label in labels_bar]
+    bar_data=pd.DataFrame()
+    bar_data["Count"]=values_bar
+    bar_data["GENE MUTATED"]=labels_bar
+    bar_data["GENE MUTATED"]=bar_data["GENE MUTATED"].astype(str)
+    category4_gene_graph=make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Category IV")
+
+    ######################  CATEGORY IV MUTATION GRAPH
+    labels_bar=list(category4_data["MUTATION"].unique())
+    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+    values_bar=[len(category4_data[category4_data["MUTATION"]==label])for label in labels_bar]
+    bar_data=pd.DataFrame()
+    bar_data["Count"]=values_bar
+    bar_data["MUTATION"]=labels_bar
+    bar_data["MUTATION"]=bar_data["MUTATION"].astype(str)
+    category4_mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count Category IV")
 
 ########################    RESULTS OVERALL ##############################################################
 
-
-    first_graph=pie_graph
-    second_graph=bar_categories
-    third_graph=gene_graph
-    fourth_graph=mutation_graph
+    if active_tab=="Overall":
+        first_graph=pie_graph
+        second_graph=bar_categories
+        third_graph=gene_graph
+        fourth_graph=mutation_graph
 
 ###################################### DURATION GRAPH
 
@@ -620,23 +707,38 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
 
         )
     #################### MUTATIONS BY RESULT
-    if active_tab=="Mutations by result":
+    if active_tab=="Mutations by Result":
         first_graph=positive_gene_graph
         second_graph=positive_mutation_graph
         third_graph=negative_gene_graph
         fourth_graph=negative_mutation_graph
-    ###################### MUTATIONS BY CATEGORY
-    if active_tab=="Mutations by category":
-        first_graph=fig_tab
+
+    ###############################################
+    ################### GRAPHS FOR COMPARING PATHOLOGISTS
+    #########################
+
+
+    ##############################COMPARING CP
+    if active_tab=="Comparing CP":
+        first_graph=make_table_graph(["A","B"],[[3,4],[1,8]],"IDEAS ARE CHEAP")
         second_graph=positive_mutation_graph
         third_graph=negative_gene_graph
         fourth_graph=negative_mutation_graph
+
+    ##################
+    ###################### MUTATIONS BY CATEGORY
+    if active_tab=="Mutations by Category":
+        first_graph=category3_gene_graph
+        second_graph=category3_mutation_graph
+        third_graph=category4_gene_graph
+        fourth_graph=category4_mutation_graph
+
 ##############################ROM
     if active_tab=="ROM":
-        first_graph=fig_tab
-        second_graph=positive_mutation_graph
-        third_graph=negative_gene_graph
-        fourth_graph=negative_mutation_graph
+        first_graph=rom_graph
+        second_graph=rom_graph_cat3
+        third_graph=rom_graph_cat4
+        fourth_graph=make_table_graph(["Group","BCR","PCR"],[["All tests","Molecular","Category III","Category IV"],[negativity_overall,negativity_molecular,negativity_catIII,negativity_catIV],[positivity_overall,positivity_molecular,positivity_catIII,positivity_catIV]],"Call Rates")
 
     ##################
     # tests=data.shape[0]
@@ -649,4 +751,4 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     # if active_tab=="tab-1":
     #     first_graph=rom_graph
 
-    return first_graph,second_graph,third_graph,fourth_graph,tests,positives_overall,positivity_overall,molecular_tests,positivity_molecular,positivity_catIII,positivity_catIV
+    return first_graph,second_graph,third_graph,fourth_graph,tests,positives_overall,molecular_tests,positives_catIII,positives_catIV#positivity_catIII,positivity_catIV

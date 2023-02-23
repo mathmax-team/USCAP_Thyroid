@@ -326,3 +326,15 @@ h1, h2, h3, h4, h5, h6 {
   --bs-table-accent-bg: none;
 
 }
+.nav-link.active {
+  background-color: #8aefb6;
+}
+.navbar-dark .navbar-nav .nav-link.active, .navbar-dark .navbar-nav .show>.nav-link {
+  color: #252323;
+}
+.navbar-dark .navbar-nav .nav-link {
+  color: rgba(27, 29, 28, 0.55);
+}
+.nav-pills .nav-link.active, .nav-tabs .nav-link.active {
+  background-color: #98f4a5;
+}

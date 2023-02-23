@@ -1,6 +1,6 @@
 import dash
-from dash import dcc
-from dash import html
+from dash import dcc, callback
+from dash import html,no_update
 import numpy as np
 import plotly.express as px
 from dash.dependencies import Input, Output
@@ -21,6 +21,16 @@ import pandas as pd
 Records_df=pd.read_csv("Records.csv")
 Records_df["day"]=pd.to_datetime(Records_df["day"])
 
+############################# TABS
+header_tabs=dbc.Tabs(id="id_tabs",
+                        children=[
+                        dbc.Tab( label="Overall Information",tab_id="Overall",style={"color":"red"}),
+                        dbc.Tab( label="Mutations by Category",tab_id="Mutations by Category"),
+                        dbc.Tab(label="Mutations by Result",tab_id="Mutations by Result"),
+                        dbc.Tab(label="ROM",tab_id="ROM"),
+                        dbc.Tab( label="Comparing CP",tab_id="Comparing CP"),
+                        ],
+                         )
 ############# GRAPH BY TYPE
 
 
@@ -133,7 +143,7 @@ dbc.Container(
                     # dbc.Col(html.P(""),width=0),
                     # dbc.Col(html.P("POWER BY",style={"color":"white","font-size":"12px"}),width=2),
                     dbc.Col(html.Img(src="/assets/USCAPheaderlogo.png", height="50px"),width=2),
-                    dbc.Col(html.P("",style={"color":"white","font-size":"30px","justify":"right","align-self":"end"}),width=8,),
+                    dbc.Col(header_tabs,width=8),
                 ],
                 align="center",
                 className="g-0",
@@ -142,23 +152,23 @@ dbc.Container(
             href="#",
             style={"textDecoration": "none","content-align":"left","width":"90%"},
         ),
-        dbc.NavbarToggler(id="navbar-toggler2", n_clicks=0),
-        dbc.Collapse(
-            dbc.Nav(
-                [dropdown],
-                className="ms-auto",
-                navbar=True,
-            ),
-            id="navbar-collapse2",
-            navbar=True,
-        ),
+        # dbc.NavbarToggler(id="navbar-toggler2", n_clicks=0),
+        # dbc.Collapse(
+        #     dbc.Nav(
+        #         [dropdown],
+        #         className="ms-auto",
+        #         navbar=True,
+        #     ),
+        #     id="navbar-collapse2",
+        #     navbar=True,
+        # ),
     ],
 ),
 # color="#0dcdf6",
 color="#aab8b1",
 dark=True,
 className="mb-5",
-style={"height":"6vh"},
+style={"height":"8vh"},
 )
 
 
@@ -292,7 +302,7 @@ app.layout = html.Div(
                         html.Img(
                             className="logo",
                             src=app.get_asset_url("logo_IC_nobg.png"),
-                            style={'display': 'inline-block',"height":"9vh"}),
+                            style={'display': 'inline-block',"height":"7vh"}),
                     ],style={"display":"flex","height":"10vh","justify-content":"center","color":"white","background-color":"black","margin-bottom":"0px"}
                     ),
                     ],
@@ -453,6 +463,41 @@ def display_page(pathname):
     else:
         return "404 Page Error! Please choose a link"
 ###################################################
+
+############################## SOME INFO FROM DATA FRAME
+
+df=pd.read_excel("data/USCAP.xlsx")
+first_day=min(df["SIGN_DATE"].to_list())
+last_day=max(df["SIGN_DATE"].to_list())
+############DICTIONARY FOR DEFAULT TIME RANGES
+##################################################
+
+Default_time_ranges=dict()
+Default_time_ranges["Historical"]=[first_day,last_day]
+
+Default_time_ranges["Last year"]=[date.today().replace(day=1,month=1,year=date.today().year-1),date.today().replace(day=31,month=12,year=date.today().year-1)]
+
+Default_time_ranges["Current month"]=[date.today().replace(day=1),date.today()]
+Default_time_ranges["Current year"]=[date.today().replace(day=1,month=1),date.today()]
+#############################################CALL BACK FOR DATES
+@callback(
+    Output(component_id= 'id_date_range', component_property='start_date'),
+    Output(component_id= 'id_date_range', component_property='end_date'),
+    Input(component_id='id_time_period_choice', component_property='value'),
+    # State(component_id= 'id_date_range', component_property='start_date'),
+    # State(component_id= 'id_date_range', component_property='end_date'),
+)
+def update_time_range(input_range):
+    """Control time range selection."""
+
+    start_date=first_day
+    end_date=last_day
+    if input_range != None:
+        [start_date,end_date]=Default_time_ranges[input_range]
+
+
+
+    return no_update if input_range==None else start_date,end_date
 
 if __name__ == "__main__":
     app.run_server(debug=True,port=8051)
