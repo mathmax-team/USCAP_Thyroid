@@ -719,28 +719,29 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     #########################
     count_data=pd.DataFrame()
     pathologists=list(all_paths_df["CYTOPATHOLOGIST"].unique())
-    count_data["pathologists"]=pathologists
+    count_data["Pathologists"]=pathologists
     for i in range(1,8):
         count_data[make_roman(i)]=[count_categories(all_paths_df,pathologist,i) for pathologist in pathologists]
-    count_data["cases"]=[count_cases(all_paths_df,pathologist) for pathologist in pathologists]
+    count_data["Cases"]=[count_cases(all_paths_df,pathologist) for pathologist in pathologists]
     count_data["positives"]=[count_by_result(all_paths_df,pathologist,"POSITIVE") for pathologist in pathologists]
-    count_data["positive_rate"]=count_data["positives"]/count_data["cases"]
+    count_data["positive_rate"]=count_data["positives"]/count_data["Cases"]
     count_data["positive_rate"]=count_data["positive_rate"].apply(lambda z:round(z,2))
     for i in range(1,8):
-        count_data["Cat "+make_roman(i)+" Calling Rate"]=count_data[make_roman(i)]/count_data["cases"]
+        count_data["Cat "+make_roman(i)+" Calling Rate"]=count_data[make_roman(i)]/count_data["Cases"]
         count_data["Cat "+make_roman(i)+" Calling Rate"]=count_data["Cat "+make_roman(i)+" Calling Rate"].apply(lambda z:round(z,2))
-    count_data["pathologists"]=pathologists
+    count_data["Pathologists"]=pathologists
 
     count_data["Cat III positives"]=[count_result_by_category(df,pathologist,3,"POSITIVE") for pathologist in pathologists]
     count_data["Cat III Positivity Rate"]=count_data["Cat III positives"]/count_data["III"]
-    compare_frequencies=make_stacked_bar(count_data,"pathologists",[make_roman(i) for i in range(1,8)], "Category Count by Pathologist")
-    compare_ratios=make_stacked_bar(count_data,"pathologists",["Cat "+make_roman(i)+" Calling Rate"  for i in range(1,4)], "Category distribution by Pathologist")
+    count_data["Cat III Positivity Rate"]=count_data["Cat III Positivity Rate"].apply(lambda z:round(z,2))
+    compare_frequencies=make_stacked_bar(count_data,"Pathologists",[make_roman(i) for i in range(1,8)], "Category Count by Pathologist")
+    compare_ratios=make_stacked_bar(count_data,"Pathologists",["Cat "+make_roman(i)+" Calling Rate"  for i in range(1,4)], "Category distribution by Pathologist")
 
     scat= px.scatter(count_data,x='Cat III Calling Rate',
                 y='Cat III Positivity Rate',
-                color='pathologists',
-                size='cases',
-                 hover_data=['pathologists', 'positive_rate']
+                color='Pathologists',
+                size='Cases',
+                 hover_data=['Pathologists']
                 )
     scat.update_layout(
             autosize=True,
