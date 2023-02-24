@@ -22,10 +22,11 @@ import pandas as pd
 header_tabs=dbc.Tabs(id="id_tabs",
                         children=[
                         dbc.Tab( label="Overall Information",tab_id="Overall",style={"color":"red"}),
+                        dbc.Tab( label="Comparing CP",tab_id="Comparing CP"),
                         dbc.Tab( label="Mutations by Category",tab_id="Mutations by Category"),
                         dbc.Tab(label="Mutations by Result",tab_id="Mutations by Result"),
                         dbc.Tab(label="ROM",tab_id="ROM"),
-                        dbc.Tab( label="Comparing CP",tab_id="Comparing CP"),
+
                         ],
                          )
 ############# GRAPH BY TYPE
@@ -116,18 +117,18 @@ app = dash.Dash(external_stylesheets=[dbc.themes.CYBORG])
 #             dark=True,
 #             style={"font-color":"red"}
 #         )
-dropdown = dbc.DropdownMenu(
-    children=[
-        dbc.DropdownMenuItem("TBSRTC",href="/Bethesda_distribution"),
-        dbc.DropdownMenuItem("Molecular",href="/Molecular"),
-        dbc.DropdownMenuItem("Comparison",href="/Comparison"),
+# dropdown = dbc.DropdownMenu(
+#     children=[
+#         dbc.DropdownMenuItem("TBSRTC",href="/Bethesda_distribution"),
+#         dbc.DropdownMenuItem("Molecular",href="/Molecular"),
+#         dbc.DropdownMenuItem("Comparison",href="/Comparison"),
 
 
-    ],
-    nav=True,
-    in_navbar=True,
-    label="Menu",
-)
+#     ],
+#     nav=True,
+#     in_navbar=True,
+#     label="Menu",
+# )
 logo = dbc.Navbar(
 dbc.Container(
     [
