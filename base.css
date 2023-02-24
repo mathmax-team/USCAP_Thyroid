@@ -391,6 +391,7 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
   }
   /* Larger than tablet */
   @media (min-width: 750px) {
+
   }
   /* Larger than desktop */
   @media (min-width: 1000px) {
@@ -398,6 +399,7 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
   /* Larger than Desktop HD */
   @media (min-width: 1200px) {
   }
+
 .card-body{
   padding:0;
 }
