@@ -18,9 +18,6 @@ from pages import Bethesda_distribution, Comparison, Molecular
 import pandas as pd
 
 
-Records_df=pd.read_csv("Records.csv")
-Records_df["day"]=pd.to_datetime(Records_df["day"])
-
 ############################# TABS
 header_tabs=dbc.Tabs(id="id_tabs",
                         children=[
@@ -352,121 +349,123 @@ app.layout = html.Div(
 #     Input(component_id='genotype', component_property='value'),
 
 # )
-def update_graphs(start_date,end_date,type_label,result_label,genotype_label):
-    if type_label==None:
-        type_label="Liquid based"
-    if result_label==None:
-        type_label="Negative"
-    if genotype_label==None:
-        genotype_label="HPV 16"
+# def update_graphs(start_date,end_date,type_label,result_label,genotype_label):
+#     if type_label==None:
+#         type_label="Liquid based"
+#     if result_label==None:
+#         type_label="Negative"
+#     if genotype_label==None:
+#         genotype_label="HPV 16"
 
-    type_label=str(type_label)
-    result_label=str(result_label)
-    genotype_label=str(genotype_label)
+#     type_label=str(type_label)
+#     result_label=str(result_label)
+#     genotype_label=str(genotype_label)
 
     #################### FILTER BY DATE
 
-    filtered_Rec_df=filter_dataframe(Records_df,pd.to_datetime(start_date),pd.to_datetime(end_date))
+    # filtered_Rec_df=filter_dataframe(Records_df,pd.to_datetime(start_date),pd.to_datetime(end_date))
 
 ########### UPDATE NUMBER OF TEST
-    number_of_tests=filtered_Rec_df.shape[0]
+    # number_of_tests=filtered_Rec_df.shape[0]
 
  ########## UPDATE AVERAGE
-    number_of_days=filtered_Rec_df["day"].nunique()
+    # number_of_days=filtered_Rec_df["day"].nunique()
 
-    average="No tests"
-    if number_of_days !=0:
-        average=round(number_of_tests/number_of_days,1)
+    # average="No tests"
+    # if number_of_days !=0:
+    #     average=round(number_of_tests/number_of_days,1)
 
 ########## UPDATE POSITIVE RATE
-    number_of_negatives=filtered_Rec_df[filtered_Rec_df["result"]=="Negative"].shape[0]
-    number_of_positives=number_of_tests-number_of_negatives
-    positive_rate = "No tests"
-    if number_of_tests !=0:
-        positive_rate=round(number_of_positives/number_of_tests,4)
+    # number_of_negatives=filtered_Rec_df[filtered_Rec_df["result"]=="Negative"].shape[0]
+    # number_of_positives=number_of_tests-number_of_negatives
+    # positive_rate = "No tests"
+    # if number_of_tests !=0:
+    #     positive_rate=round(number_of_positives/number_of_tests,4)
 ##################################################### UPDATE FALSE NEGATIVE RATE
-    number_of_negative_cytologies=filtered_Rec_df[filtered_Rec_df["cytology"]=="Negativecytology"].shape[0]
-    number_of_false_negatives=filtered_Rec_df["need_surgery"].sum()
-    false_negative_rate = "No tests"
-    if number_of_negative_cytologies !=0:
-        false_negative_rate=round(0.1*number_of_false_negatives/number_of_negative_cytologies,4)
+    # number_of_negative_cytologies=filtered_Rec_df[filtered_Rec_df["cytology"]=="Negativecytology"].shape[0]
+    # number_of_false_negatives=filtered_Rec_df["need_surgery"].sum()
+    # false_negative_rate = "No tests"
+    # if number_of_negative_cytologies !=0:
+    #     false_negative_rate=round(0.1*number_of_false_negatives/number_of_negative_cytologies,4)
 
 ################### GROUP BY WEEK WHEN NEEDED
 
-    if pd.Timedelta(pd.to_datetime(end_date)-pd.to_datetime(start_date)).days>100:
-        filtered_Rec_df["day"]=filtered_Rec_df["day"].apply(lambda z:next_monday(z))
+    # if pd.Timedelta(pd.to_datetime(end_date)-pd.to_datetime(start_date)).days>100:
+    #     filtered_Rec_df["day"]=filtered_Rec_df["day"].apply(lambda z:next_monday(z))
 
 
 
 
 ############# GRAPH BY TYPE
-    if type_label[:3]=="All":
-        type_label="All"
-    if genotype_label[:3]=="All":
-        genotype_label="All"
-    if result_label[:3]=="All":
-        result_label="All"
+    # if type_label[:3]=="All":
+    #     type_label="All"
+    # if genotype_label[:3]=="All":
+    #     genotype_label="All"
+    # if result_label[:3]=="All":
+    #     result_label="All"
 
-    types_dict=dict()
-    for possibility in ["All"]+type_list:
-        types_dict[possibility]=make_plotable(filtered_Rec_df,{"type":possibility})
+    # types_dict=dict()
+    # for possibility in ["All"]+type_list:
+    #     types_dict[possibility]=make_plotable(filtered_Rec_df,{"type":possibility})
 
-    type_graph=scatter_graph(type_label,types_dict)
-
-#################################### GRAPH BY RESULT ############
-
-    results_dict=dict()
-    for possibility in ["All"]+results_list:
-        results_dict[possibility]=make_plotable(filtered_Rec_df,{"result":possibility,"type":type_label})
-
-    results_graph=scatter_graph(result_label,results_dict)
+    # type_graph=scatter_graph(type_label,types_dict)
 
 #################################### GRAPH BY RESULT ############
 
-    genotype_dict=dict()
-    for possibility in ["All"]+genotype_list:
-        genotype_dict[possibility]=make_plotable(filtered_Rec_df,{"genotype":possibility,"type":type_label,"result":result_label})
+    # results_dict=dict()
+    # for possibility in ["All"]+results_list:
+    #     results_dict[possibility]=make_plotable(filtered_Rec_df,{"result":possibility,"type":type_label})
 
-    genotype_graph=scatter_graph(genotype_label,genotype_dict)
+    # results_graph=scatter_graph(result_label,results_dict)
+
+#################################### GRAPH BY RESULT ############
+
+    # genotype_dict=dict()
+    # for possibility in ["All"]+genotype_list:
+    #     genotype_dict[possibility]=make_plotable(filtered_Rec_df,{"genotype":possibility,"type":type_label,"result":result_label})
+
+    # genotype_graph=scatter_graph(genotype_label,genotype_dict)
 
 
 ############################################### SENSITIVITY GRAPH
 
-    sensitivity_dict=dict()
+    # sensitivity_dict=dict()
 
-    sensitivity_dict["Positive cytology"]=make_plotable(filtered_Rec_df,{"cytology":"Positivecytology"})
-    sensitivity_dict["Positive histology"]=make_plotable(filtered_Rec_df,{"cytology":"Positivecytology","hystology":"Positivehystology"})
-    sensitivity_graph=sensitivity_scatter_graph(sensitivity_dict)
+    # sensitivity_dict["Positive cytology"]=make_plotable(filtered_Rec_df,{"cytology":"Positivecytology"})
+    # sensitivity_dict["Positive histology"]=make_plotable(filtered_Rec_df,{"cytology":"Positivecytology","hystology":"Positivehystology"})
+    # sensitivity_graph=sensitivity_scatter_graph(sensitivity_dict)
 
 
-    ############## GRAPH ADEQUAC
+    # ############## GRAPH ADEQUAC
 
-    adequate=filtered_Rec_df[filtered_Rec_df["adequacy"]=="Sat"].shape[0]
-    inadequate_processed=filtered_Rec_df[filtered_Rec_df["adequacy"]=="Insat_P"].shape[0]
-    inadequate_not_processed=filtered_Rec_df[filtered_Rec_df["adequacy"]=="Insat_NP"].shape[0]
-    adequacy_graph=make_adequacy_graph(adequate,inadequate_processed,inadequate_not_processed)
+    # adequate=filtered_Rec_df[filtered_Rec_df["adequacy"]=="Sat"].shape[0]
+    # inadequate_processed=filtered_Rec_df[filtered_Rec_df["adequacy"]=="Insat_P"].shape[0]
+    # inadequate_not_processed=filtered_Rec_df[filtered_Rec_df["adequacy"]=="Insat_NP"].shape[0]
+    # adequacy_graph=make_adequacy_graph(adequate,inadequate_processed,inadequate_not_processed)
 
-    return  type_graph,results_graph,genotype_graph,sensitivity_graph,adequacy_graph,number_of_tests,average,positive_rate,false_negative_rate
+    # return  type_graph,results_graph,genotype_graph,sensitivity_graph,adequacy_graph,number_of_tests,average,positive_rate,false_negative_rate
 
 app.config.suppress_callback_exceptions=True
 #######################################################
 
 # @app.callback(Output('page-content', 'children'),
 #               [Input('url', 'pathname')])
-def display_page(pathname):
-    if pathname == '/Molecular':
-        return Molecular.layout
-    if pathname == '/Comparison':
-        return Comparison.layout
-    if pathname == '/Bethesda_distribution':
-        return Bethesda_distribution.layout
-    else:
-        return "404 Page Error! Please choose a link"
+# def display_page(pathname):
+#     if pathname == '/Molecular':
+#         return Molecular.layout
+#     if pathname == '/Comparison':
+#         return Comparison.layout
+#     if pathname == '/Bethesda_distribution':
+#         return Bethesda_distribution.layout
+#     else:
+#         return "404 Page Error! Please choose a link"
 ###################################################
 
-############################## SOME INFO FROM DATA FRAME
+# ############################## SOME INFO FROM DATA FRAME
 
-df=pd.read_excel("data/USCAP.xlsx")
+df=pd.read_csv("data/USCAP_Large.csv")
+for col in ["ACCESS_DATE","SIGN_DATE"]:
+    df[col]=df[col].apply(lambda z:pd.Timestamp(z))
 first_day=min(df["SIGN_DATE"].to_list())
 last_day=max(df["SIGN_DATE"].to_list())
 ############DICTIONARY FOR DEFAULT TIME RANGES
@@ -497,7 +496,7 @@ def update_time_range(input_range):
 
 
 
-    return no_update if input_range==None else start_date,end_date
+    return no_update if input_range==None else start_date,last_day
 
 if __name__ == "__main__":
     app.run_server(debug=True,port=8051)

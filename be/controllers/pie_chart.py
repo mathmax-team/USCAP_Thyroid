@@ -2,15 +2,15 @@ import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 
+
+
 def make_pie(dataframe,names,values,title):
-    # fig = px.pie( names=names,values=values, sort=False)
-    fig =px.pie(dataframe,
-        labels=names,
-        values=values,
-        # colors=names,
-        color_discrete_sequence=px.colors.qualitative.T10,
-        # Second, make sure that Plotly won't reorder your data while plotting
-        )
+    fig=px.pie(dataframe, values=values, names=names,
+            title='Population of American continent',
+             color_discrete_sequence=px.colors.qualitative.T10
+
+
+    )
 
     fig.update_layout(
         autosize=False,
@@ -25,12 +25,17 @@ def make_pie(dataframe,names,values,title):
         title={
         "text":title,
         'y':0.98,
-        'x':0.46,
+        'x':0.50,
         'xanchor': 'center',
         'yanchor': 'top'
         },
-        # legend_traceorder="reversed",
+
+
+        # legend_title="",
+        # xaxis_title=None,
+        # yaxis_title="lajdsf"
 
     )
+    fig.update_traces(sort=False)
 
     return fig

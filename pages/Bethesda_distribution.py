@@ -22,7 +22,10 @@ import numpy as np
 
 ############################## SOME INFO FROM DATA FRAME
 
-df=pd.read_excel("data/USCAP.xlsx")
+df=pd.read_csv("data/USCAP_Large.csv")
+for col in ["ACCESS_DATE","SIGN_DATE"]:
+    df[col]=df[col].apply(lambda z:pd.Timestamp(z))
+
 first_day=min(df["SIGN_DATE"].to_list())
 last_day=max(df["SIGN_DATE"].to_list())
 ############DICTIONARY FOR DEFAULT TIME RANGES
@@ -46,12 +49,16 @@ pathologists=df["CYTOPATHOLOGIST"].tolist()
 pathologists=[x for x in pathologists if str(x) !="nan"]
 # pathologists=list(map(lambda z:int(z),pathologists))
 pathologists=list(set(pathologists))
+
+pathologists=[x for x in pathologists if df[df["CYTOPATHOLOGIST"]==x].shape[0]>=50]
+
 pathologists=sorted(pathologists,key=lambda z: eval(z[11:]))
 pathologists=["All pathologists"]+pathologists
 
 ##########################
 #########   TABLE I
 ##########################
+x=str(last_day)
 
 table_headerI = [
     html.Thead(html.Tr([html.Th("Tests"),html.Th("Molecular Tests"),html.Th("+ Tests")]))
@@ -90,15 +97,15 @@ tableII = dbc.Table(table_headerII + table_bodyII, bordered=True,style={"width":
 #                             )
 
 ##############################
-def oldmake_drop(lista:list,id:str):
-    menu=dcc.Dropdown(id=id,
-    options=[ {"label": html.Span([i],style={"color":"yellow"}), "value": i} for i in lista],
-    value=lista[-1],
-    clearable=False,
-    style={"color":"red",}
+# def oldmake_drop(lista:list,id:str):
+#     menu=dcc.Dropdown(id=id,
+#     options=[ {"label": html.Span([i],style={"color":"yellow"}), "value": i} for i in lista],
+#     value=lista[-1],
+#     clearable=False,
+#     style={"color":"red",}
 
-        )
-    return {"drop":menu}
+#         )
+#     return {"drop":menu}
 
 ############################################################
 def make_drop(lista:list,id:str):
@@ -119,10 +126,7 @@ sex_choice=make_drop(["All sexes","Female","Male"],"id_sex_choice")
 responsable_choice=make_drop(pathologists,"id_responsable_choice")
 ages=["All ages","Less than 40","40 to 49","50 to 59","60 to 69","70 or older"]
 age_choice=make_drop(ages,"id_age_choice")
-simpledrop=dcc.Dropdown(
-    ['New York City', 'Montreal', 'Paris', 'London', 'Amsterdam', 'Berlin', 'Rome'],
-    'Paris', id='height-example-dropdown', maxHeight=300,clearable=False
-)
+
 newdrop=dcc.Dropdown(
     [
         {
@@ -279,26 +283,6 @@ layout = html.Div(
                         ],
                     ),
 
-
-                #     html.Div(
-                #     className="div-for-dropdown",
-                #     children=[
-                #         dcc.DatePickerSingle(
-                #             id = 'date_start',
-                #             style={"width":"100%"}
-                #                 )
-                #     ],
-                # ),
-                # # Change to side-by-side for mobile layout
-                # html.Div(
-                #     className="div-for-dropdown",
-                #     children=[
-                #         dcc.DatePickerSingle(
-                #             id = 'date_end',
-                #             style={"width":"100%"}
-                #                 )
-                #     ],
-                # ),
                 html.Div(className="div_for_text",
                         children=[html.P("Filter by sex")],style={"height":"25px"}),
                 html.Div(
@@ -510,7 +494,8 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
    ######## PIE GRAPH CATEGORIES
     title="Bethesda Category Distribution"
     Beth_info=data["Bethesda Cathegory"].value_counts().to_dict()
-    numeric_names=sorted(list(Beth_info.keys()))
+    # numeric_names=sorted(list(Beth_info.keys()))
+    numeric_names=sorted(list(data["Bethesda Cathegory"].unique()))
     values=[Beth_info[x] for x in numeric_names]
     names=[make_roman(x) for x in numeric_names]
     pie_data=pd.DataFrame()
@@ -525,7 +510,7 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     bar_data["Count"]=values_bar
     bar_data["Category"]=[make_roman(x) for x in labels_bar]
     # bar_data["labels"]=bar_data["labels"].astype(str)
-    bar_categories=make_bar(bar_data,"Category","Count","Bethesda Category Counts")
+    bar_categories=make_bar(bar_data,"Category","Count","Bethesda Category Counts","Count")
 
     ######################  ROM GRAPH OVERALL
     labels_bar=list(data["ROM"].unique())
@@ -656,14 +641,21 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     bar_data["MUTATION"]=labels_bar
     bar_data["MUTATION"]=bar_data["MUTATION"].astype(str)
     category4_mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count Category IV")
+######################
+###################### GAPMINDER
 
+    dfgap = px.data.gapminder()
+    gapminder=px.scatter(dfgap, x="gdpPercap", y="lifeExp", animation_frame="year", animation_group="country",
+           size="pop", color="continent", hover_name="country",
+           log_x=True, size_max=55, range_x=[100,100000], range_y=[25,90])
+#######################
 ########################    RESULTS OVERALL ##############################################################
 
     if active_tab=="Overall":
         first_graph=pie_graph
         second_graph=bar_categories
         third_graph=gene_graph
-        fourth_graph=mutation_graph
+        fourth_graph=gapminder
 
 ###################################### DURATION GRAPH
 

@@ -2,7 +2,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 
-def make_bar(data_frame,labels_column,values_column,title):
+def make_bar(data_frame,labels_column,values_column,title,yaxis_title=None):
     feg = px.bar( data_frame,x=labels_column, y=values_column, title="Wide-Form Input",color=labels_column,
     color_discrete_sequence=px.colors.qualitative.T10
     # color_discrete_sequence=["red", "green", "blue", "goldenrod", "magenta","orange"]
@@ -26,6 +26,7 @@ def make_bar(data_frame,labels_column,values_column,title):
             },
             legend_title="",
             xaxis_title=None,
+            yaxis_title=yaxis_title
             # legend_traceorder="reversed",
 
         )
