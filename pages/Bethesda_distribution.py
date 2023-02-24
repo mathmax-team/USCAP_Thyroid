@@ -1,6 +1,6 @@
 # Import necessary libraries
 import dash
-from dash import html, dcc, callback,no_update
+from dash import html, dcc, callback,no_update,dash_table
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import plotly.express as px
@@ -719,12 +719,13 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     #########################
     count_data=pd.DataFrame()
     pathologists=list(all_paths_df["CYTOPATHOLOGIST"].unique())
+    pathologists=[x for x in pathologists if str(x)!= "nan"]
     count_data["Pathologists"]=pathologists
     for i in range(1,8):
         count_data[make_roman(i)]=[count_categories(all_paths_df,pathologist,i) for pathologist in pathologists]
     count_data["Cases"]=[count_cases(all_paths_df,pathologist) for pathologist in pathologists]
-    count_data["positives"]=[count_by_result(all_paths_df,pathologist,"POSITIVE") for pathologist in pathologists]
-    count_data["positive_rate"]=count_data["positives"]/count_data["Cases"]
+    count_data["Positives"]=[count_by_result(all_paths_df,pathologist,"POSITIVE") for pathologist in pathologists]
+    count_data["positive_rate"]=count_data["Positives"]/count_data["Cases"]
     count_data["positive_rate"]=count_data["positive_rate"].apply(lambda z:round(z,2))
     for i in range(1,8):
         count_data["Cat "+make_roman(i)+" Calling Rate"]=count_data[make_roman(i)]/count_data["Cases"]
@@ -732,13 +733,13 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     count_data["Pathologists"]=pathologists
 
     count_data["Cat III positives"]=[count_result_by_category(df,pathologist,3,"POSITIVE") for pathologist in pathologists]
-    count_data["Cat III Positivity Rate"]=count_data["Cat III positives"]/count_data["III"]
-    count_data["Cat III Positivity Rate"]=count_data["Cat III Positivity Rate"].apply(lambda z:round(z,2))
+    count_data["CatIII_Positivity_Rate"]=count_data["Cat III positives"]/count_data["III"]
+    count_data["CatIII_Positivity_Rate"]=count_data["CatIII_Positivity_Rate"].apply(lambda z:round(z,2))
     compare_frequencies=make_stacked_bar(count_data,"Pathologists",[make_roman(i) for i in range(1,8)], "Category Count by Pathologist")
     compare_ratios=make_stacked_bar(count_data,"Pathologists",["Cat "+make_roman(i)+" Calling Rate"  for i in range(1,4)], "Category distribution by Pathologist")
 
     scat= px.scatter(count_data,x='Cat III Calling Rate',
-                y='Cat III Positivity Rate',
+                y='CatIII_Positivity_Rate',
                 color='Pathologists',
                 size='Cases',
                  hover_data=['Pathologists']
@@ -765,12 +766,44 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
             # legend_traceorder="reversed",
 
         )
+    ###########################
+    CP_table= go.Figure(data=[go.Table(
+    header=dict(values=list(count_data[["Pathologists","Cases","Positives","CatIII_Positivity_Rate"]].columns),
+                # fill_color='paleturquoise',
+                align='left'),
+    cells=dict(values=[count_data.Pathologists,count_data.Cases,count_data.Positives,count_data.CatIII_Positivity_Rate],
+            #    fill_color='lavender',
+               align='left'))
+        ])
+    CP_table.update_layout(
+        autosize=True,
+        margin=dict(
+            l=0,
+            r=0,
+            b=0,
+            t=40,
+            pad=0
+        ),
+        template="plotly_dark",
+        title={
+        "text":"",
+        'y':0.98,
+        'x':0.46,
+        'xanchor': 'center',
+        'yanchor': 'top'
+        },
+        legend_title="",
+        # xaxis_title=None,
+        # legend_traceorder="reversed",
+
+    )
+
     ##############################COMPARING CP
     if active_tab=="Comparing CP":
         first_graph=compare_frequencies
         second_graph=compare_ratios
         third_graph=scat
-        fourth_graph=scat
+        fourth_graph=CP_table
 
     ##################
     ###################### MUTATIONS BY CATEGORY
