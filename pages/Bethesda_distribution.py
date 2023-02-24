@@ -751,7 +751,7 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     new_row["Positives"]=[count_data["Positives"].sum()]
     new_row["positive_rate"]=[count_data["Positives"].sum()/count_data["Cases"].sum()]
     new_row["Cat III Positives"]=[count_data["Cat III Positives"].sum()]
-    new_row["Cat III + Rate"]=[round(count_data["Cat III Positives"].sum()/count_data["Cases"].sum(),2)]
+    new_row["Cat III + Rate"]=[round(count_data["Cat III Positives"].sum()/count_data["III"].sum(),2)]
     for i in range(1,7):
         new_row["Cat "+ make_roman(i) +" Rate"]=[round(count_data[make_roman(i)].sum()/count_data["Cases"].sum(),2)]
     ######################################
@@ -798,7 +798,7 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
         )
     ###########################
 
-    CP=make_table_graph_from_df(count_data[["Pathologists","Cases","Cat III Rate","III","Cat III Positives","Cat III + Rate"]],"Summary")
+    CP=make_table_graph_from_df(count_data[["Pathologists","Cases","Cat III Rate","Cat III Positives","Cat III + Rate"]],"Summary")
     ##############################COMPARING CP
     if active_tab=="Comparing CP":
         first_graph=compare_frequencies
