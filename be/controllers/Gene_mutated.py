@@ -26,7 +26,9 @@ def make_gene(data_frame,labels_column,values_column,title):
             },
             legend_title="",
             xaxis_title=None,
+
             # legend_traceorder="reversed",
 
         )
+
     return fig

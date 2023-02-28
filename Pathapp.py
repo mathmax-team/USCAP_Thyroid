@@ -13,10 +13,28 @@ from be.controllers.filtering_tools import filter_dataframe,make_plotable,next_m
 from be.controllers.scatter_plot import scatter_graph
 from be.controllers.adequacy_bar_graph import make_adequacy_graph
 from be.controllers.sensitivity_graph import sensitivity_scatter_graph
+from be.controllers.default_times_ranges import Default_time_ranges,first_day,last_day,df
 # Connect to your app pages
-from pages import Bethesda_distribution, Comparison, Molecular
+from pages import Bethesda_distribution#, Comparison, Molecular
 import pandas as pd
+# ############################## SOME INFO FROM DATA FRAME
 
+# df=pd.read_csv("data/USCAP_Large.csv")
+# for col in ["ACCESS_DATE","SIGN_DATE"]:
+#     df[col]=df[col].apply(lambda z:pd.Timestamp(z))
+# first_day=min(df["SIGN_DATE"].to_list())
+# last_day=max(df["SIGN_DATE"].to_list())
+# ############DICTIONARY FOR DEFAULT TIME RANGES
+# ##################################################
+
+# Default_time_ranges=dict()
+# Default_time_ranges["Historical"]=[first_day,last_day]
+
+# Default_time_ranges["Last year"]=[date.today().replace(day=1,month=1,year=date.today().year-1),date.today().replace(day=31,month=12,year=date.today().year-1)]
+
+# Default_time_ranges["Current month"]=[date.today().replace(day=1),date.today()]
+# Default_time_ranges["Current year"]=[date.today().replace(day=1,month=1),date.today()]
+#############################################CALL BACK FOR DATES
 
 ############################# TABS
 header_tabs=dbc.Tabs(id="id_tabs",
@@ -464,22 +482,22 @@ app.config.suppress_callback_exceptions=True
 
 # ############################## SOME INFO FROM DATA FRAME
 
-df=pd.read_csv("data/USCAP_Large.csv")
-for col in ["ACCESS_DATE","SIGN_DATE"]:
-    df[col]=df[col].apply(lambda z:pd.Timestamp(z))
-first_day=min(df["SIGN_DATE"].to_list())
-last_day=max(df["SIGN_DATE"].to_list())
-############DICTIONARY FOR DEFAULT TIME RANGES
-##################################################
+# df=pd.read_csv("data/USCAP_Large.csv")
+# for col in ["ACCESS_DATE","SIGN_DATE"]:
+#     df[col]=df[col].apply(lambda z:pd.Timestamp(z))
+# first_day=min(df["SIGN_DATE"].to_list())
+# last_day=max(df["SIGN_DATE"].to_list())
+# ############DICTIONARY FOR DEFAULT TIME RANGES
+# ##################################################
 
-Default_time_ranges=dict()
-Default_time_ranges["Historical"]=[first_day,last_day]
+# Default_time_ranges=dict()
+# Default_time_ranges["Historical"]=[first_day,last_day]
 
-Default_time_ranges["Last year"]=[date.today().replace(day=1,month=1,year=date.today().year-1),date.today().replace(day=31,month=12,year=date.today().year-1)]
+# Default_time_ranges["Last year"]=[date.today().replace(day=1,month=1,year=date.today().year-1),date.today().replace(day=31,month=12,year=date.today().year-1)]
 
-Default_time_ranges["Current month"]=[date.today().replace(day=1),date.today()]
-Default_time_ranges["Current year"]=[date.today().replace(day=1,month=1),date.today()]
-#############################################CALL BACK FOR DATES
+# Default_time_ranges["Current month"]=[date.today().replace(day=1),date.today()]
+# Default_time_ranges["Current year"]=[date.today().replace(day=1,month=1),date.today()]
+# #############################################CALL BACK FOR DATES
 @callback(
     Output(component_id= 'id_date_range', component_property='start_date'),
     Output(component_id= 'id_date_range', component_property='end_date'),
@@ -497,7 +515,7 @@ def update_time_range(input_range):
 
 
 
-    return no_update if input_range==None else start_date,last_day
+    return no_update if input_range==None else start_date,end_date
 
 if __name__ == "__main__":
     app.run_server(debug=True,port=8051)

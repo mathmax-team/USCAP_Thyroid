@@ -6,7 +6,6 @@ import pandas as pd
 
 def make_pie(dataframe,names,values,title):
     fig=px.pie(dataframe, values=values, names=names,
-            title='Population of American continent',
              color_discrete_sequence=px.colors.qualitative.T10
 
 

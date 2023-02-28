@@ -7,6 +7,7 @@ import plotly.express as px
 from dash.dependencies import Input, Output,State
 from datetime import date,timedelta
 import pandas as pd
+from plotly.subplots import make_subplots
 from be.controllers.pie_chart import make_pie
 from be.controllers.roman import make_roman
 from be.controllers.bar_chart import make_bar
@@ -16,28 +17,32 @@ from be.controllers.table_chart import make_table_graph
 from be.controllers.stacked_bar_graph import make_stacked_bar
 from be.controllers.counters import count_by_result,count_cases,count_categories,count_result_by_category
 from be.controllers.make_table_graph_from_df import make_table_graph_from_df
+from be.controllers.ages_graph import make_ages_graph
+from be.controllers.scater_graph_bethesda_time import make_scatter_graph_time_bethesda
+from be.controllers.molecular_overview_graph import make_molecular_overview
+from be.controllers.default_times_ranges import Default_time_ranges,first_day,last_day,df
 import numpy as np
 ##################################################
 
 
 ############################## SOME INFO FROM DATA FRAME
 
-df=pd.read_csv("data/USCAP_Large.csv")
-for col in ["ACCESS_DATE","SIGN_DATE"]:
-    df[col]=df[col].apply(lambda z:pd.Timestamp(z))
+# df=pd.read_csv("data/USCAP_Large.csv")
+# for col in ["ACCESS_DATE","SIGN_DATE"]:
+#     df[col]=df[col].apply(lambda z:pd.Timestamp(z))
 
-first_day=min(df["SIGN_DATE"].to_list())
-last_day=max(df["SIGN_DATE"].to_list())
+# first_day=min(df["SIGN_DATE"].to_list())
+# last_day=max(df["SIGN_DATE"].to_list())
 ############DICTIONARY FOR DEFAULT TIME RANGES
 ##################################################
 
-Default_time_ranges=dict()
-Default_time_ranges["Historical"]=[first_day,last_day]
+# Default_time_ranges=dict()
+# Default_time_ranges["Historical"]=[first_day,last_day]
 
-Default_time_ranges["Last year"]=[date.today().replace(day=1,month=1,year=date.today().year-1),date.today().replace(day=31,month=12,year=date.today().year-1)]
+# Default_time_ranges["Last year"]=[date.today().replace(day=1,month=1,year=date.today().year-1),date.today().replace(day=31,month=12,year=date.today().year-1)]
 
-Default_time_ranges["Current month"]=[date.today().replace(day=1),date.today()]
-Default_time_ranges["Current year"]=[date.today().replace(day=1,month=1),date.today()]
+# Default_time_ranges["Current month"]=[date.today().replace(day=1),date.today()]
+# Default_time_ranges["Current year"]=[date.today().replace(day=1,month=1),date.today()]
 
 
 
@@ -47,12 +52,13 @@ df["CYTOPATHOLOGIST"]=df["CYTOPATHOLOGIST"].apply(lambda z: "Pathologist " + str
 
 pathologists=df["CYTOPATHOLOGIST"].tolist()
 pathologists=[x for x in pathologists if str(x) !="nan"]
-# pathologists=list(map(lambda z:int(z),pathologists))
+#pathologists=list(map(lambda z:int(z),pathologists))
 pathologists=list(set(pathologists))
 
-pathologists=[x for x in pathologists if df[df["CYTOPATHOLOGIST"]==x].shape[0]>=50]
+pathologists=[x for x in pathologists if df[df["CYTOPATHOLOGIST"]==x].shape[0]>=200]
 
 pathologists=sorted(pathologists,key=lambda z: eval(z[11:]))
+df=df[df["CYTOPATHOLOGIST"].isin(pathologists)]
 pathologists=["All pathologists"]+pathologists
 
 ##########################
@@ -74,10 +80,10 @@ tableI = dbc.Table(table_headerI + table_bodyI, bordered=True,style={"width":"10
 ################# TABLE II
 
 table_headerII = [
-    html.Thead(html.Tr([html.Th("Cat III tests"),html.Th("Cat IV tests")]))
+    html.Thead(html.Tr([html.Th("Currently -"),html.Th("Cat III"),html.Th("Cat IV")]))
 ]
 
-row1II = html.Tr([html.Td("345",id="id_catIII_tests"), html.Td("0",id="id_catIV_tests")])
+row1II = html.Tr([html.Td("0",id="id_currently-"),html.Td("345",id="id_catIII_tests"), html.Td("0",id="id_catIV_tests")])
 
 
 table_bodyII = [html.Tbody([row1II])]
@@ -121,7 +127,7 @@ def make_drop(lista:list,id:str):
 
 ###################  GENERATE THE DROPDOWN ELEMENTS  #######################
 
-time_period_choice=make_drop(["Historical","Current year","Current month","Last year"],"id_time_period_choice")
+time_period_choice=make_drop(list(Default_time_ranges.keys()),"id_time_period_choice")
 sex_choice=make_drop(["All sexes","Female","Male"],"id_sex_choice")
 responsable_choice=make_drop(pathologists,"id_responsable_choice")
 ages=["All ages","Less than 40","40 to 49","50 to 59","60 to 69","70 or older"]
@@ -393,6 +399,7 @@ def update_time_range(input_range):
     Output(component_id= 'id_positive_tests', component_property='children'),
     # Output(component_id= 'id_positivity_overall', component_property='children'),
     Output(component_id= 'id_molecular_tests', component_property='children'),
+    Output(component_id= 'id_currently-', component_property='children'),
     Output(component_id= 'id_catIII_tests', component_property='children'),
     # Output(component_id= 'id_positivity_catIII', component_property='children'),
     Output(component_id= 'id_catIV_tests', component_property='children'),
@@ -412,7 +419,7 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
 
     data=data[(data["SIGN_DATE"]>=pd.to_datetime(start_date))&(data["SIGN_DATE"]<=pd.to_datetime(end_date))]
 
-
+    time_fitered_data=data
 
     """Apply Sex filter"""
     if sex !="All sexes":
@@ -490,6 +497,10 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     if catIV_tests>0:
         positivity_catIV=round(positives_catIV/catIV_tests,2)
         negativity_catIV=round(negatives_catIV/catIV_tests,2)
+###################
+#########  CURRRENTLY NEGATIVE
+###################
+    currently_negative=data[data["RESULT"]=="CURRENTLY NEGATIVE"].shape[0]
 
    ######## PIE GRAPH CATEGORIES
     title="Bethesda Category Distribution"
@@ -497,11 +508,11 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     # numeric_names=sorted(list(Beth_info.keys()))
     numeric_names=sorted(list(data["Bethesda Cathegory"].unique()))
     values=[Beth_info[x] for x in numeric_names]
-    names=[make_roman(x) for x in numeric_names]
+    names=["Cat "+make_roman(x) for x in numeric_names]
     pie_data=pd.DataFrame()
-    pie_data["pie_values"]=values
-    pie_data["pie_names"]=names
-    pie_graph=make_pie(pie_data,"pie_names","pie_values",title)
+    pie_data["Category"]=names
+    pie_data["Count"]=values
+    pie_graph=make_pie(pie_data,"Category","Count",title)
 
     ######################  BAR GRAPH CATEGORIES
     labels_bar=sorted(list(data["Bethesda Cathegory"].unique()))
@@ -542,15 +553,34 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     bar_data["ROM"]=labels_bar
     bar_data["ROM"]=bar_data["ROM"].astype(str)
     rom_graph_cat4=make_rom(bar_data,"ROM","Count","Risk of Malignancy Category IV")
+
+
     ######################  OVERALL GENE GRAPH
     labels_bar=list(data["GENE MUTATED"].unique())
-    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
-    values_bar=[len(data[data["GENE MUTATED"]==label])for label in labels_bar]
+    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan","0"]]
+    def count_instances(x):
+        return data[data["GENE MUTATED"]==x].shape[0]
+
+    labels_bar=sorted(labels_bar,key=lambda z:count_instances(z),reverse=True)
+    values_bar=[count_instances(x) for x in labels_bar]
     bar_data=pd.DataFrame()
     bar_data["Count"]=values_bar
     bar_data["GENE MUTATED"]=labels_bar
     bar_data["GENE MUTATED"]=bar_data["GENE MUTATED"].astype(str)
-    gene_graph=make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Molecular Tests")
+
+    #### MAKE PIE DATAFRAME
+    count_results=data["RESULT"].value_counts().to_dict()
+    pie_data=pd.DataFrame()
+    pie_data["Result"]=list(count_results.keys())
+    pie_data["Count"]=list(count_results.values())
+    molecular_by_result_graph=make_pie(pie_data,"Result","Count","Molecular Tests By Result")
+
+
+
+
+    gene_graph= make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Molecular Tests")
+    # make_molecular_overview(pie_data,bar_data)
+    #make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Molecular Tests")
 
     ######################  OVERALL MUTATION GRAPH
     labels_bar=list(data["MUTATION"].unique())
@@ -648,14 +678,58 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     gapminder=px.scatter(dfgap, x="gdpPercap", y="lifeExp", animation_frame="year", animation_group="country",
            size="pop", color="continent", hover_name="country",
            log_x=True, size_max=55, range_x=[100,100000], range_y=[25,90])
+#################################
+#######AGE DISTRIBUTION BY SEX
+#################################
+    """Apply Pathologist filter"""
+    sex_data=time_fitered_data
+    if responsable !="All pathologists":
+        sex_data=time_fitered_data[time_fitered_data["CYTOPATHOLOGIST"]==responsable]
+    sex_distribution_graph=make_ages_graph(sex_data)
+##########
 #######################
+####### Bethesda Category count over time
+########################
+
+    yearly_data=df
+    """Apply Sex filter"""
+    if sex !="All sexes":
+        yearly_data=df[df["SEX"]==sex]
+
+    """Apply Age filter"""
+
+
+    if age =="Less than 40":
+        yearly_data=yearly_data[yearly_data["AGE"]<40]
+    if age =="40 to 49":
+        yearly_data=yearly_data[(yearly_data["AGE"]>=40)&(yearly_data["AGE"]<50)]
+    if age =="50 to 59":
+        yearly_data=yearly_data[(yearly_data["AGE"]>=50)&(yearly_data["AGE"]<60)]
+    if age =="60 to 69":
+        yearly_data=yearly_data[(yearly_data["AGE"]>=60)&(yearly_data["AGE"]<70)]
+    if age =="70 or older":
+        yearly_data=yearly_data[yearly_data["AGE"]>=70]
+
+
+    """Apply Pathologist filter"""
+    if responsable !="All pathologists":
+        yearly_data=yearly_data[yearly_data["CYTOPATHOLOGIST"]==responsable]
+    category_counter=dict()
+    years=list(yearly_data["YEAR"].unique())
+    for i in range(1,7):
+        category_counter["Cat "+make_roman(i)]=pd.DataFrame()
+        category_counter["Cat "+make_roman(i)]["x"]=years
+        category_counter["Cat "+make_roman(i)]["y"]=[yearly_data[(yearly_data["Bethesda Cathegory"]==i)&(yearly_data["YEAR"]==year)].shape[0] for year in years]
+
+    bethesda_time_graph=make_scatter_graph_time_bethesda(category_counter)
+################################
 ########################    RESULTS OVERALL ##############################################################
 
     if active_tab=="Overall":
         first_graph=pie_graph
-        second_graph=bar_categories
+        second_graph=bethesda_time_graph#bar_categories
         third_graph=gene_graph
-        fourth_graph=gapminder
+        fourth_graph=sex_distribution_graph
 
 ###################################### DURATION GRAPH
 
@@ -712,22 +786,23 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     ################### GRAPHS FOR COMPARING PATHOLOGISTS
     #########################
     count_data=pd.DataFrame()
-    pathologists=list(all_paths_df["CYTOPATHOLOGIST"].unique())
-    pathologists=[x for x in pathologists if str(x)!= "nan"]
-    pathologists=sorted(pathologists,key=lambda z: eval(z[11:]))
-    count_data["Pathologists"]=pathologists
+    pathologists_to_count=list(all_paths_df["CYTOPATHOLOGIST"].unique())
+    pathologists_to_count=[x for x in pathologists_to_count if str(x)!= "nan"]
+    pathologists_to_count=[x for x in pathologists_to_count if df[df["CYTOPATHOLOGIST"]==x].shape[0]>=200]
+    pathologists_to_count=sorted(pathologists_to_count,key=lambda z: eval(z[11:]))
+    count_data["Pathologists"]=pathologists_to_count
     for i in range(1,7):
-        count_data[make_roman(i)]=[count_categories(all_paths_df,pathologist,i) for pathologist in pathologists]
-    count_data["Cases"]=[count_cases(all_paths_df,pathologist) for pathologist in pathologists]
-    count_data["Positives"]=[count_by_result(all_paths_df,pathologist,"POSITIVE") for pathologist in pathologists]
+        count_data[make_roman(i)]=[count_categories(all_paths_df,pathologist,i) for pathologist in pathologists_to_count]
+    count_data["Cases"]=[count_cases(all_paths_df,pathologist) for pathologist in pathologists_to_count]
+    count_data["Positives"]=[count_by_result(all_paths_df,pathologist,"POSITIVE") for pathologist in pathologists_to_count]
     count_data["positive_rate"]=count_data["Positives"]/count_data["Cases"]
     count_data["positive_rate"]=count_data["positive_rate"].apply(lambda z:round(z,2))
     for i in range(1,7):
-        count_data["Cat "+make_roman(i)+" Rate"]=count_data[make_roman(i)]/count_data["Cases"]
-        count_data["Cat "+make_roman(i)+" Rate"]=count_data["Cat "+make_roman(i)+" Rate"].apply(lambda z:round(z,2))
-    count_data["Pathologists"]=pathologists
+        count_data["Cat "+make_roman(i)]=count_data[make_roman(i)]/count_data["Cases"]
+        count_data["Cat "+make_roman(i)]=count_data["Cat "+make_roman(i)].apply(lambda z:round(z,2))
+    count_data["Pathologists"]=pathologists_to_count
 
-    count_data["Cat III Positives"]=[count_result_by_category(df,pathologist,3,"POSITIVE") for pathologist in pathologists]
+    count_data["Cat III Positives"]=[count_result_by_category(df,pathologist,3,"POSITIVE") for pathologist in pathologists_to_count]
     count_data["Cat III + Rate"]=round(count_data["Cat III Positives"]/count_data["III"],2)
 
 
@@ -745,22 +820,24 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     new_row["Cat III Positives"]=[count_data["Cat III Positives"].sum()]
     new_row["Cat III + Rate"]=[round(count_data["Cat III Positives"].sum()/count_data["III"].sum(),2)]
     for i in range(1,7):
-        new_row["Cat "+ make_roman(i) +" Rate"]=[round(count_data[make_roman(i)].sum()/count_data["Cases"].sum(),2)]
+        new_row["Cat "+ make_roman(i)]=[round(count_data[make_roman(i)].sum()/count_data["Cases"].sum(),2)]
     ######################################
+    rate_data=count_data
 
 
-    compare_frequencies=make_stacked_bar(count_data,"Pathologists",[make_roman(i) for i in range(1,7)], "Category Count by Pathologist")
 
     ###################################
     new_row=pd.DataFrame.from_dict(new_row)
-    count_data=pd.concat([count_data,new_row])
+    rate_data=pd.concat([count_data,new_row])
 
     #######################################
     #######################################
 
-    compare_ratios=make_stacked_bar(count_data,"Pathologists",["Cat "+make_roman(i)+" Rate"  for i in range(1,7)], "Category distribution by Pathologist")
-
-    scat= px.scatter(count_data,x='Cat III Rate',
+    compare_ratios=make_stacked_bar(rate_data,"Pathologists",["Cat "+make_roman(i)  for i in range(1,7)], "Category Distribution By Pathologist","Rate")
+    for i in range(1,7):
+        count_data["Cat "+make_roman(i)]=count_data[make_roman(i)]
+    compare_frequencies=make_stacked_bar(count_data,"Pathologists",["Cat "+make_roman(i) for i in range(1,7)], "Category Count By Pathologist","Count")
+    scat= px.scatter(rate_data,x='Cat '+make_roman(3),
                 y='Cat III + Rate',
                 color='Pathologists',
                 size='Cases',
@@ -790,13 +867,14 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
         )
     ###########################
 
-    CP=make_table_graph_from_df(count_data[["Pathologists","Cases","Cat III Rate","Cat III Positives","Cat III + Rate"]],"Summary")
+    CP=make_table_graph_from_df(count_data[["Pathologists","Cases","Cat III","Cat III Positives","Cat III + Rate"]],"Summary")
     ##############################COMPARING CP
     if active_tab=="Comparing CP":
-        first_graph=compare_frequencies
+        first_graph=molecular_by_result_graph
         second_graph=compare_ratios
         third_graph=scat
-        fourth_graph=CP
+        # third_graph=CP
+        fourth_graph=compare_frequencies
 
     ##################
     ###################### MUTATIONS BY CATEGORY
@@ -824,4 +902,4 @@ def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
     # if active_tab=="tab-1":
     #     first_graph=rom_graph
 
-    return first_graph,second_graph,third_graph,fourth_graph,tests,positives_overall,molecular_tests,positives_catIII,positives_catIV#positivity_catIII,positivity_catIV
+    return first_graph,second_graph,third_graph,fourth_graph,tests,positives_overall,molecular_tests,currently_negative,positives_catIII,positives_catIV#positivity_catIII,positivity_catIV
