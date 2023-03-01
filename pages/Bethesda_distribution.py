@@ -361,6 +361,31 @@ layout = html.Div(
 #     # State(component_id= 'id_date_range', component_property='start_date'),
 #     # State(component_id= 'id_date_range', component_property='end_date'),
 # )
+
+# @callback(
+#     Output(component_id= 'id_date_range', component_property='start_date'),
+#     Output(component_id= 'id_date_range', component_property='end_date'),
+#     Input(component_id='id_time_period_choice', component_property='value'),
+
+# )
+# def update_time_range(input_range):
+#     """Control time range selection."""
+
+#     start_date=first_day
+#     end_date=last_day
+#     if input_range != None:
+#         [start_date,end_date]=Default_time_ranges[input_range]
+
+
+
+#     return no_update if input_range==None else start_date,end_date
+
+@callback(
+    Output(component_id= 'id_date_range', component_property='start_date'),
+    Output(component_id= 'id_date_range', component_property='end_date'),
+    Input(component_id='id_time_period_choice', component_property='value'),
+
+)
 def update_time_range(input_range):
     """Control time range selection."""
 
