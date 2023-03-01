@@ -41,8 +41,8 @@ header_tabs=dbc.Tabs(id="id_tabs",
                         children=[
                         dbc.Tab( label="Overall Information",tab_id="Overall",style={"color":"red"}),
                         dbc.Tab( label="Comparing CP",tab_id="Comparing CP"),
-                        dbc.Tab( label="Mutations by Category",tab_id="Mutations by Category"),
-                        dbc.Tab(label="Mutations by Result",tab_id="Mutations by Result"),
+                        # dbc.Tab( label="Mutations by Category",tab_id="Mutations by Category"),
+                        # dbc.Tab(label="Mutations by Result",tab_id="Mutations by Result"),
                         dbc.Tab(label="ROM",tab_id="ROM"),
 
                         ],
@@ -498,12 +498,12 @@ app.config.suppress_callback_exceptions=True
 # Default_time_ranges["Current month"]=[date.today().replace(day=1),date.today()]
 # Default_time_ranges["Current year"]=[date.today().replace(day=1,month=1),date.today()]
 # #############################################CALL BACK FOR DATES
+
 @callback(
     Output(component_id= 'id_date_range', component_property='start_date'),
     Output(component_id= 'id_date_range', component_property='end_date'),
     Input(component_id='id_time_period_choice', component_property='value'),
-    # State(component_id= 'id_date_range', component_property='start_date'),
-    # State(component_id= 'id_date_range', component_property='end_date'),
+
 )
 def update_time_range(input_range):
     """Control time range selection."""
