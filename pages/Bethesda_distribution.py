@@ -16,13 +16,18 @@ from be.controllers.Gene_mutated import make_gene
 from be.controllers.table_chart import make_table_graph
 from be.controllers.stacked_bar_graph import make_stacked_bar
 from be.controllers.counters import count_by_result,count_cases,count_categories,count_result_by_category
+from be.controllers.CatIII_Call_Rate_over_time import make_CatIII_Call_Rate_time
 from be.controllers.make_table_graph_from_df import make_table_graph_from_df
 from be.controllers.ages_graph import make_ages_graph
 from be.controllers.scater_graph_bethesda_time import make_scatter_graph_time_bethesda
 from be.controllers.gap_minder_graph import make_gapminder
 from be.controllers.movie import gap_movie
+from be.controllers.tab_names import Movie,Overall,ComparingCP
+from be.controllers.gap_minder_data import make_gap_minder_data
+from be.controllers.empty_figure import empty_fig
+from be.controllers.scat_callrate_vs_positiverate import scat_callrate_vs_positive
 from be.controllers.molecular_overview_graph import make_molecular_overview
-from be.controllers.default_times_ranges import Default_time_ranges,first_day,last_day,df
+from be.controllers.default_times_ranges import Default_time_ranges,first_day,last_day,df,pathologists,years
 import numpy as np
 ##################################################
 
@@ -49,19 +54,19 @@ import numpy as np
 
 
 ################################################RENAME PATHOLOGISTS
-df["CYTOPATHOLOGIST"]=df["CYTOPATHOLOGIST"].apply(lambda z: "Pathologist " + str(int(z)) if(str(z) != 'nan') else z)
-###################################### LIST OF PATHOLOGISTS
+# df["CYTOPATHOLOGIST"]=df["CYTOPATHOLOGIST"].apply(lambda z: "Pathologist " + str(int(z)) if(str(z) != 'nan') else z)
+# ###################################### LIST OF PATHOLOGISTS
 
-pathologists=df["CYTOPATHOLOGIST"].tolist()
-pathologists=[x for x in pathologists if str(x) !="nan"]
-#pathologists=list(map(lambda z:int(z),pathologists))
-pathologists=list(set(pathologists))
+# pathologists=df["CYTOPATHOLOGIST"].tolist()
+# pathologists=[x for x in pathologists if str(x) !="nan"]
+# #pathologists=list(map(lambda z:int(z),pathologists))
+# pathologists=list(set(pathologists))
 
-pathologists=[x for x in pathologists if df[df["CYTOPATHOLOGIST"]==x].shape[0]>=200]
+# pathologists=[x for x in pathologists if df[df["CYTOPATHOLOGIST"]==x].shape[0]>=200]
 
-pathologists=sorted(pathologists,key=lambda z: eval(z[11:]))
-df=df[df["CYTOPATHOLOGIST"].isin(pathologists)]
-pathologists=["All pathologists"]+pathologists
+# pathologists=sorted(pathologists,key=lambda z: eval(z[11:]))
+# df=df[df["CYTOPATHOLOGIST"].isin(pathologists)]
+# pathologists=+pathologists
 
 ##########################
 #########   TABLE I
@@ -131,7 +136,7 @@ def make_drop(lista:list,id:str):
 
 time_period_choice=make_drop(list(Default_time_ranges.keys()),"id_time_period_choice")
 sex_choice=make_drop(["All sexes","Female","Male"],"id_sex_choice")
-responsable_choice=make_drop(pathologists,"id_responsable_choice")
+responsable_choice=make_drop(["All pathologists"]+pathologists,"id_responsable_choice")
 ages=["All ages","Less than 40","40 to 49","50 to 59","60 to 69","70 or older"]
 age_choice=make_drop(ages,"id_age_choice")
 
@@ -170,33 +175,27 @@ choices=dbc.DropdownMenu(
     label="Menu",
 )
 
-fig = go.Figure()
-
-fig.add_trace(go.Scatter(
-    x=[0, 1, 2, 3, 4, 5, 6, 7, 8],
-    y=[0, 1, 4, 6, 7, 5, 9, 7, 8]
-))
-
-fig.update_layout(
-    autosize=False,
-    width=470,
-    height=300,
-    margin=dict(
-        l=0,
-        r=0,
-        b=0,
-        t=0,
-        pad=0
-    ),
-    template="plotly_dark",
-    paper_bgcolor=" rgb(18, 18, 18)",
-    plot_bgcolor=" rgb(18, 18, 18)"
-)
+# fig = go.Figure()
+# fig.update_layout(
+#     autosize=False,
+#     # width=470,
+#     # height=300,
+#     margin=dict(
+#         l=0,
+#         r=0,
+#         b=0,
+#         t=0,
+#         pad=0
+#     ),
+#     template="plotly_dark",
+#     paper_bgcolor=" rgb(18, 18, 18)",
+#     plot_bgcolor=" rgb(18, 18, 18)"
+# )
 def make_card(id):
     card = dbc.Card(
         dbc.CardBody(
             [dcc.Graph(id=id,
-        figure=fig,
+        figure=empty_fig(),
     # style={"height":"100%"},
     config={
                             'displayModeBar': False
@@ -421,7 +420,7 @@ def update_time_range(input_range):
     Input(component_id='id_tabs', component_property='active_tab'),
 )
 def update_visibility(active_tab):
-    if active_tab=="ROM":
+    if active_tab==Movie:
         ans={"display":"none"},{"display":"inherit"}
     else:
         ans={"display":"inherit"},{"display":"none"}
@@ -434,12 +433,10 @@ def update_visibility(active_tab):
     Output(component_id= 'id_third_graph', component_property='figure'),
     Output(component_id= 'id_fourth_graph', component_property='figure'),
     Output(component_id= 'id_tests', component_property='children'),
-    Output(component_id= 'id_positive_tests', component_property='children'),
-    # Output(component_id= 'id_positivity_overall', component_property='children'),
     Output(component_id= 'id_molecular_tests', component_property='children'),
+    Output(component_id= 'id_positive_tests', component_property='children'),
     Output(component_id= 'id_currently-', component_property='children'),
     Output(component_id= 'id_catIII_tests', component_property='children'),
-    # Output(component_id= 'id_positivity_catIII', component_property='children'),
     Output(component_id= 'id_catIV_tests', component_property='children'),
     Input(component_id= 'id_date_range', component_property='start_date'),
     Input(component_id= 'id_date_range', component_property='end_date'),
@@ -453,6 +450,12 @@ def update_visibility(active_tab):
 
 
 def update_graphs(start_date,end_date,responsable,age,sex,active_tab):
+
+    first_graph=empty_fig()
+    second_graph=empty_fig()
+    third_graph=empty_fig()
+    fourth_graph=empty_fig()
+
     data=df
 
     """Apply Date filter"""
@@ -478,7 +481,7 @@ def update_graphs(start_date,end_date,responsable,age,sex,active_tab):
         data=data[(data["AGE"]>=60)&(data["AGE"]<70)]
     if age =="70 or older":
         data=data[data["AGE"]>=70]
-    all_paths_df=data
+    all_pathologists_df=data
 
     """Apply Pathologist filter"""
     if responsable !="All pathologists":
@@ -490,476 +493,436 @@ def update_graphs(start_date,end_date,responsable,age,sex,active_tab):
     category3_data=data[data["Bethesda Cathegory"]==3]
     category4_data=data[data["Bethesda Cathegory"]==4]
 
-################################### TABLE DATA
+###################################
+####################################
+#####################################
+################# TABLE DATA
+
+
     tests=data.shape[0]
-    positivity_overall="----"
-    negativity_overall="----"
-    positives_overall=data[data["RESULT"]=="POSITIVE"].shape[0]
-    negatives_overall=data[data["RESULT"]!="POSITIVE"].shape[0]
-
-
-    if tests>0:
-        positivity_overall=round(positives_overall/tests,2)
-        negativity_overall=round(negatives_overall/tests,2)
-
-
-
     molecular_tests=data[data["MOLECULAR "]=="THYROSEQ"].shape[0]
-
-    positivity_molecular="----"
-    negativity_molecular="----"
-    positives_molecular=data[(data["RESULT"]=="POSITIVE")&(data["MOLECULAR "]=="THYROSEQ")].shape[0]
-    negatives_molecular=data[(data["RESULT"]=="NEGATIVE")&(data["MOLECULAR "]=="THYROSEQ")].shape[0]
-
-    if molecular_tests>0:
-        positivity_molecular=round(positives_molecular/molecular_tests,2)
-        negativity_molecular=round(negatives_molecular/molecular_tests,2)
-
-    ###################### CatIII positivity
-    catIII_tests=data[data["Bethesda Cathegory"]==3].shape[0]
-    positivity_catIII="----"
-    negativity_catIII="-----"
-    positives_catIII=data[(data["RESULT"]=="POSITIVE")&(data["Bethesda Cathegory"]==3)].shape[0]
-    negatives_catIII=data[(data["RESULT"]=="NEGATIVE")&(data["Bethesda Cathegory"]==3)].shape[0]
-
-
-    if catIII_tests>0:
-        positivity_catIII=round(positives_catIII/catIII_tests,2)
-        negativity_catIII=round(negatives_catIII/catIII_tests,2)
-     ###################### CatIII positivity
-    catIV_tests=data[data["Bethesda Cathegory"]==4].shape[0]
-    positivity_catIV="----"
-    negativity_catIV="----"
-    positives_catIV=data[(data["RESULT"]=="POSITIVE")&(data["Bethesda Cathegory"]==4)].shape[0]
-    negatives_catIV=data[(data["RESULT"]=="NEGATIVE")&(data["Bethesda Cathegory"]==4)].shape[0]
-
-
-    if catIV_tests>0:
-        positivity_catIV=round(positives_catIV/catIV_tests,2)
-        negativity_catIV=round(negatives_catIV/catIV_tests,2)
-###################
-#########  CURRRENTLY NEGATIVE
-###################
+    positives_overall=data[data["RESULT"]=="POSITIVE"].shape[0]
     currently_negative=data[data["RESULT"]=="CURRENTLY NEGATIVE"].shape[0]
+    catIII_tests=data[data["Bethesda Cathegory"]==3].shape[0]
+    catIV_tests=data[data["Bethesda Cathegory"]==4].shape[0]
+
+
+
 
    ######## PIE GRAPH CATEGORIES
-    title="Bethesda Category Distribution"
-    Beth_info=data["Bethesda Cathegory"].value_counts().to_dict()
-    # numeric_names=sorted(list(Beth_info.keys()))
-    numeric_names=sorted(list(data["Bethesda Cathegory"].unique()))
-    values=[Beth_info[x] for x in numeric_names]
-    names=["Cat "+make_roman(x) for x in numeric_names]
-    pie_data=pd.DataFrame()
-    pie_data["Category"]=names
-    pie_data["Count"]=values
-    pie_graph=make_pie(pie_data,"Category","Count",title)
+    def  pie_graph_beth(data_frame):
+        title="Bethesda Category Distribution"
+        Beth_info=data_frame["Bethesda Cathegory"].value_counts().to_dict()
+        # numeric_names=sorted(list(Beth_info.keys()))
+        numeric_names=sorted(list(data_frame["Bethesda Cathegory"].unique()))
+        values=[Beth_info[x] for x in numeric_names]
+        names=["Cat "+make_roman(x) for x in numeric_names]
+        pie_data=pd.DataFrame()
+        pie_data["Category"]=names
+        pie_data["Count"]=values
+        return make_pie(pie_data,"Category","Count",title)
 
-    ######################  BAR GRAPH CATEGORIES
-    labels_bar=sorted(list(data["Bethesda Cathegory"].unique()))
-    values_bar=[len(data[data["Bethesda Cathegory"]==label])for label in labels_bar]
-    bar_data=pd.DataFrame()
-    bar_data["Count"]=values_bar
-    bar_data["Category"]=[make_roman(x) for x in labels_bar]
-    # bar_data["labels"]=bar_data["labels"].astype(str)
-    bar_categories=make_bar(bar_data,"Category","Count","Bethesda Category Counts","Count")
+####### Bethesda Category count over time
+########################
+    def Bethesda_time_graph(dataframe,sexo,edad,medicoresponsable):
+        yearly_data=dataframe
+        """Apply Sex filter"""
+        if sexo !="All sexes":
+            yearly_data=yearly_data[yearly_data["SEX"]==sexo]
+
+        """Apply Age filter"""
+
+
+        if edad =="Less than 40":
+            yearly_data=yearly_data[yearly_data["AGE"]<40]
+        if edad =="40 to 49":
+            yearly_data=yearly_data[(yearly_data["AGE"]>=40)&(yearly_data["AGE"]<50)]
+        if edad =="50 to 59":
+            yearly_data=yearly_data[(yearly_data["AGE"]>=50)&(yearly_data["AGE"]<60)]
+        if edad =="60 to 69":
+            yearly_data=yearly_data[(yearly_data["AGE"]>=60)&(yearly_data["AGE"]<70)]
+        if edad =="70 or older":
+            yearly_data=yearly_data[yearly_data["AGE"]>=70]
+
+
+        """Apply Pathologist filter"""
+        if medicoresponsable !="All pathologists":
+            yearly_data=yearly_data[yearly_data["CYTOPATHOLOGIST"]==medicoresponsable]
+
+        category_counter=dict()
+        # years=list(yearly_data["YEAR"].unique())
+        for i in range(1,7):
+            category_counter["Cat "+make_roman(i)]=pd.DataFrame()
+            category_counter["Cat "+make_roman(i)]["x"]=years
+            category_counter["Cat "+make_roman(i)]["y"]=[yearly_data[(yearly_data["Bethesda Cathegory"]==i)&(yearly_data["YEAR"]==year)].shape[0] for year in years]
+
+        return make_scatter_graph_time_bethesda(category_counter)
+######################  OVERALL GENE GRAPH
+    def gene_graph(dataframe):
+        labels_bar=list(dataframe["GENE MUTATED"].unique())
+        labels_bar=[x for x in labels_bar if str(x) not in ["?","nan","0"]]
+        def count_instances(x):
+            return dataframe[dataframe["GENE MUTATED"]==x].shape[0]
+
+        labels_bar=sorted(labels_bar,key=lambda z:count_instances(z),reverse=True)
+        values_bar=[count_instances(x) for x in labels_bar]
+        bar_data=pd.DataFrame()
+        bar_data["Count"]=values_bar
+        bar_data["GENE MUTATED"]=labels_bar
+        bar_data["GENE MUTATED"]=bar_data["GENE MUTATED"].astype(str)
+
+
+
+
+
+
+        return make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Molecular Tests")
+
+        """Apply Pathologist filter"""
+    def sex_distribution_graph(dataframe,medicoresponsable):
+        sex_data=dataframe
+        if responsable !="All pathologists":
+            sex_data=dataframe[dataframe["CYTOPATHOLOGIST"]==medicoresponsable]
+        return make_ages_graph(sex_data)
+
+######################    RESULTS OVERALL ##############################################################
+
+    if active_tab==Overall:
+        first_graph=pie_graph_beth(data)
+        second_graph=Bethesda_time_graph(df,sex,age,responsable)
+        third_graph=gene_graph(data)
+        fourth_graph=sex_distribution_graph(time_fitered_data,responsable)
+
+    #########################
+    ######################### GRAPHS COMPARING CYTOPATHOLOGISTS
+    #########################
+
+
+    #### MOLECULAR BY RESULT GRAPH
+    def molecular_by_result_graph(dataframe):
+        count_results=dataframe["RESULT"].value_counts().to_dict()
+        pie_data=pd.DataFrame()
+        pie_data["Result"]=list(count_results.keys())
+        pie_data["Count"]=list(count_results.values())
+        return make_pie(pie_data,"Result","Count","Molecular Tests By Result")
+
+############# CATEGORY RATIOS BY PATHOLOGISTS
+    def count_data(all_paths_df):
+        count_data=pd.DataFrame()
+
+        count_data["Pathologists"]=pathologists
+        for i in range(1,7):
+            count_data[make_roman(i)]=[count_categories(all_paths_df,pathologist,i) for pathologist in pathologists]
+        count_data["Cases"]=[count_cases(all_paths_df,pathologist) for pathologist in pathologists]
+        count_data["Positives"]=[count_by_result(all_paths_df,pathologist,"POSITIVE") for pathologist in pathologists]
+        count_data["Currently Negative"]=[count_by_result(all_paths_df,pathologist,"CURRENTLY NEGATIVE") for pathologist in pathologists]
+        count_data["Positives or CN"]=count_data["Positives"]+count_data["Currently Negative"]
+        count_data["positive_rate"]=count_data["Positives or CN"]/count_data["Cases"]
+        count_data["positive_rate"]=count_data["positive_rate"].apply(lambda z:round(z,2))
+        for i in range(1,7):
+            count_data["Cat "+make_roman(i)]=count_data[make_roman(i)]/count_data["Cases"]
+            count_data["Cat "+make_roman(i)]=count_data["Cat "+make_roman(i)].apply(lambda z:round(z,2))
+        # count_data["Pathologists"]=pathologists
+
+        count_data["Cat III Positives"]=[count_result_by_category(df,pathologist,3,"POSITIVE") for pathologist in pathologists]
+        count_data["Cat III + Rate"]=round(count_data["Cat III Positives"]/count_data["III"],2)
+
+
+    #################################### ADD ALL PATHOLOGISTS ROW
+    ###################################
+        new_row=dict()
+        new_row["Pathologists"]=["All pathologists"]
+        new_row["Cases"]=[count_data["Cases"].sum()]
+        for i in range(1,7):
+            new_row[make_roman(i)]=[count_data[make_roman(i)].sum()]
+        for i in range(1,7):
+            new_row["ratio category "+make_roman(i)]=[new_row[make_roman(i)][0]/new_row["Cases"][0]]
+        new_row["Positives"]=[count_data["Positives"].sum()]
+        new_row["positive_rate"]=[count_data["Positives"].sum()/count_data["Cases"].sum()]
+        new_row["Cat III Positives"]=[count_data["Cat III Positives"].sum()]
+        new_row["Cat III + Rate"]=[round(count_data["Cat III Positives"].sum()/count_data["III"].sum(),2)]
+        for i in range(1,7):
+            new_row["Cat "+ make_roman(i)]=[round(count_data[make_roman(i)].sum()/count_data["Cases"].sum(),2)]
+
+        new_row=pd.DataFrame.from_dict(new_row)
+        count_data=pd.concat([count_data,new_row])
+        count_data["Cat III Call Rate"]=count_data["Cat III"]
+        return count_data
+
+    #######################################
+    #######################################
+
+    def compare_ratios(dataframe):
+        return make_stacked_bar(dataframe,"Pathologists",["Cat "+make_roman(i)  for i in range(1,7)], "Category Distribution By Pathologist","Rate")
+
+    def scat_call_vs_pos(dataframe):
+        return scat_callrate_vs_positive(dataframe)
+
+
+    ##############################COMPARING CP
+    if active_tab==ComparingCP:
+
+        gap_minder_data=make_gap_minder_data(df)
+        time_df=pd.DataFrame()
+        for path in pathologists+["All pathologists"]:
+            time_path=pd.DataFrame()
+            time_path["x"]=list(gap_minder_data[gap_minder_data["Pathologist"]==path]["Year"].unique())
+            time_path["y"]=list(gap_minder_data[gap_minder_data["Pathologist"]==path]["Call rate category III"])
+            time_path[path]=[path for i in range(time_path["x"].shape[0]) ]
+            time_df=pd.concat([time_df,time_path])
+
+
+        counting_data=count_data(all_pathologists_df)
+
+
+        first_graph=molecular_by_result_graph(data)
+        second_graph=compare_ratios(counting_data)
+        third_graph=scat_callrate_vs_positive(counting_data)
+        fourth_graph=make_CatIII_Call_Rate_time(time_df)
+
+
+    return first_graph,second_graph,third_graph,fourth_graph,tests,molecular_tests,positives_overall,currently_negative,catIII_tests,catIV_tests
+
+
+     ##############
+     # ############  MAYBE LATER
+
+    # ######################  BAR GRAPH CATEGORIES
+    # labels_bar=sorted(list(data["Bethesda Cathegory"].unique()))
+    # values_bar=[len(data[data["Bethesda Cathegory"]==label])for label in labels_bar]
+    # bar_data=pd.DataFrame()
+    # bar_data["Count"]=values_bar
+    # bar_data["Category"]=[make_roman(x) for x in labels_bar]
+    # # bar_data["labels"]=bar_data["labels"].astype(str)
+    # bar_categories=make_bar(bar_data,"Category","Count","Bethesda Category Counts","Count")
 
     ######################  ROM GRAPH OVERALL
-    labels_bar=list(data["ROM"].unique())
-    labels_bar=sorted([x for x in labels_bar if str(x) not in ["?","nan"]])
-    values_bar=[len(data[data["ROM"]==label])for label in labels_bar]
-    labels_bar=[str(x)+ "%" for x in labels_bar]
-    bar_data=pd.DataFrame()
-    bar_data["Count"]=values_bar
-    bar_data["ROM"]=labels_bar
-    bar_data["ROM"]=bar_data["ROM"].astype(str)
-    rom_graph=make_rom(bar_data,"ROM","Count","Risk of Malignancy Overall")
+    # labels_bar=list(data["ROM"].unique())
+    # labels_bar=sorted([x for x in labels_bar if str(x) not in ["?","nan"]])
+    # values_bar=[len(data[data["ROM"]==label])for label in labels_bar]
+    # labels_bar=[str(x)+ "%" for x in labels_bar]
+    # bar_data=pd.DataFrame()
+    # bar_data["Count"]=values_bar
+    # bar_data["ROM"]=labels_bar
+    # bar_data["ROM"]=bar_data["ROM"].astype(str)
+    # rom_graph=make_rom(bar_data,"ROM","Count","Risk of Malignancy Overall")
 ######################  ROM GRAPH CAT III
-    labels_bar=list(category3_data["ROM"].unique())
-    labels_bar=sorted([x for x in labels_bar if str(x) not in ["?","nan"]])
-    values_bar=[len(category3_data[category3_data["ROM"]==label])for label in labels_bar]
-    labels_bar=[str(x)+ "%" for x in labels_bar]
-    bar_data=pd.DataFrame()
-    bar_data["Count"]=values_bar
-    bar_data["ROM"]=labels_bar
-    bar_data["ROM"]=bar_data["ROM"].astype(str)
-    rom_graph_cat3=make_rom(bar_data,"ROM","Count","Risk of Malignancy Category III")
+    # labels_bar=list(category3_data["ROM"].unique())
+    # labels_bar=sorted([x for x in labels_bar if str(x) not in ["?","nan"]])
+    # values_bar=[len(category3_data[category3_data["ROM"]==label])for label in labels_bar]
+    # labels_bar=[str(x)+ "%" for x in labels_bar]
+    # bar_data=pd.DataFrame()
+    # bar_data["Count"]=values_bar
+    # bar_data["ROM"]=labels_bar
+    # bar_data["ROM"]=bar_data["ROM"].astype(str)
+    # rom_graph_cat3=make_rom(bar_data,"ROM","Count","Risk of Malignancy Category III")
     ######################  ROM GRAPH CAT IV
-    labels_bar=list(category4_data["ROM"].unique())
-    labels_bar=sorted([x for x in labels_bar if str(x) not in ["?","nan"]])
-    values_bar=[len(category4_data[category4_data["ROM"]==label])for label in labels_bar]
-    labels_bar=[str(x)+ "%" for x in labels_bar]
-    bar_data=pd.DataFrame()
-    bar_data["Count"]=values_bar
-    bar_data["ROM"]=labels_bar
-    bar_data["ROM"]=bar_data["ROM"].astype(str)
-    rom_graph_cat4=make_rom(bar_data,"ROM","Count","Risk of Malignancy Category IV")
-
-
-    ######################  OVERALL GENE GRAPH
-    labels_bar=list(data["GENE MUTATED"].unique())
-    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan","0"]]
-    def count_instances(x):
-        return data[data["GENE MUTATED"]==x].shape[0]
-
-    labels_bar=sorted(labels_bar,key=lambda z:count_instances(z),reverse=True)
-    values_bar=[count_instances(x) for x in labels_bar]
-    bar_data=pd.DataFrame()
-    bar_data["Count"]=values_bar
-    bar_data["GENE MUTATED"]=labels_bar
-    bar_data["GENE MUTATED"]=bar_data["GENE MUTATED"].astype(str)
-
-    #### MAKE PIE DATAFRAME
-    count_results=data["RESULT"].value_counts().to_dict()
-    pie_data=pd.DataFrame()
-    pie_data["Result"]=list(count_results.keys())
-    pie_data["Count"]=list(count_results.values())
-    molecular_by_result_graph=make_pie(pie_data,"Result","Count","Molecular Tests By Result")
+    # labels_bar=list(category4_data["ROM"].unique())
+    # labels_bar=sorted([x for x in labels_bar if str(x) not in ["?","nan"]])
+    # values_bar=[len(category4_data[category4_data["ROM"]==label])for label in labels_bar]
+    # labels_bar=[str(x)+ "%" for x in labels_bar]
+    # bar_data=pd.DataFrame()
+    # bar_data["Count"]=values_bar
+    # bar_data["ROM"]=labels_bar
+    # bar_data["ROM"]=bar_data["ROM"].astype(str)
+    # rom_graph_cat4=make_rom(bar_data,"ROM","Count","Risk of Malignancy Category IV")
 
 
 
-
-    gene_graph= make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Molecular Tests")
     # make_molecular_overview(pie_data,bar_data)
     #make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Molecular Tests")
 
-    ######################  OVERALL MUTATION GRAPH
-    labels_bar=list(data["MUTATION"].unique())
-    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
-    values_bar=[len(data[data["MUTATION"]==label])for label in labels_bar]
-    bar_data=pd.DataFrame()
-    bar_data["Count"]=values_bar
-    bar_data["MUTATION"]=labels_bar
-    bar_data["MUTATION"]=bar_data["MUTATION"].astype(str)
-    mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count Molecular Tests")
+#     ######################  OVERALL MUTATION GRAPH
+#     labels_bar=list(data["MUTATION"].unique())
+#     labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+#     values_bar=[len(data[data["MUTATION"]==label])for label in labels_bar]
+#     bar_data=pd.DataFrame()
+#     bar_data["Count"]=values_bar
+#     bar_data["MUTATION"]=labels_bar
+#     bar_data["MUTATION"]=bar_data["MUTATION"].astype(str)
+#     mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count Molecular Tests")
 
-    ######################  POSITIVE GENE GRAPH
-    labels_bar=list(positive_data["GENE MUTATED"].unique())
-    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
-    values_bar=[len(positive_data[positive_data["GENE MUTATED"]==label])for label in labels_bar]
-    bar_data=pd.DataFrame()
-    bar_data["Count"]=values_bar
-    bar_data["GENE MUTATED"]=labels_bar
-    bar_data["GENE MUTATED"]=bar_data["GENE MUTATED"].astype(str)
-    positive_gene_graph=make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Positive Tests")
+#     ######################  POSITIVE GENE GRAPH
+#     labels_bar=list(positive_data["GENE MUTATED"].unique())
+#     labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+#     values_bar=[len(positive_data[positive_data["GENE MUTATED"]==label])for label in labels_bar]
+#     bar_data=pd.DataFrame()
+#     bar_data["Count"]=values_bar
+#     bar_data["GENE MUTATED"]=labels_bar
+#     bar_data["GENE MUTATED"]=bar_data["GENE MUTATED"].astype(str)
+#     positive_gene_graph=make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Positive Tests")
 
-    ######################  POSITIVE MUTATION GRAPH
-    labels_bar=list(positive_data["MUTATION"].unique())
-    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
-    values_bar=[len(positive_data[positive_data["MUTATION"]==label])for label in labels_bar]
-    bar_data=pd.DataFrame()
-    bar_data["Count"]=values_bar
-    bar_data["MUTATION"]=labels_bar
-    bar_data["MUTATION"]=bar_data["MUTATION"].astype(str)
-    positive_mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count Positive Tests")
-    ######################  NEGATIVE GENE GRAPH
-    labels_bar=list(negative_data["GENE MUTATED"].unique())
-    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
-    values_bar=[len(negative_data[negative_data["GENE MUTATED"]==label])for label in labels_bar]
-    bar_data=pd.DataFrame()
-    bar_data["Count"]=values_bar
-    bar_data["GENE MUTATED"]=labels_bar
-    bar_data["GENE MUTATED"]=bar_data["GENE MUTATED"].astype(str)
-    negative_gene_graph=make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Negative Tests")
+#     ######################  POSITIVE MUTATION GRAPH
+#     labels_bar=list(positive_data["MUTATION"].unique())
+#     labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+#     values_bar=[len(positive_data[positive_data["MUTATION"]==label])for label in labels_bar]
+#     bar_data=pd.DataFrame()
+#     bar_data["Count"]=values_bar
+#     bar_data["MUTATION"]=labels_bar
+#     bar_data["MUTATION"]=bar_data["MUTATION"].astype(str)
+#     positive_mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count Positive Tests")
+#     ######################  NEGATIVE GENE GRAPH
+#     labels_bar=list(negative_data["GENE MUTATED"].unique())
+#     labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+#     values_bar=[len(negative_data[negative_data["GENE MUTATED"]==label])for label in labels_bar]
+#     bar_data=pd.DataFrame()
+#     bar_data["Count"]=values_bar
+#     bar_data["GENE MUTATED"]=labels_bar
+#     bar_data["GENE MUTATED"]=bar_data["GENE MUTATED"].astype(str)
+#     negative_gene_graph=make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Negative Tests")
 
-    ######################  NEGATIVE MUTATION GRAPH
-    labels_bar=list(negative_data["MUTATION"].unique())
-    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
-    values_bar=[len(negative_data[negative_data["MUTATION"]==label])for label in labels_bar]
-    bar_data=pd.DataFrame()
-    bar_data["Count"]=values_bar
-    bar_data["MUTATION"]=labels_bar
-    bar_data["MUTATION"]=bar_data["MUTATION"].astype(str)
-    negative_mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count Negative Tests")
-######################### CATEGORY GRAPHS
-#########################
+#     ######################  NEGATIVE MUTATION GRAPH
+#     labels_bar=list(negative_data["MUTATION"].unique())
+#     labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+#     values_bar=[len(negative_data[negative_data["MUTATION"]==label])for label in labels_bar]
+#     bar_data=pd.DataFrame()
+#     bar_data["Count"]=values_bar
+#     bar_data["MUTATION"]=labels_bar
+#     bar_data["MUTATION"]=bar_data["MUTATION"].astype(str)
+#     negative_mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count Negative Tests")
+# ######################### CATEGORY GRAPHS
+# #########################
 
-######################  CATEGORY III GENE GRAPH
-    labels_bar=list(category3_data["GENE MUTATED"].unique())
-    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
-    values_bar=[len(category3_data[category3_data["GENE MUTATED"]==label])for label in labels_bar]
-    bar_data=pd.DataFrame()
-    bar_data["Count"]=values_bar
-    bar_data["GENE MUTATED"]=labels_bar
-    bar_data["GENE MUTATED"]=bar_data["GENE MUTATED"].astype(str)
-    category3_gene_graph=make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Category III")
+# ######################  CATEGORY III GENE GRAPH
+#     labels_bar=list(category3_data["GENE MUTATED"].unique())
+#     labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+#     values_bar=[len(category3_data[category3_data["GENE MUTATED"]==label])for label in labels_bar]
+#     bar_data=pd.DataFrame()
+#     bar_data["Count"]=values_bar
+#     bar_data["GENE MUTATED"]=labels_bar
+#     bar_data["GENE MUTATED"]=bar_data["GENE MUTATED"].astype(str)
+#     category3_gene_graph=make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Category III")
 
-    ######################  CATEGORY III MUTATION GRAPH
-    labels_bar=list(category3_data["MUTATION"].unique())
-    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
-    values_bar=[len(category3_data[category3_data["MUTATION"]==label])for label in labels_bar]
-    bar_data=pd.DataFrame()
-    bar_data["Count"]=values_bar
-    bar_data["MUTATION"]=labels_bar
-    bar_data["MUTATION"]=bar_data["MUTATION"].astype(str)
-    category3_mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count Category III")
-    ######################  CATEGORY IV GENE GRAPH
-    labels_bar=list(category4_data["GENE MUTATED"].unique())
-    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
-    values_bar=[len(category4_data[category4_data["GENE MUTATED"]==label])for label in labels_bar]
-    bar_data=pd.DataFrame()
-    bar_data["Count"]=values_bar
-    bar_data["GENE MUTATED"]=labels_bar
-    bar_data["GENE MUTATED"]=bar_data["GENE MUTATED"].astype(str)
-    category4_gene_graph=make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Category IV")
+#     ######################  CATEGORY III MUTATION GRAPH
+#     labels_bar=list(category3_data["MUTATION"].unique())
+#     labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+#     values_bar=[len(category3_data[category3_data["MUTATION"]==label])for label in labels_bar]
+#     bar_data=pd.DataFrame()
+#     bar_data["Count"]=values_bar
+#     bar_data["MUTATION"]=labels_bar
+#     bar_data["MUTATION"]=bar_data["MUTATION"].astype(str)
+#     category3_mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count Category III")
+#     ######################  CATEGORY IV GENE GRAPH
+#     labels_bar=list(category4_data["GENE MUTATED"].unique())
+#     labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+#     values_bar=[len(category4_data[category4_data["GENE MUTATED"]==label])for label in labels_bar]
+#     bar_data=pd.DataFrame()
+#     bar_data["Count"]=values_bar
+#     bar_data["GENE MUTATED"]=labels_bar
+#     bar_data["GENE MUTATED"]=bar_data["GENE MUTATED"].astype(str)
+#     category4_gene_graph=make_gene(bar_data,"GENE MUTATED","Count","Gene Mutated Count Category IV")
 
-    ######################  CATEGORY IV MUTATION GRAPH
-    labels_bar=list(category4_data["MUTATION"].unique())
-    labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
-    values_bar=[len(category4_data[category4_data["MUTATION"]==label])for label in labels_bar]
-    bar_data=pd.DataFrame()
-    bar_data["Count"]=values_bar
-    bar_data["MUTATION"]=labels_bar
-    bar_data["MUTATION"]=bar_data["MUTATION"].astype(str)
-    category4_mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count Category IV")
-######################
-###################### GAPMINDER
+#     ######################  CATEGORY IV MUTATION GRAPH
+#     labels_bar=list(category4_data["MUTATION"].unique())
+#     labels_bar=[x for x in labels_bar if str(x) not in ["?","nan"]]
+#     values_bar=[len(category4_data[category4_data["MUTATION"]==label])for label in labels_bar]
+#     bar_data=pd.DataFrame()
+#     bar_data["Count"]=values_bar
+#     bar_data["MUTATION"]=labels_bar
+#     bar_data["MUTATION"]=bar_data["MUTATION"].astype(str)
+#     category4_mutation_graph=make_gene(bar_data,"MUTATION","Count","Mutation Count Category IV")
 
-    dfgap = px.data.gapminder()
-    gapminder=px.scatter(dfgap, x="gdpPercap", y="lifeExp", animation_frame="year", animation_group="country",
-           size="pop", color="continent", hover_name="country",
-           log_x=True, size_max=55, range_x=[100,100000], range_y=[25,90])
-#################################
-#######AGE DISTRIBUTION BY SEX
-#################################
-    """Apply Pathologist filter"""
-    sex_data=time_fitered_data
-    if responsable !="All pathologists":
-        sex_data=time_fitered_data[time_fitered_data["CYTOPATHOLOGIST"]==responsable]
-    sex_distribution_graph=make_ages_graph(sex_data)
-##########
-#######################
-####### Bethesda Category count over time
-########################
-
-    yearly_data=df
-    """Apply Sex filter"""
-    if sex !="All sexes":
-        yearly_data=df[df["SEX"]==sex]
-
-    """Apply Age filter"""
-
-
-    if age =="Less than 40":
-        yearly_data=yearly_data[yearly_data["AGE"]<40]
-    if age =="40 to 49":
-        yearly_data=yearly_data[(yearly_data["AGE"]>=40)&(yearly_data["AGE"]<50)]
-    if age =="50 to 59":
-        yearly_data=yearly_data[(yearly_data["AGE"]>=50)&(yearly_data["AGE"]<60)]
-    if age =="60 to 69":
-        yearly_data=yearly_data[(yearly_data["AGE"]>=60)&(yearly_data["AGE"]<70)]
-    if age =="70 or older":
-        yearly_data=yearly_data[yearly_data["AGE"]>=70]
-
-
-    """Apply Pathologist filter"""
-    if responsable !="All pathologists":
-        yearly_data=yearly_data[yearly_data["CYTOPATHOLOGIST"]==responsable]
-    category_counter=dict()
-    years=list(yearly_data["YEAR"].unique())
-    for i in range(1,7):
-        category_counter["Cat "+make_roman(i)]=pd.DataFrame()
-        category_counter["Cat "+make_roman(i)]["x"]=years
-        category_counter["Cat "+make_roman(i)]["y"]=[yearly_data[(yearly_data["Bethesda Cathegory"]==i)&(yearly_data["YEAR"]==year)].shape[0] for year in years]
-
-    bethesda_time_graph=make_scatter_graph_time_bethesda(category_counter)
-################################
-########################    RESULTS OVERALL ##############################################################
-
-    if active_tab=="Overall":
-        first_graph=pie_graph
-        second_graph=bethesda_time_graph#bar_categories
-        third_graph=gene_graph
-        fourth_graph=sex_distribution_graph
+##
 
 ###################################### DURATION GRAPH
 
-    data["duration"]=(data["SIGN_DATE"]-data["ACCESS_DATE"])
-    data["duration"]=data["duration"].apply(lambda z:z.days)
-    Duration=data["duration"].value_counts().to_dict()
-    numeric_names=sorted(list(Duration.keys()))
-    names=[str(x) for x in numeric_names]
-    values=[Duration[x] for x in numeric_names]
-    duration_data=pd.DataFrame()
-    duration_data["Processing days"]=values
-    duration_data["duration_names"]=names
-    duration_graph=make_rom(duration_data,"duration_names","Processing days","Processing Time in Days")
+    # data["duration"]=(data["SIGN_DATE"]-data["ACCESS_DATE"])
+    # data["duration"]=data["duration"].apply(lambda z:z.days)
+    # Duration=data["duration"].value_counts().to_dict()
+    # numeric_names=sorted(list(Duration.keys()))
+    # names=[str(x) for x in numeric_names]
+    # values=[Duration[x] for x in numeric_names]
+    # duration_data=pd.DataFrame()
+    # duration_data["Processing days"]=values
+    # duration_data["duration_names"]=names
+    # duration_graph=make_rom(duration_data,"duration_names","Processing days","Processing Time in Days")
 
 
 
 
 
-    fig_tab = go.Figure(data=[go.Table(header=dict(values=['A Scores', 'B Scores']),
-                 cells=dict(values=[[100, 90, 80, 90], [95, 85, 75, 95]]))
-                     ])
-    fig_tab.update_layout(
-            autosize=True,
-            margin=dict(
-                l=0,
-                r=0,
-                b=0,
-                t=40,
-                pad=0
-            ),
-            template="plotly_dark",
-            title={
-            "text":"Somethings else",
-            'y':0.98,
-            'x':0.46,
-            'xanchor': 'center',
-            'yanchor': 'top',
-            },
-            legend_title="",
-            xaxis_title=None,
+    # fig_tab = go.Figure(data=[go.Table(header=dict(values=['A Scores', 'B Scores']),
+    #              cells=dict(values=[[100, 90, 80, 90], [95, 85, 75, 95]]))
+    #                  ])
+    # fig_tab.update_layout(
+    #         autosize=True,
+    #         margin=dict(
+    #             l=0,
+    #             r=0,
+    #             b=0,
+    #             t=40,
+    #             pad=0
+    #         ),
+    #         template="plotly_dark",
+    #         title={
+    #         "text":"Somethings else",
+    #         'y':0.98,
+    #         'x':0.46,
+    #         'xanchor': 'center',
+    #         'yanchor': 'top',
+    #         },
+    #         legend_title="",
+    #         xaxis_title=None,
 
 
-            # legend_traceorder="reversed",
+    #         # legend_traceorder="reversed",
 
-        )
+    #     )
     #################### MUTATIONS BY RESULT
-    if active_tab=="Mutations by Result":
-        first_graph=positive_gene_graph
-        second_graph=positive_mutation_graph
-        third_graph=negative_gene_graph
-        fourth_graph=negative_mutation_graph
+    # if active_tab=="Mutations by Result":
+    #     first_graph=positive_gene_graph
+    #     second_graph=positive_mutation_graph
+    #     third_graph=negative_gene_graph
+    #     fourth_graph=negative_mutation_graph
 
     ###############################################
     ################### GRAPHS FOR COMPARING PATHOLOGISTS
     #########################
-    count_data=pd.DataFrame()
-    pathologists_to_count=list(all_paths_df["CYTOPATHOLOGIST"].unique())
-    pathologists_to_count=[x for x in pathologists_to_count if str(x)!= "nan"]
-    pathologists_to_count=[x for x in pathologists_to_count if df[df["CYTOPATHOLOGIST"]==x].shape[0]>=200]
-    pathologists_to_count=sorted(pathologists_to_count,key=lambda z: eval(z[11:]))
-    count_data["Pathologists"]=pathologists_to_count
-    for i in range(1,7):
-        count_data[make_roman(i)]=[count_categories(all_paths_df,pathologist,i) for pathologist in pathologists_to_count]
-    count_data["Cases"]=[count_cases(all_paths_df,pathologist) for pathologist in pathologists_to_count]
-    count_data["Positives"]=[count_by_result(all_paths_df,pathologist,"POSITIVE") for pathologist in pathologists_to_count]
-    count_data["positive_rate"]=count_data["Positives"]/count_data["Cases"]
-    count_data["positive_rate"]=count_data["positive_rate"].apply(lambda z:round(z,2))
-    for i in range(1,7):
-        count_data["Cat "+make_roman(i)]=count_data[make_roman(i)]/count_data["Cases"]
-        count_data["Cat "+make_roman(i)]=count_data["Cat "+make_roman(i)].apply(lambda z:round(z,2))
-    count_data["Pathologists"]=pathologists_to_count
-
-    count_data["Cat III Positives"]=[count_result_by_category(df,pathologist,3,"POSITIVE") for pathologist in pathologists_to_count]
-    count_data["Cat III + Rate"]=round(count_data["Cat III Positives"]/count_data["III"],2)
-
-
-#################################### ADD ALL PATHOLOGISTS ROW
-###################################
-    new_row=dict()
-    new_row["Pathologists"]=["All pathologists"]
-    new_row["Cases"]=[count_data["Cases"].sum()]
-    for i in range(1,7):
-        new_row[make_roman(i)]=[count_data[make_roman(i)].sum()]
-    for i in range(1,7):
-        new_row["ratio category "+make_roman(i)]=[new_row[make_roman(i)][0]/new_row["Cases"][0]]
-    new_row["Positives"]=[count_data["Positives"].sum()]
-    new_row["positive_rate"]=[count_data["Positives"].sum()/count_data["Cases"].sum()]
-    new_row["Cat III Positives"]=[count_data["Cat III Positives"].sum()]
-    new_row["Cat III + Rate"]=[round(count_data["Cat III Positives"].sum()/count_data["III"].sum(),2)]
-    for i in range(1,7):
-        new_row["Cat "+ make_roman(i)]=[round(count_data[make_roman(i)].sum()/count_data["Cases"].sum(),2)]
-    ######################################
-    rate_data=count_data
-
-
-
-    ###################################
-    new_row=pd.DataFrame.from_dict(new_row)
-    rate_data=pd.concat([count_data,new_row])
-
-    #######################################
-    #######################################
-
-    compare_ratios=make_stacked_bar(rate_data,"Pathologists",["Cat "+make_roman(i)  for i in range(1,7)], "Category Distribution By Pathologist","Rate")
-    for i in range(1,7):
-        count_data["Cat "+make_roman(i)]=count_data[make_roman(i)]
-    compare_frequencies=make_stacked_bar(count_data,"Pathologists",["Cat "+make_roman(i) for i in range(1,7)], "Category Count By Pathologist","Count")
-    scat= px.scatter(rate_data,x='Cat '+make_roman(3),
-                y='Cat III + Rate',
-                color='Pathologists',
-                size='Cases',
-                 hover_data=['Pathologists']
-                )
-    scat.update_layout(
-            autosize=True,
-            margin=dict(
-                l=0,
-                r=0,
-                b=0,
-                t=40,
-                pad=0
-            ),
-            template="plotly_dark",
-            title={
-            "text":"Cat III  Calling Rate vs Positivity",
-            'y':0.98,
-            'x':0.46,
-            'xanchor': 'center',
-            'yanchor': 'top'
-            },
-            legend_title="",
-            # xaxis_title=None,
-            # legend_traceorder="reversed",
-
-        )
-    ###########################
-
-    CP=make_table_graph_from_df(count_data[["Pathologists","Cases","Cat III","Cat III Positives","Cat III + Rate"]],"Summary")
-    ##############################COMPARING CP
-    if active_tab=="Comparing CP":
-        first_graph=molecular_by_result_graph
-        second_graph=compare_ratios
-        third_graph=scat
-        # third_graph=CP
-        fourth_graph=compare_frequencies
 
     ##################
     ###################### MUTATIONS BY CATEGORY
-    if active_tab=="Mutations by Category":
-        first_graph=category3_gene_graph
-        second_graph=category3_mutation_graph
-        third_graph=category4_gene_graph
-        fourth_graph=category4_mutation_graph
+    # if active_tab=="Mutations by Category":
+    #     first_graph=category3_gene_graph
+    #     second_graph=category3_mutation_graph
+    #     third_graph=category4_gene_graph
+    #     fourth_graph=category4_mutation_graph
 ######################################
 ######################################
-    dfLarge=pd.read_csv("data/USCAP_Large.csv")
-    gap_pathologists=[pathologist for pathologist in list(dfLarge["CYTOPATHOLOGIST"].unique()) if dfLarge[dfLarge["CYTOPATHOLOGIST"]==pathologist].shape[0]>200]
+    # dfLarge=pd.read_csv("data/USCAP_Large.csv")
+    # gap_pathologists=[pathologist for pathologist in list(dfLarge["CYTOPATHOLOGIST"].unique()) if dfLarge[dfLarge["CYTOPATHOLOGIST"]==pathologist].shape[0]>200]
 
-    gap_pathologists=["Pathologist "+ str(pathologist) for pathologist in sorted(gap_pathologists)]
+    # gap_pathologists=["Pathologist "+ str(pathologist) for pathologist in sorted(gap_pathologists)]
 
-    years=list(dfLarge["YEAR"].unique())
-    gap_minder_data=pd.DataFrame()
-    for year in years:
-        for pathologist in gap_pathologists:
-            new_row=dict()
-            size=dfLarge[(dfLarge["CYTOPATHOLOGIST"]==eval(pathologist[12:]))&(dfLarge["YEAR"]==year)].shape[0]
+    # years=list(dfLarge["YEAR"].unique())
+    # gap_minder_data=pd.DataFrame()
+    # for year in years:
+    #     for pathologist in gap_pathologists:
+    #         new_row=dict()
+    #         size=dfLarge[(dfLarge["CYTOPATHOLOGIST"]==eval(pathologist[12:]))&(dfLarge["YEAR"]==year)].shape[0]
 
-            calls_CatIII=dfLarge[(dfLarge["CYTOPATHOLOGIST"]==eval(pathologist[12:]))&(dfLarge["YEAR"]
-            ==year)&(dfLarge["Bethesda Cathegory"]==3)].shape[0]
-            if calls_CatIII>0:
-                call_rate_CatIII=calls_CatIII/size
+    #         calls_CatIII=dfLarge[(dfLarge["CYTOPATHOLOGIST"]==eval(pathologist[12:]))&(dfLarge["YEAR"]
+    #         ==year)&(dfLarge["Bethesda Cathegory"]==3)].shape[0]
+    #         if calls_CatIII>0:
+    #             call_rate_CatIII=calls_CatIII/size
 
-                positive_rate_CatIII=dfLarge[(dfLarge["CYTOPATHOLOGIST"]==eval(pathologist[12:]))&(dfLarge["YEAR"]
-                ==year)&(dfLarge["Bethesda Cathegory"]==3)&(dfLarge["RESULT"]=="POSITIVE")].shape[0]/calls_CatIII
-                new_row["Pathologist"]=[pathologist]
-                new_row["Year"]=[year]
-                new_row["Case Count"]=[size]
-                new_row["Call rate category III"]=[call_rate_CatIII]
-                new_row["Positive rate category III"]=[positive_rate_CatIII]
-                new_row=pd.DataFrame.from_dict(new_row)
+    #             positive_rate_CatIII=dfLarge[(dfLarge["CYTOPATHOLOGIST"]==eval(pathologist[12:]))&(dfLarge["YEAR"]
+    #             ==year)&(dfLarge["Bethesda Cathegory"]==3)&(dfLarge["RESULT"]=="POSITIVE")].shape[0]/calls_CatIII
+    #             new_row["Pathologist"]=[pathologist]
+    #             new_row["Year"]=[year]
+    #             new_row["Case Count"]=[size]
+    #             new_row["Call rate category III"]=[call_rate_CatIII]
+    #             new_row["Positive rate category III"]=[positive_rate_CatIII]
+    #             new_row=pd.DataFrame.from_dict(new_row)
 
 
-                gap_minder_data=pd.concat([gap_minder_data,new_row])
-    gap_movie=make_gapminder(gap_minder_data,"Call rate category III","Positive rate category III","Year","Pathologist","Case Count","Pathologist","Pathologist")
+    #             gap_minder_data=pd.concat([gap_minder_data,new_row])
+    # gap_movie=make_gapminder(gap_minder_data,"Call rate category III","Positive rate category III","Year","Pathologist","Case Count","Pathologist","Pathologist")
 ##############################ROM
-    if active_tab=="ROM":
-        first_graph=gap_movie#rom_graph
-        second_graph=rom_graph_cat3
-        third_graph=rom_graph_cat4
-        fourth_graph=make_table_graph(["Group","BCR","PCR"],[["All tests","Molecular","Category III","Category IV"],[negativity_overall,negativity_molecular,negativity_catIII,negativity_catIV],[positivity_overall,positivity_molecular,positivity_catIII,positivity_catIV]],"Call Rates")
+    # if active_tab=="ROM":
+    #     first_graph=gap_movie#rom_graph
+    #     second_graph=rom_graph_cat3
+    #     third_graph=rom_graph_cat4
+    #     fourth_graph=make_table_graph(["Group","BCR","PCR"],[["All tests","Molecular","Category III","Category IV"],[negativity_overall,negativity_molecular,negativity_catIII,negativity_catIV],[positivity_overall,positivity_molecular,positivity_catIII,positivity_catIV]],"Call Rates")
 
     ##################
     # tests=data.shape[0]
@@ -972,4 +935,4 @@ def update_graphs(start_date,end_date,responsable,age,sex,active_tab):
     # if active_tab=="tab-1":
     #     first_graph=rom_graph
 
-    return first_graph,second_graph,third_graph,fourth_graph,tests,positives_overall,molecular_tests,currently_negative,positives_catIII,positives_catIV#positivity_catIII,positivity_catIV
+

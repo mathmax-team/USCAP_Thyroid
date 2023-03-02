@@ -14,6 +14,7 @@ from be.controllers.scatter_plot import scatter_graph
 from be.controllers.adequacy_bar_graph import make_adequacy_graph
 from be.controllers.sensitivity_graph import sensitivity_scatter_graph
 from be.controllers.default_times_ranges import Default_time_ranges,first_day,last_day,df
+from be.controllers.tab_names import Overall,Movie,ComparingCP
 # Connect to your app pages
 from pages import Bethesda_distribution, Comparison, Molecular
 import pandas as pd
@@ -39,12 +40,11 @@ import pandas as pd
 ############################# TABS
 header_tabs=dbc.Tabs(id="id_tabs",
                         children=[
-                        dbc.Tab( label="Overall Information",tab_id="Overall",style={"color":"red"}),
-                        dbc.Tab( label="Comparing CP",tab_id="Comparing CP"),
+                        dbc.Tab(label=Overall,tab_id=Overall),
+                        dbc.Tab( label=ComparingCP,tab_id=ComparingCP),
                         # dbc.Tab( label="Mutations by Category",tab_id="Mutations by Category"),
                         # dbc.Tab(label="Mutations by Result",tab_id="Mutations by Result"),
-                        dbc.Tab(label="ROM",tab_id="ROM"),
-
+                        dbc.Tab(label=Movie,tab_id=Movie),
                         ],
                          )
 ############# GRAPH BY TYPE
@@ -78,39 +78,39 @@ def make_drop(lista:list,id:str):
 ###################  GENERATE THE DROPDOWN ELEMENTS  #######################
 
 
-# dropletter=make_drop(['Last year', 'Last month', 'Last week'],"dropletter")
-type_drop=make_drop(type_list+["All test types"],"type")
-results_drop=make_drop(results_list+["All results"],"results")###### it starts at 1 to rule out the "All results" option
-genotype_drop=make_drop(genotype_list+["All genotypes"],"genotype")
+# # dropletter=make_drop(['Last year', 'Last month', 'Last week'],"dropletter")
+# type_drop=make_drop(type_list+["All test types"],"type")
+# results_drop=make_drop(results_list+["All results"],"results")###### it starts at 1 to rule out the "All results" option
+# genotype_drop=make_drop(genotype_list+["All genotypes"],"genotype")
 
 
-dropletter=dbc.DropdownMenu(
-    children=[
-        dbc.DropdownMenuItem("Math"),
-        dbc.DropdownMenuItem("Physics"),
-        # dbc.DropdownMenuItem(divider=True),
-        dbc.DropdownMenuItem("Computing"),
-    ],
-    nav=True,
-    in_navbar=True,
-    label="Menu",
-)
+# dropletter=dbc.DropdownMenu(
+#     children=[
+#         dbc.DropdownMenuItem("Math"),
+#         dbc.DropdownMenuItem("Physics"),
+#         # dbc.DropdownMenuItem(divider=True),
+#         dbc.DropdownMenuItem("Computing"),
+#     ],
+#     nav=True,
+#     in_navbar=True,
+#     label="Menu",
+# )
 
-def drawFigure(altura,id):
-    return  html.Div([
-        dbc.Card(
-            dbc.CardBody([
-                dcc.Graph(
-                    figure={},
-                    id=id,
-                    config={
-                        'displayModeBar': False
-                    },
-                )
-            ],
-            )
-        ),
-    ])
+# def drawFigure(altura,id):
+#     return  html.Div([
+#         dbc.Card(
+#             dbc.CardBody([
+#                 dcc.Graph(
+#                     figure={},
+#                     id=id,
+#                     config={
+#                         'displayModeBar': False
+#                     },
+#                 )
+#             ],
+#             )
+#         ),
+#     ])
 
 app = dash.Dash(external_stylesheets=[dbc.themes.CYBORG])
 
@@ -122,7 +122,7 @@ dbc.Container(
             # Use row and col to control vertical alignment of logo / brand
             dbc.Row(
                 [
-                    dbc.Col(html.Img(src="/assets/UHealth_logo.png", height="50px"),width=2),
+                    dbc.Col(html.Img(src="/assets/UHealth_logo.png",height="50px"),width=2),
                     dbc.Col(html.Img(src="/assets/USCAPheaderlogo.png", height="50px"),width=2),
                     dbc.Col(header_tabs,width=8),
                 ],
@@ -190,4 +190,4 @@ app.config.suppress_callback_exceptions=True
 #     return ans
 
 if __name__ == "__main__":
-    app.run_server(debug=False,port=8051)
+    app.run_server(debug=True,port=8051)
