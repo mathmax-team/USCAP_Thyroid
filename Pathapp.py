@@ -146,7 +146,7 @@ style={"height":"8vh"},
 # Layout of Dash App
 app.layout = html.Div(
      children=[logo,
-        html.Div(children=["Camilo"],id="id_hidden"),#,style={"display":"None"}),
+        # html.Div(children=["Camilo"],id="id_hidden"),#,style={"display":"None"}),
         dcc.Location(id='url', refresh=False),
         html.Div(id='page-content', children=[Bethesda_distribution.layout],style={"height":"85vh","backgkround-color":"white","margin-top":"0px"}),
         html.Div([
@@ -166,18 +166,18 @@ app.layout = html.Div(
 app.config.suppress_callback_exceptions=True
 #######################################################
 
-@app.callback(
-    Output(component_id='id_hidden', component_property='children'),
-    Input(component_id='id_tabs', component_property='active_tab'),
+# @app.callback(
+#     Output(component_id='id_hidden', component_property='children'),
+#     Input(component_id='id_tabs', component_property='active_tab'),
 
-    # State(component_id='ROM', component_property='value'),
+#     # State(component_id='ROM', component_property='value'),
 
-)
-def update_page(input_value):
-    ans="Dashboard"
-    if input_value == "ROM":
-        ans="Movie"
-    return ans
+# )
+# def update_page(input_value):
+#     ans="Dashboard"
+#     if input_value == "ROM":
+#         ans="Movie"
+#     return ans
 
 # @app.callback(
 #     Output(component_id='page-content', component_property='children'),
@@ -190,4 +190,4 @@ def update_page(input_value):
 #     return ans
 
 if __name__ == "__main__":
-    app.run_server(debug=True,port=8051)
+    app.run_server(debug=False,port=8051)

@@ -7,6 +7,9 @@ def make_gapminder(dataframe,x_column,y_column,animation_column,animation_group_
             # log_x=True, size_max=55, range_x=[100,100000], range_y=[25,90])
     this_figure.update_layout(
                 autosize=True,
+                # width=1400,
+                #  height=700,
+
                 margin=dict(
                     l=0,
                     r=0,
@@ -23,7 +26,12 @@ def make_gapminder(dataframe,x_column,y_column,animation_column,animation_group_
                 'yanchor': 'top'
                 },
                 legend_title="",
-                xaxis_title="",
+                # xaxis_title="",
+                font=dict(
+            # family="Courier New, monospace",
+            size=18,
+            # color="RebeccaPurple"
+    )
                 # legend_traceorder="reversed",
 
             )

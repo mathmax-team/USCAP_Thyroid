@@ -12,7 +12,7 @@ def make_pie(dataframe,names,values,title):
     )
 
     fig.update_layout(
-        autosize=False,
+        autosize=True,
         margin=dict(
             l=0,
             r=0,
@@ -28,11 +28,6 @@ def make_pie(dataframe,names,values,title):
         'xanchor': 'center',
         'yanchor': 'top'
         },
-
-
-        # legend_title="",
-        # xaxis_title=None,
-        # yaxis_title="lajdsf"
 
     )
     fig.update_traces(sort=False)

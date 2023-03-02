@@ -20,6 +20,7 @@ from be.controllers.make_table_graph_from_df import make_table_graph_from_df
 from be.controllers.ages_graph import make_ages_graph
 from be.controllers.scater_graph_bethesda_time import make_scatter_graph_time_bethesda
 from be.controllers.gap_minder_graph import make_gapminder
+from be.controllers.movie import gap_movie
 from be.controllers.molecular_overview_graph import make_molecular_overview
 from be.controllers.default_times_ranges import Default_time_ranges,first_day,last_day,df
 import numpy as np
@@ -196,7 +197,7 @@ def make_card(id):
         dbc.CardBody(
             [dcc.Graph(id=id,
         figure=fig,
-    style={"height":"100%"},
+    # style={"height":"100%"},
     config={
                             'displayModeBar': False
                         })
@@ -209,6 +210,26 @@ def make_card(id):
     )
     return card
 
+content= [
+                    html.Div([
+                    dbc.Row([
+                        dbc.Col(make_card("id_first_graph")), dbc.Col([make_card("id_second_graph")])
+                    ]),
+                    dbc.Row([
+                        dbc.Col([make_card("id_third_graph")]), dbc.Col([make_card("id_fourth_graph")]),
+                    ]),
+                ])
+                    ]
+short_content=html.Div([
+    html.P("",style={"height":"150px"}),
+    dcc.Graph(
+        figure=gap_movie,
+        # style={"height":"100%"},
+        config={
+                            'displayModeBar': False
+                        },id="id_movie_content",style={"margin-top":"200px"})
+]
+)
 # smallcard = dbc.Card(
 #     dbc.CardBody(
 #         [table,
@@ -239,7 +260,8 @@ tab2_content = dbc.Card(
     className="mt-3",
 )
 
-layout = html.Div(
+layout = html.Div([
+    html.Div(
      children=[
         html.Div(
             className="row",
@@ -306,28 +328,7 @@ layout = html.Div(
                 # Column for app graphs and plots
                 html.Div(
                     className="nine columns div-for-charts bg-grey",
-                    children=[
-                    # header_tabs,
-
-
-                        # ]
-                            # dbc.Tab(
-                            #     "This tab's content is never seen", label="Tab 3", disabled=True
-                            # ),
-                        # ],
-                    #  ),
-                    html.Div([
-                    dbc.Row([
-                        dbc.Col(make_card("id_first_graph")), dbc.Col([make_card("id_second_graph")])
-                    ]),
-                    dbc.Row([
-                        dbc.Col([make_card("id_third_graph")]), dbc.Col([make_card("id_fourth_graph")]),
-                    ]),
-                    # dbc.Row([
-                    #     dbc.Col([card]), dbc.Col([card]),dbc.Col([card])
-                    # ])
-                ])
-                    ],
+                    children=content,
                 ),
 
 
@@ -335,7 +336,8 @@ layout = html.Div(
         style={"margin-top":"0px","padding":"0px","background-color":"1f1f1f"}
     )
 
-                    ])
+                    ],id="id_dashboard_content"),
+    short_content])
 
 ############################################CALL BACK FOR SET CUSTOM
 #@callback(
@@ -413,7 +415,17 @@ def update_time_range(input_range):
 #             ans=item
 
 #     return no_update if ans!=0 else None
-
+@callback(
+    Output(component_id='id_dashboard_content', component_property='style'),
+    Output(component_id='id_movie_content',component_property='style'),
+    Input(component_id='id_tabs', component_property='active_tab'),
+)
+def update_visibility(active_tab):
+    if active_tab=="ROM":
+        ans={"display":"none"},{"display":"inherit"}
+    else:
+        ans={"display":"inherit"},{"display":"none"}
+    return ans
 
 #############################################CALL BACK FOR GRAPHS
 @callback(
@@ -438,7 +450,9 @@ def update_time_range(input_range):
 
 )
 
-def update_time_range(start_date,end_date,responsable,age,sex,active_tab):
+
+
+def update_graphs(start_date,end_date,responsable,age,sex,active_tab):
     data=df
 
     """Apply Date filter"""
