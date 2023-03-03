@@ -157,15 +157,15 @@ app.layout = html.Div(
         # html.Div(children=["Camilo"],id="id_hidden"),#,style={"display":"None"}),
         dcc.Location(id='url', refresh=False),
         html.Div(id='page-content', children=[Bethesda.layout],style={"height":"85vh","backgkround-color":"white","margin-top":"0px"}),
-        html.Div([
+        html.A(href="https://impossiblecode.ai/",children=[
                         html.P(
                             "POWERED BY ",
-                            style={"font-size":"0.5em","align-self":"center"}),
+                            style={"font-size":"0.6em","align-self":"center","margin-top":"0px"}),
                         # html.Div(image_link("",app.get_asset_url("logo_IC_nobg.png")),className="logo",style={'display': 'inline-block',"height":"7vh"})
                         html.Img(
                             className="logo",
                             src=app.get_asset_url("logo_IC_nobg.png"),
-                            style={'display': 'inline-block',"height":"7vh"}),
+                            style={'display': 'inline-block',"height":"7vh","margin-top":"2px"}),
                     ],style={"display":"flex","height":"10vh","justify-content":"center","color":"white","background-color":"black","margin-bottom":"0px"}
                     ),
                     ],
