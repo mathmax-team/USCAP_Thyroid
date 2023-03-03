@@ -1,5 +1,5 @@
 """Creates and returns results graph."""
-from sample_data import results_list,type_list,genotype_list
+#from sample_data import results_list,type_list,genotype_list
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np

@@ -8,11 +8,11 @@ from plotly import graph_objs as go
 from plotly.graph_objs import *
 import dash_bootstrap_components as dbc
 from datetime import date
-from sample_data import sensitivity_list,choices,last_week_date, last_year_date, last_month_date,results_list,genotype_list,type_list
-from be.controllers.filtering_tools import filter_dataframe,make_plotable,next_monday
-from be.controllers.scatter_plot import scatter_graph
-from be.controllers.adequacy_bar_graph import make_adequacy_graph
-from be.controllers.sensitivity_graph import sensitivity_scatter_graph
+# from sample_data import sensitivity_list,choices,last_week_date, last_year_date, last_month_date,results_list,genotype_list,type_list
+# from be.controllers.filtering_tools import filter_dataframe,make_plotable,next_monday
+# from be.controllers.scatter_plot import scatter_graph
+# from be.controllers.adequacy_bar_graph import make_adequacy_graph
+# from be.controllers.sensitivity_graph import sensitivity_scatter_graph
 from be.controllers.default_times_ranges import Default_time_ranges,first_day,last_day,df
 from be.controllers.tab_names import Overall,Movie,ComparingCP
 # Connect to your app pages

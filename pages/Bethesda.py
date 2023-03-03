@@ -7,26 +7,26 @@ import plotly.express as px
 from dash.dependencies import Input, Output,State
 from datetime import date,timedelta
 import pandas as pd
-from plotly.subplots import make_subplots
+#from plotly.subplots import make_subplots
 from be.controllers.pie_chart import make_pie
 from be.controllers.roman import make_roman
-from be.controllers.bar_chart import make_bar
-from be.controllers.ROM_chart import make_rom
+# from be.controllers.bar_chart import make_bar
+# from be.controllers.ROM_chart import make_rom
 from be.controllers.Gene_mutated import make_gene
-from be.controllers.table_chart import make_table_graph
+# from be.controllers.table_chart import make_table_graph
 from be.controllers.stacked_bar_graph import make_stacked_bar
 from be.controllers.counters import count_by_result,count_cases,count_categories,count_result_by_category
 from be.controllers.CatIII_Call_Rate_over_time import make_CatIII_Call_Rate_time
-from be.controllers.make_table_graph_from_df import make_table_graph_from_df
+# from be.controllers.make_table_graph_from_df import make_table_graph_from_df
 from be.controllers.ages_graph import make_ages_graph
 from be.controllers.scater_graph_bethesda_time import make_scatter_graph_time_bethesda
-from be.controllers.gap_minder_graph import make_gapminder
+# from be.controllers.gap_minder_graph import make_gapminder
 from be.controllers.movie import gap_movie
 from be.controllers.tab_names import Movie,Overall,ComparingCP
 from be.controllers.gap_minder_data import make_gap_minder_data
 from be.controllers.empty_figure import empty_fig
 from be.controllers.scat_callrate_vs_positiverate import scat_callrate_vs_positive
-from be.controllers.molecular_overview_graph import make_molecular_overview
+# from be.controllers.molecular_overview_graph import make_molecular_overview
 from be.controllers.default_times_ranges import Default_time_ranges,first_day,last_day,df,pathologists,years
 import numpy as np
 ##################################################

@@ -1,7 +1,7 @@
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
-from sample_data import type_list
+#from sample_data import type_list
 def sensitivity_scatter_graph(sensitivity_dict):
     """Create a scatter graph based on filtered data frame."""
     my_green="#42D7A7"
