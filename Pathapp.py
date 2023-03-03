@@ -16,7 +16,7 @@ from be.controllers.sensitivity_graph import sensitivity_scatter_graph
 from be.controllers.default_times_ranges import Default_time_ranges,first_day,last_day,df
 from be.controllers.tab_names import Overall,Movie,ComparingCP
 # Connect to your app pages
-from pages import Bethesda_distribution, Comparison, Molecular
+from pages import Bethesda, Comparison, Molecular
 import pandas as pd
 # ############################## SOME INFO FROM DATA FRAME
 
@@ -74,7 +74,15 @@ def make_drop(lista:list,id:str):
         )
     return {"drop":menu}
 
-
+def image_link(link,path_to_image):
+    return html.A(
+                    href=link,
+                    children=[
+                    html.Img(
+                    src=path_to_image,height="50px"
+                    )
+                      ]
+                    )
 ###################  GENERATE THE DROPDOWN ELEMENTS  #######################
 
 
@@ -117,22 +125,22 @@ app = dash.Dash(external_stylesheets=[dbc.themes.CYBORG])
 
 logo = dbc.Navbar(
 dbc.Container(
-    [
-        html.A(
+    [html.A(
+
             # Use row and col to control vertical alignment of logo / brand
             dbc.Row(
                 [
-                    dbc.Col(html.Img(src="/assets/UHealth_logo.png",height="50px"),width=2),
-                    dbc.Col(html.Img(src="/assets/USCAPheaderlogo.png", height="50px"),width=2),
+                    dbc.Col(image_link("","/assets/UHealth_logo.png"),width=2),
+                    # dbc.Col(html.Img(src="/assets/USCAPheaderlogo.png", height="50px"),width=2),
+                    dbc.Col(image_link("","/assets/USCAPheaderlogo.png"),width=2),
                     dbc.Col(header_tabs,width=8),
                 ],
                 align="center",
                 className="g-0",
                 justify="center",
             ),
-            href="#",
-            style={"textDecoration": "none","content-align":"left","width":"90%"},
-        ),
+    style={"textDecoration": "none","content-align":"left","width":"90%"}),
+
     ],
 ),
 # color="#0dcdf6",
@@ -148,11 +156,12 @@ app.layout = html.Div(
      children=[logo,
         # html.Div(children=["Camilo"],id="id_hidden"),#,style={"display":"None"}),
         dcc.Location(id='url', refresh=False),
-        html.Div(id='page-content', children=[Bethesda_distribution.layout],style={"height":"85vh","backgkround-color":"white","margin-top":"0px"}),
+        html.Div(id='page-content', children=[Bethesda.layout],style={"height":"85vh","backgkround-color":"white","margin-top":"0px"}),
         html.Div([
                         html.P(
                             "POWERED BY ",
                             style={"font-size":"0.5em","align-self":"center"}),
+                        # html.Div(image_link("",app.get_asset_url("logo_IC_nobg.png")),className="logo",style={'display': 'inline-block',"height":"7vh"})
                         html.Img(
                             className="logo",
                             src=app.get_asset_url("logo_IC_nobg.png"),

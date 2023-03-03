@@ -9,16 +9,12 @@ import plotly.graph_objects as go
 def make_CatIII_Call_Rate_time(
         dataframe):
     """Create a plot given dictionary  whose keys are the six Bethesda Categories and values are dataframes of count by year."""
-    paleta=px.colors.qualitative.T10
-    N=len(paleta)
 
-    count=0
 
         # graph.add_trace(go.Scatter(x=possibilities[possibility]["x"], y= possibilities[possibility]["y"],mode="markers+lines", name=possibility, showlegend=True, visible=True,fill=None,line=dict(color=paleta[count%N])))
-    # graph=px.line(dataframe,x="x", y="y",markers=True)
-    graph=px.line(x=[2,4],y=[3,4])
+    graph=px.line(dataframe,x="Year", y="Cat III Call Rate",color="Pathologist",markers=True, color_discrete_sequence=px.colors.qualitative.T10)
+    # graph=px.line(x=[2,4],y=[3,4])
 
-    count=count+1
     graph.update_layout(
                 autosize=True,
                 margin=dict(

@@ -549,14 +549,15 @@ def update_graphs(start_date,end_date,responsable,age,sex,active_tab):
         if medicoresponsable !="All pathologists":
             yearly_data=yearly_data[yearly_data["CYTOPATHOLOGIST"]==medicoresponsable]
 
-        category_counter=dict()
-        # years=list(yearly_data["YEAR"].unique())
-        for i in range(1,7):
-            category_counter["Cat "+make_roman(i)]=pd.DataFrame()
-            category_counter["Cat "+make_roman(i)]["x"]=years
-            category_counter["Cat "+make_roman(i)]["y"]=[yearly_data[(yearly_data["Bethesda Cathegory"]==i)&(yearly_data["YEAR"]==year)].shape[0] for year in years]
 
-        return make_scatter_graph_time_bethesda(category_counter)
+        beth_df=pd.DataFrame()
+        for i in range(1,7):
+            temp_df=pd.DataFrame()
+            temp_df["Year"]=years
+            temp_df["Call Count"]=[yearly_data[(yearly_data["Bethesda Cathegory"]==i)&(yearly_data["YEAR"]==year)].shape[0] for year in years]
+            temp_df["Category"]=["Cat "+make_roman(i) for year in years]
+            beth_df=pd.concat([beth_df,temp_df],ignore_index=True)
+        return make_scatter_graph_time_bethesda(beth_df)
 ######################  OVERALL GENE GRAPH
     def gene_graph(dataframe):
         labels_bar=list(dataframe["GENE MUTATED"].unique())
@@ -666,9 +667,9 @@ def update_graphs(start_date,end_date,responsable,age,sex,active_tab):
         time_df=pd.DataFrame()
         for path in pathologists+["All pathologists"]:
             time_path=pd.DataFrame()
-            time_path["x"]=list(gap_minder_data[gap_minder_data["Pathologist"]==path]["Year"].unique())
-            time_path["y"]=list(gap_minder_data[gap_minder_data["Pathologist"]==path]["Call rate category III"])
-            time_path[path]=[path for i in range(time_path["x"].shape[0]) ]
+            time_path["Year"]=list(gap_minder_data[gap_minder_data["Pathologist"]==path]["Year"].unique())
+            time_path["Cat III Call Rate"]=list(gap_minder_data[gap_minder_data["Pathologist"]==path]["Call rate category III"])
+            time_path["Pathologist"]=[path for i in range(time_path["Cat III Call Rate"].shape[0]) ]
             time_df=pd.concat([time_df,time_path])
 
 

@@ -23,13 +23,13 @@ def make_ages_graph(df):
     # overall_df["AGES"]=sorted(overall_fre.keys())
     # overall_df["COUNTS"]=[overall_fre[x] for x in sorted(overall_fre.keys())]
 
-    colors=px.colors.qualitative.Plotly
+    colors=px.colors.qualitative.T10
 
     fig = make_subplots(rows=2, cols=1,
                          )
     # first=make_bar(female_df,"AGES","COUNTS","SOmethig")
     female_age_hist= go.Bar(x=female_df["AGES"], y=female_df["COUNTS"],name="Female",marker=dict(color=colors[5]))
-    male_age_hist=go.Bar(x=male_df["AGES"], y=male_df["COUNTS"],name="Male",marker=dict(color=colors[9]))
+    male_age_hist=go.Bar(x=male_df["AGES"], y=male_df["COUNTS"],name="Male",marker=dict(color=colors[3]))
 
     fig.add_trace(
         female_age_hist,

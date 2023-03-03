@@ -1,10 +1,14 @@
 import pandas as pd
 import plotly.express as px
 
-def make_gapminder(dataframe,x_column,y_column,animation_column,animation_group_column,size_column,color_column,hover_name_column):
-    this_figure=px.scatter(dataframe, x=x_column, y=y_column, animation_frame=animation_column, animation_group=animation_group_column,
-            size=size_column, color=color_column, hover_name=hover_name_column,)
-            # log_x=True, size_max=55, range_x=[100,100000], range_y=[25,90])
+def make_gapminder(dataframe,x_column,y_column,animation_frame_column,animation_group_column,size_column):
+    this_figure=px.scatter(dataframe, x=x_column, y=y_column, animation_frame=animation_frame_column, animation_group=animation_group_column,
+            size=size_column,color=animation_group_column, hover_name=animation_group_column,
+            color_discrete_sequence=px.colors.qualitative.T10,range_x=[0,0.5], range_y=[0,0.5])
+            #  log_x=True, size_max=55, range_x=[100,100000], range_y=[25,90])
+    A=str(list(dataframe[dataframe[animation_group_column]=="All pathologists"][size_column]))
+    B=str(list(dataframe[dataframe[animation_group_column]=="Pathologist 7"][size_column]))
+    C=str(A==B)
     this_figure.update_layout(
                 autosize=True,
                 # width=1400,

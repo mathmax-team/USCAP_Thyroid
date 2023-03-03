@@ -8,7 +8,7 @@ def scat_callrate_vs_positive(dataframe):
                     y='Cat III + Rate',
                     color='Pathologists',
                     size='Cases',
-                    hover_data=['Pathologists']
+                    hover_data=['Pathologists'],color_discrete_sequence=px.colors.qualitative.T10
                     )
     scat.update_layout(
             autosize=True,

@@ -22,7 +22,7 @@ def make_gap_minder_data(dataframe):
                 new_row["Call rate category III"]=[call_rate_CatIII]
                 new_row["Positive rate category III"]=[positive_rate_CatIII]
                 new_row=pd.DataFrame.from_dict(new_row)
-                gap_minder_data=pd.concat([gap_minder_data,new_row])
+                gap_minder_data=pd.concat([gap_minder_data,new_row],ignore_index=True)
     for year in years:
         new_row=dict()
         size=dataframe[(dataframe["YEAR"]==year)].shape[0]
