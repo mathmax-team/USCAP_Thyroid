@@ -199,13 +199,13 @@ def make_card(id):
     # style={"height":"100%"},
     config={
                             'displayModeBar': False
-                        })
+                        },style={"height":"35vh"})
                 # html.H4("Title", id="card-title"),
                 # html.H2("100", id="card-value"),
                 # html.P("Description", id="card-description")
             ]
         )
-    ,style={"height":"40vh"," background-color":"rgb(18, 18, 18)"},
+    ,style={"width":"30vw","height":"35vh"," background-color":"rgb(18, 18, 18)"},
     )
     return card
 

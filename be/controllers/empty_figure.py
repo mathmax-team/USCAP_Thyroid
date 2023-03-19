@@ -4,8 +4,8 @@ def empty_fig():
     ans= go.Figure()
     ans.update_layout(
     autosize=True,
-    width=470,
-    height=300,
+    #width=470,
+    #height=300,
     margin=dict(
         l=0,
         r=0,
